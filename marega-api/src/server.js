@@ -31,7 +31,9 @@ async function start() {
 
     catch (err) {
 
-        console.error(err);
+        console.error("❌ Impossible de démarrer MAREGA :", err);
+
+        process.exit(1);
 
     }
 
