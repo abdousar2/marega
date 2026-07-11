@@ -1,6 +1,6 @@
 const API_URL =
     import.meta.env.VITE_API_URL ||
-    "http://localhost:5000/api";
+    "https://marega.onrender.com/api";
 
 export async function api(url, options = {}) {
 
