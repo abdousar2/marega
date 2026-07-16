@@ -13,6 +13,7 @@ const ApartmentsService = {
         return api("/apartments", {
 
             method: "POST",
+
             body: JSON.stringify(apartment)
 
         });
@@ -24,6 +25,7 @@ const ApartmentsService = {
         return api(`/apartments/${id}`, {
 
             method: "PUT",
+
             body: JSON.stringify(apartment)
 
         });

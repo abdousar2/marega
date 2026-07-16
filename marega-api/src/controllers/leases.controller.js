@@ -1,4 +1,7 @@
 const Lease = require("../models/lease.model");
+const Rent = require("../models/rent.model");
+const PDFService = require("../services/pdf.service");
+
 
 class LeasesController {
 
@@ -58,9 +61,38 @@ class LeasesController {
 
         try {
 
+            // Création du contrat
             const lease = await Lease.create(req.body);
 
-            res.status(201).json(lease);
+            // Contrat enrichi
+            const completeLease =
+                await Lease.getCompleteById(lease.id);
+
+            // Génération du PDF
+           const pdfPath =
+                await PDFService.generateLeasePDF(
+                    completeLease
+                );
+
+
+            // Sauvegarde du chemin
+            await Lease.updatePdfPath(
+                lease.id,
+                pdfPath
+            );
+
+            await Rent.generateFromLease({
+                ...lease,
+                monthly_rent: lease.monthly_rent
+            });
+
+            // Recharge le contrat avec pdf_path
+            const finalLease =
+                await Lease.getCompleteById(
+                    lease.id
+                );
+
+            res.status(201).json(finalLease);
 
         }
 
@@ -69,7 +101,10 @@ class LeasesController {
             console.error(err);
 
             res.status(500).json({
-                error: "Erreur lors de la création du contrat."
+
+                error:
+                    "Erreur lors de la création du contrat."
+
             });
 
         }

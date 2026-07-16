@@ -8,6 +8,7 @@ import Payments from "./admin/pages/Payments";
 import Messages from "./admin/pages/Messages";
 import ApartmentDetails from "./admin/pages/ApartmentDetails";
 import Contracts from "./admin/pages/Contracts";
+import Rents from "./admin/pages/Rents";
 
 function App() {
   return (
@@ -58,6 +59,11 @@ function App() {
         <Route
           path="/admin/contracts"
           element={<Contracts />}
+        />
+
+        <Route
+          path="/admin/rents"
+          element={<Rents />}
         />
 
       </Routes>

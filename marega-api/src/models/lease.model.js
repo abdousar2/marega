@@ -1,13 +1,14 @@
 const db = require("../config/database");
+
 class Lease {
 
     static async getAll() {
 
-        const result = await db.query(
-            `SELECT *
-             FROM marega.leases
-             ORDER BY created_at DESC`
-        );
+        const result = await db.query(`
+            SELECT *
+            FROM marega.leases
+            ORDER BY created_at DESC
+        `);
 
         return result.rows;
 
@@ -16,9 +17,11 @@ class Lease {
     static async getById(id) {
 
         const result = await db.query(
-            `SELECT *
-             FROM marega.leases
-             WHERE id = $1`,
+            `
+            SELECT *
+            FROM marega.leases
+            WHERE id = $1
+            `,
             [id]
         );
 
@@ -26,11 +29,109 @@ class Lease {
 
     }
 
-    static async create(data) {
+    static async getCompleteById(id) {
 
         const result = await db.query(
 
-            `INSERT INTO marega.leases
+            `
+            SELECT
+
+                l.*,
+
+                t.first_name,
+                t.last_name,
+
+                CONCAT(
+                    t.first_name,
+                    ' ',
+                    t.last_name
+                ) AS tenant_name,
+
+                t.phone,
+                t.email,
+                t.profession,
+
+                a.number AS apartment_number,
+                a.type AS apartment_type,
+                a.surface,
+                a.rent AS apartment_rent,
+                a.deposit,
+
+                b.name AS building_name,
+                b.address AS building_address
+
+            FROM marega.leases l
+
+            JOIN marega.tenants t
+                ON t.id = l.tenant_id
+
+            JOIN marega.apartments a
+                ON a.id = l.apartment_id
+
+            JOIN marega.buildings b
+                ON b.id = a.building_id
+
+            WHERE l.id = $1
+            `,
+
+            [id]
+
+        );
+
+        return result.rows[0];
+
+    }
+
+    static async generateContractNumber() {
+
+        const year = new Date().getFullYear();
+
+        const result = await db.query(
+
+            `
+            SELECT contract_number
+
+            FROM marega.leases
+
+            WHERE contract_number LIKE $1
+
+            ORDER BY id DESC
+
+            LIMIT 1
+            `,
+
+            [`MRG-${year}-%`]
+
+        );
+
+        let next = 1;
+
+        if (result.rows.length > 0) {
+
+            const last = result.rows[0].contract_number;
+
+            const lastNumber = parseInt(
+                last.split("-")[2],
+                10
+            );
+
+            next = lastNumber + 1;
+
+        }
+
+        return `MRG-${year}-${String(next).padStart(6, "0")}`;
+
+    }
+
+    static async create(data) {
+
+        const contractNumber =
+            await Lease.generateContractNumber();
+
+        const result = await db.query(
+
+            `
+            INSERT INTO marega.leases
             (
                 apartment_id,
                 tenant_id,
@@ -50,12 +151,14 @@ class Lease {
                 $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
             )
 
-            RETURNING *`,
+            RETURNING *
+            `,
 
             [
+
                 data.apartment_id,
                 data.tenant_id,
-                data.contract_number,
+                contractNumber,
                 data.start_date,
                 data.end_date,
                 data.monthly_rent,
@@ -64,6 +167,7 @@ class Lease {
                 data.payment_day,
                 data.status,
                 data.notes
+
             ]
 
         );
@@ -76,7 +180,8 @@ class Lease {
 
         const result = await db.query(
 
-            `UPDATE marega.leases
+            `
+            UPDATE marega.leases
 
             SET
 
@@ -95,9 +200,11 @@ class Lease {
 
             WHERE id = $12
 
-            RETURNING *`,
+            RETURNING *
+            `,
 
             [
+
                 data.apartment_id,
                 data.tenant_id,
                 data.contract_number,
@@ -110,6 +217,7 @@ class Lease {
                 data.status,
                 data.notes,
                 id
+
             ]
 
         );
@@ -122,14 +230,42 @@ class Lease {
 
         await db.query(
 
-            `DELETE FROM marega.leases
-             WHERE id = $1`,
+            `
+            DELETE FROM marega.leases
+            WHERE id = $1
+            `,
 
             [id]
 
         );
 
         return true;
+
+    }
+
+    static async updatePdfPath(id, pdfPath) {
+
+        await db.query(
+
+            `
+            UPDATE marega.leases
+
+            SET
+
+                pdf_path = $1,
+                updated_at = CURRENT_TIMESTAMP
+
+            WHERE id = $2
+            `,
+
+            [
+
+                pdfPath,
+                id
+
+            ]
+
+        );
 
     }
 

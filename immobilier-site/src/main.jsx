@@ -9,6 +9,7 @@ import BuildingsProvider from "./context/BuildingsContext";
 import TenantsProvider from "./context/TenantsContext";
 import PaymentsProvider from "./context/PaymentsContext";
 import ContractsProvider from "./context/ContractsContext";
+import RentsProvider from "./context/RentsContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -18,7 +19,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <TenantsProvider>
             <PaymentsProvider>
               <ContractsProvider>
-                <App />
+                <RentsProvider>
+                  <App />
+                </RentsProvider>
               </ContractsProvider>
             </PaymentsProvider>
           </TenantsProvider>

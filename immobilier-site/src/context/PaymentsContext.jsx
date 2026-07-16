@@ -1,31 +1,76 @@
-import { createContext, useEffect, useState } from "react";
+import {
+    createContext,
+    useEffect,
+    useState
+} from "react";
 
-export const PaymentsContext = createContext();
+import PaymentsService
+    from "../services/payments.service";
 
-export default function PaymentsProvider({ children }) {
-  const [payments, setPayments] = useState(() => {
-    const saved = localStorage.getItem("marega-payments");
+export const PaymentsContext =
+    createContext();
 
-    return saved
-      ? JSON.parse(saved)
-      : [];
-  });
+export default function PaymentsProvider({
 
-  useEffect(() => {
-    localStorage.setItem(
-      "marega-payments",
-      JSON.stringify(payments)
+    children
+
+}) {
+
+    const [payments, setPayments] =
+        useState([]);
+
+    const [loading, setLoading] =
+        useState(true);
+
+    async function reloadPayments() {
+
+        try {
+
+            const data =
+                await PaymentsService.getAll();
+
+            setPayments(data);
+
+        }
+
+        catch (err) {
+
+            console.error(err);
+
+        }
+
+        finally {
+
+            setLoading(false);
+
+        }
+
+    }
+
+    useEffect(() => {
+
+        reloadPayments();
+
+    }, []);
+
+    return (
+
+        <PaymentsContext.Provider
+
+            value={{
+
+                payments,
+                loading,
+                reloadPayments
+
+            }}
+
+        >
+
+            {children}
+
+        </PaymentsContext.Provider>
+
     );
-  }, [payments]);
 
-  return (
-    <PaymentsContext.Provider
-      value={{
-        payments,
-        setPayments,
-      }}
-    >
-      {children}
-    </PaymentsContext.Provider>
-  );
 }

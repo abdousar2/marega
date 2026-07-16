@@ -81,8 +81,6 @@ export default function Contracts() {
 
             apartment_id: apartment.id,
 
-            contract_number: `CTR-${Date.now()}`,
-
             start_date: startDate,
 
             end_date: endDate,
@@ -104,32 +102,7 @@ export default function Contracts() {
         console.log(payload);
 
 await LeasesService.create(payload);
-
-          await LeasesService.create({
-
-              tenant_id: tenant.id,
-
-              apartment_id: apartment.id,
-
-              contract_number: `CTR-${Date.now()}`,
-
-              start_date: startDate,
-
-              end_date: endDate,
-
-              monthly_rent: apartment.rent,
-
-              charges: 0,
-
-              deposit: apartment.deposit,
-
-              payment_day: 5,
-
-              status: "Actif",
-
-              notes: ""
-
-          });
+           
 
           await reloadContracts();
 
@@ -148,9 +121,9 @@ await LeasesService.create(payload);
           alert("Impossible de créer le contrat.");
 
       }
+      
 
   };
-
   return (
     <Layout>
 
@@ -250,8 +223,10 @@ await LeasesService.create(payload);
               >
 
                 <h2 className="text-xl font-bold">
-                    Contrat #{contract.id}
-                </h2>
+
+                  {contract.contract_number}
+
+              </h2>
 
                 <p className="mt-3">
                   👤 {tenant?.first_name} {tenant?.last_name}
@@ -292,6 +267,19 @@ await LeasesService.create(payload);
                   ).toLocaleString()}
                   FCFA
                 </p>
+
+                {contract.pdf_path && (
+
+                    <a
+                        href={`http://localhost:5000${contract.pdf_path}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded"
+                    >
+                        📄 Télécharger le contrat
+                    </a>
+
+                )}
 
               </div>
             );

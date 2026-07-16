@@ -1,184 +1,155 @@
-import { Link } from "react-router-dom";
-import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
-  const [open, setOpen] = useState(false);
 
-  return (
-    <>
-      {/* Bouton mobile */}
+    const menu = [
 
-      <button
-        onClick={() => setOpen(!open)}
-        className="
-          fixed
-          top-4
-          left-4
-          z-50
-          bg-slate-900
-          text-white
-          p-3
-          rounded-xl
-        "
-      >
-        ☰
-      </button>
+        {
+            label: "Tableau de bord",
+            icon: "📊",
+            url: "/admin"
+        },
 
-      {/* Overlay */}
+        {
+            label: "Immeubles",
+            icon: "🏢",
+            url: "/admin/buildings"
+        },
 
-      {open && (
-        <div
-          className="
-            fixed
-            inset-0
-            bg-black/50
-            z-40
-          "
-          onClick={() => setOpen(false)}
-        />
-      )}
+        {
+            label: "Appartements",
+            icon: "🏠",
+            url: "/admin/apartments"
+        },
 
-      {/* Sidebar */}
+        {
+            label: "Locataires",
+            icon: "👤",
+            url: "/admin/tenants"
+        },
 
-      <aside
-        className={`
-          fixed
-          md:static
-          top-0
-          left-0
-          z-50
-          w-72
-          bg-slate-900
-          text-white
-          min-h-screen
-          transition-transform
-          duration-300
-          ${
-            open
-              ? "translate-x-0"
-              : "-translate-x-full md:translate-x-0"
-          }
-        `}
-      >
-        <div className="p-6 border-b border-slate-700">
+        {
+            label: "Contrats",
+            icon: "📄",
+            url: "/admin/contracts"
+        },
 
-          <h1 className="text-3xl font-bold">
-            MAREGA
-          </h1>
+        {
+            label: "Loyers",
+            icon: "📅",
+            url: "/admin/rents"
+        },
 
-          <p className="text-slate-400 text-sm mt-2">
-            ERP Immobilier
-          </p>
+        {
+            label: "Paiements",
+            icon: "💳",
+            url: "/admin/payments"
+        },
 
-        </div>
+        {
+            label: "Messages",
+            icon: "📩",
+            url: "/admin/messages"
+        }
 
-        <nav className="p-4">
+    ];
 
-          <ul className="space-y-2">
+    return (
 
-            <li>
-              <Link
-                to="/admin"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                📊 Dashboard
-              </Link>
-            </li>
+        <aside className="w-72 bg-slate-900 text-white flex flex-col shadow-xl">
 
-            <li>
-              <Link
-                to="/admin/buildings"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                🏢 Immeubles
-              </Link>
-            </li>
+            {/* Logo */}
 
-            <li>
-              <Link
-                to="/admin/apartments"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                🏠 Appartements
-              </Link>
-            </li>
+            <div className="h-24 flex flex-col items-center justify-center border-b border-slate-700">
 
-            <li>
-              <Link
-                to="/admin/tenants"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                👥 Locataires
-              </Link>
-            </li>
+                <div className="text-3xl font-extrabold tracking-wider">
 
-            <li>
-              <Link
-                to="/admin/payments"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                💰 Paiements
-              </Link>
-            </li>
+                    MAREGA
 
-            <li>
-              <Link
-                to="/admin/contracts"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                📄 Contrats
-              </Link>
-            </li>
+                </div>
 
-            <li>
-              <Link
-                to="/admin/messages"
-                className="
-                  block
-                  p-3
-                  rounded-xl
-                  hover:bg-slate-800
-                "
-              >
-                ✉️ Messages
-              </Link>
-            </li>
+                <div className="text-sm text-slate-400">
 
-          </ul>
+                    Gestion Immobilière
 
-        </nav>
+                </div>
 
-      </aside>
-    </>
-  );
+            </div>
+
+            {/* Menu */}
+
+            <nav className="flex-1 mt-6">
+
+                {
+
+                    menu.map(item => (
+
+                        <NavLink
+
+                            key={item.url}
+
+                            to={item.url}
+
+                            end={item.url === "/admin"}
+
+                            className={({ isActive }) =>
+
+                                `flex items-center gap-4 mx-4 my-2 px-4 py-3 rounded-xl transition-all duration-200
+
+                                ${
+
+                                    isActive
+
+                                    ? "bg-blue-600 shadow-lg"
+
+                                    : "hover:bg-slate-800"
+
+                                }`
+
+                            }
+
+                        >
+
+                            <span className="text-xl">
+
+                                {item.icon}
+
+                            </span>
+
+                            <span>
+
+                                {item.label}
+
+                            </span>
+
+                        </NavLink>
+
+                    ))
+
+                }
+
+            </nav>
+
+            {/* Footer */}
+
+            <div className="border-t border-slate-700 p-5">
+
+                <div className="text-sm text-slate-400">
+
+                    MAREGA ERP
+
+                </div>
+
+                <div className="text-xs text-slate-500 mt-1">
+
+                    Version 1.0
+
+                </div>
+
+            </div>
+
+        </aside>
+
+    );
+
 }
