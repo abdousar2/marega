@@ -13,7 +13,6 @@ import {
     SearchBar,
     Modal,
     Button,
-    Badge,
     Empty
 } from "../../components/ui";
 
