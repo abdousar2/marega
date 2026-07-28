@@ -2,6 +2,16 @@ import { useContext, useState } from "react";
 import Layout from "../Layout";
 
 import {
+    PageHeader,
+    StatsCard,
+    SearchBar,
+    Table,
+    Modal,
+    Badge,
+    Button,
+} from "../../components/ui";
+
+import {
   BuildingsContext,
 } from "../../context/BuildingsContext";
 
@@ -10,7 +20,6 @@ import {
 } from "../../context/ApartmentsContext";
 
 import { TenantsContext } from "../../context/TenantsContext";
-import { Link } from "react-router-dom";
 import ApartmentsService from "../../services/apartments.service";
 
 export default function Apartments() {
@@ -49,6 +58,8 @@ export default function Apartments() {
 
   const [editingId, setEditingId] =
     useState(null);
+
+  const [showModal, setShowModal] = useState(false);
 
   const [statusFilter, setStatusFilter] =
     useState("all");
@@ -214,7 +225,7 @@ export default function Apartments() {
 
           console.error(err);
 
-          alert("Impossible de supprimer.");
+          alert("Impossible de supprimer un appartement occupé.");
 
       }
 
@@ -225,30 +236,33 @@ export default function Apartments() {
     <Layout>
       
 
-      <h1 className="text-4xl font-bold mb-8">
-        Gestion des Appartements
-      </h1>      
+      <PageHeader
+          title="Gestion des appartements"
+          subtitle="Consultez, ajoutez et gérez tous les appartements."
+          buttonLabel="+ Nouvel appartement"
+          onButtonClick={() => {
 
-      <div className="mb-8">
+            setEditingId(null);
 
-        <input
-          type="text"
-          placeholder="🔎 Rechercher un appartement..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="
-            w-full
-            bg-white
-            border
-            p-4
-            rounded-2xl
-            shadow-sm
-          "
-        />
+            setBuildingId("");
 
-      </div>      
+            setNumber("");
+
+            setType("");
+
+            setSurface("");
+
+            setRent("");
+
+            setDeposit("");
+
+            setShowModal(true);
+
+        }}
+      />   
+      <br></br>
+
+      
 
       <div className="flex flex-wrap gap-3 mb-8">
 
@@ -291,366 +305,398 @@ export default function Apartments() {
           Occupés
         </button>
 
-      </div>      
+      </div> 
+      <br></br>     
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        <div className="bg-white p-6 rounded-2xl shadow">
-          <p className="text-slate-500">
-            Total
-          </p>
+          <StatsCard
+              title="Appartements"
+              value={apartments.length}
+              color="blue"
+          />
 
-          <h2 className="text-4xl font-bold">
-            {apartments.length}
-          </h2>
-        </div>
+          <StatsCard
+              title="Disponibles"
+              value={availableApartments.length}
+              color="green"
+          />
 
-        <div className="bg-green-50 p-6 rounded-2xl shadow">
-          <p className="text-green-700">
-            Disponibles
-          </p>
+          <StatsCard
+              title="Occupés"
+              value={occupiedApartments.length}
+              color="red"
+          />
 
-          <h2 className="text-4xl font-bold text-green-700">
-            {availableApartments.length}
-          </h2>
-        </div>
+      </div>   
+      <br></br> 
 
-        <div className="bg-red-50 p-6 rounded-2xl shadow">
-          <p className="text-red-700">
-            Occupés
-          </p>
+      <div className="flex justify-between items-start mb-8">
+        <br></br>
 
-          <h2 className="text-4xl font-bold text-red-700">
-            {occupiedApartments.length}
-          </h2>
-        </div>
+        <SearchBar
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Rechercher un appartement..."
+        />
+        
 
-      </div>
-      
-      <form
-        onSubmit={addApartment}
-        className="
-          bg-white
-          rounded-3xl
-          shadow-lg
-          p-8
-          mb-8
-        "
+      </div>    
+          <br></br>
+          
+
+      <Table
+          headers={[
+              "Appartement",
+              "Immeuble",
+              "Type",
+              "Surface",
+              "Loyer",
+              "Statut",
+              "Actions"
+          ]}
       >
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+      {
+      apartments
 
-        <select
-          value={buildingId}
-          onChange={(e) =>
-            setBuildingId(e.target.value)
-          }
-          className="border p-3 w-full mb-4 rounded"
-        >
-          <option value="">
-            Choisir un immeuble
-          </option>
+      .filter((apartment) => {
 
-          {buildings.map((building) => (
-            <option
-              key={building.id}
-              value={building.id}
-            >
-              {building.name}
-            </option>
-          ))}
-        </select>
-
-        <input
-          type="text"
-          placeholder="Numéro appartement"          
-          value={number}
-          onChange={(e) =>
-            setNumber(e.target.value)
-          }
-          className="border p-3 w-full mb-4 rounded"
-        />
-
-        <input
-            type="text"
-            placeholder="Type (Studio, F2, F3...)"
-            value={type}
-            onChange={(e) =>
-              setType(e.target.value)
-            }
-            className="border p-3 w-full mb-4 rounded"
-          />
-
-          <input
-            type="number"
-            placeholder="Surface en m²"
-            value={surface}
-            onChange={(e) =>
-              setSurface(e.target.value)
-            }
-            className="border p-3 w-full mb-4 rounded"
-          />
-
-          <input
-            type="number"
-            placeholder="Loyer mensuel"
-            value={rent}
-            onChange={(e) =>
-              setRent(e.target.value)
-            }
-            className="border p-3 w-full mb-4 rounded"
-          />
-
-          <input
-            type="number"
-            placeholder="Montant caution"
-            value={deposit}
-            onChange={(e) =>
-              setDeposit(e.target.value)
-            }
-            className="border p-3 w-full mb-4 rounded"
-          />
-
-          </div>
-
-        <button
-          className="
-            mt-6
-            bg-yellow-600
-            hover:bg-yellow-700
-            text-white
-            px-8
-            py-3
-            rounded-xl
-            transition
-            font-semibold
-          "
-        >
-          {editingId
-            ? "💾 Mettre à jour"
-            : "➕ Ajouter Appartement"}
-        </button>
-
-      </form>      
-
-      <div className="grid md:grid-cols-3 gap-6">
-
-        {apartments
-
-          .filter((apartment) => {
-
-            const occupied =
+          const occupied =
               tenants.some(
-                (tenant) =>
-                  tenant.apartmentId == apartment.id &&
-                  tenant.status === "Actif"
+
+                  tenant =>
+
+                      tenant.apartmentId == apartment.id &&
+
+                      tenant.status === "Actif"
+
               );
 
-            if (
-              statusFilter === "available" &&
-              occupied
-            ) {
+          if (statusFilter === "available" && occupied)
+
               return false;
-            }
 
-            if (
-              statusFilter === "occupied" &&
-              !occupied
-            ) {
+          if (statusFilter === "occupied" && !occupied)
+
               return false;
-            }
 
-            return true;
-          })
+          return true;
 
-          .filter((apartment) => {
+      })
 
-            const query =
-              search.toLowerCase();
+      .filter((apartment) => {
 
-            return (
-              (apartment.number || "")
-                .toLowerCase()
-                .includes(query) ||
+          const query = search.toLowerCase();
 
-              (apartment.type || "")
-                .toLowerCase()
-                .includes(query)
-            );
-          })
+          return (
 
-          .map((apartment) => {       
+              apartment.number.toLowerCase().includes(query) ||
+
+              apartment.type.toLowerCase().includes(query)
+
+          );
+
+      })
+
+      .map(apartment => {
 
           const building =
-            buildings.find(
-              (b) =>
-                b.id ==
-                apartment.building_id
-            );
-            
-            const activeTenant =
+
+              buildings.find(
+
+                  b => b.id == apartment.building_id
+
+              );
+
+          const activeTenant =
+
               tenants.find(
-                (tenant) =>
-                  tenant.apartmentId == apartment.id &&
-                  tenant.status === "Actif"
+
+                  t =>
+
+                      t.apartmentId == apartment.id &&
+
+                      t.status === "Actif"
+
               );
 
           return (
-            <div
-              key={apartment.id}
-              className="
-                bg-white
-                rounded-3xl
-                p-6
-                border
-                border-slate-100
-                shadow-lg
-                hover:shadow-2xl
-                hover:-translate-y-1
-                transition-all
-                duration-300
-              "
-            >
 
-              <Link
-                to={`/admin/apartments/${apartment.id}`}
-              >
-                <div className="flex items-center gap-4 mb-4">
+      <tr key={apartment.id}>
 
-                  <div
-                    className="
-                      w-14 h-14
-                      rounded-full
-                      bg-yellow-600
-                      text-white
-                      flex
-                      items-center
-                      justify-center
-                      font-bold
-                      text-lg
-                    "
-                  >
-                    🏠
-                  </div>
+      <td className="px-8 py-14 font-semibold ">
 
-                  <div>
+          {apartment.number}
 
-                    <h2 className="text-2xl font-bold text-slate-800">
-                      {apartment.number}
-                    </h2>
+      </td>
 
-                    <p className="text-slate-500">
-                      {apartment.type}
-                    </p>
+      <td className="px-6 py-4">
 
-                  </div>
+          {building?.name}
 
-                </div>
-                
-              </Link>
+      </td>
 
-              <p className="mt-2 text-slate-500">
-                🏢 {building?.name}
-              </p>
+      <td className="px-6 py-4">
 
-              <div className="space-y-2 mt-4">
+          {apartment.type}
 
-                <div className="flex justify-between">
-                  <span>Type</span>
-                  <span className="font-semibold">
-                    {apartment.type}
-                  </span>
-                </div>
+      </td>
 
-                <div className="flex justify-between">
-                  <span>Surface</span>
-                  <span className="font-semibold">
-                    {apartment.surface} m²
-                  </span>
-                </div>
+      <td className="px-6 py-4">
 
-                <div className="flex justify-between">
-                  <span>Loyer</span>
-                  <span className="font-semibold text-green-700">
-                    {Number(
-                      apartment.rent
-                    ).toLocaleString()} FCFA
-                  </span>
-                </div>
+          {apartment.surface} m²
 
-                <div className="flex justify-between">
-                  <span>Caution</span>
-                  <span className="font-semibold">
-                    {Number(
-                      apartment.deposit
-                    ).toLocaleString()} FCFA
-                  </span>
-                </div>
+      </td>
 
-              </div>
-              <div
-                className={`inline-flex items-center gap-2 mt-4 px-4 py-2 rounded-full font-medium ${
-                  activeTenant
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700"
-                }`}
-              >
-                {activeTenant
-                  ? "🔴 Occupé"
-                  : "🟢 Disponible"}
-              </div>
+      <td className="px-6 py-4">
 
-              {activeTenant && (
-                <p className="mt-3 text-sm text-slate-600">
-                  👤 Occupé par :
-                  <span className="font-semibold ml-1">
-                    {activeTenant.name}
-                  </span>
-                </p>
-              )}
+          {Number(apartment.rent).toLocaleString()} FCFA
 
-              <div className="flex gap-2 mt-5">
-                <button
-                  onClick={() =>
-                    editApartment(apartment)
-                  }
-                  className="
-                    flex-1
-                    bg-blue-600
-                    hover:bg-blue-700
-                    text-white
-                    py-2
-                    rounded-xl
-                    transition
-                  "
-                >
-                  ✏️ Modifier
-                </button>
+      </td>
 
-                <button
-                  onClick={() =>
-                    deleteApartment(apartment.id)
-                  }
-                  className="
-                    flex-1
-                    bg-red-600
-                    hover:bg-red-700
-                    text-white
-                    py-2
-                    rounded-xl
-                    transition
-                  "
-                >
-                  🗑️ Supprimer
-                </button>
-              </div>       
+      <td className="px-6 py-4">
 
+      <Badge
 
-            </div>
-          );
-        })}
+      color={
+
+      activeTenant
+
+      ? "red"
+
+      : "green"
+
+      }
+
+      >
+
+      {
+
+      activeTenant
+
+      ?
+
+      "Occupé"
+
+      :
+
+      "Disponible"
+
+      }
+
+      </Badge>
+
+      </td>
+
+      <td className="px-6 py-4">
+
+      <div className="flex gap-2">
+
+      <Button
+
+      variant="primary"
+
+     onClick={() => {
+
+          editApartment(apartment);
+
+          setShowModal(true);
+
+      }}
+
+      >
+
+      ✏️
+
+      </Button>
+
+      <Button
+
+      variant="danger"
+
+      onClick={() =>
+
+      deleteApartment(apartment.id)
+
+      }
+
+      >
+
+      🗑️
+
+      </Button>
 
       </div>
+
+      </td>
+
+      </tr>
+
+          );
+
+      })
+
+      }
+
+      </Table>
+
+      <Modal
+
+          open={showModal}
+
+          title={editingId ? "Modifier un appartement" : "Nouvel appartement"}
+
+          onClose={() => {
+
+              setShowModal(false);
+
+              setEditingId(null);
+
+          }}
+
+      >
+
+      <form
+          onSubmit={addApartment}
+          className="space-y-5"
+      >
+
+          <form
+            onSubmit={addApartment}
+            className="
+              bg-white
+              rounded-3xl
+              shadow-lg
+              p-8
+              mb-8
+            "
+          >
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+            <select
+              value={buildingId}
+              onChange={(e) =>
+                setBuildingId(e.target.value)
+              }
+              className="border p-3 w-full mb-4 rounded"
+            >
+              <option value="">
+                Choisir un immeuble
+              </option>
+
+              {buildings.map((building) => (
+                <option
+                  key={building.id}
+                  value={building.id}
+                >
+                  {building.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="text"
+              placeholder="Numéro appartement"          
+              value={number}
+              onChange={(e) =>
+                setNumber(e.target.value)
+              }
+              className="border p-3 w-full mb-4 rounded"
+            />
+
+            <input
+                type="text"
+                placeholder="Type (Studio, F2, F3...)"
+                value={type}
+                onChange={(e) =>
+                  setType(e.target.value)
+                }
+                className="border p-3 w-full mb-4 rounded"
+              />
+
+              <input
+                type="number"
+                placeholder="Surface en m²"
+                value={surface}
+                onChange={(e) =>
+                  setSurface(e.target.value)
+                }
+                className="border p-3 w-full mb-4 rounded"
+              />
+
+              <input
+                type="number"
+                placeholder="Loyer mensuel"
+                value={rent}
+                onChange={(e) =>
+                  setRent(e.target.value)
+                }
+                className="border p-3 w-full mb-4 rounded"
+              />
+
+              <input
+                type="number"
+                placeholder="Montant caution"
+                value={deposit}
+                onChange={(e) =>
+                  setDeposit(e.target.value)
+                }
+                className="border p-3 w-full mb-4 rounded"
+              />
+
+              </div>
+              <br></br>
+
+            <button
+              className="
+                mt-6
+                bg-yellow-600
+                hover:bg-yellow-700
+                text-white
+                px-8
+                py-3
+                rounded-xl
+                transition
+                font-semibold
+              "
+            >
+              {editingId
+                ? "💾 Mettre à jour"
+                : "➕ Ajouter Appartement"}
+            </button>
+            
+
+          </form>  
+          <br></br>
+
+          <div className="flex justify-end gap-3 pt-5">
+
+              <Button
+                  color="red"
+                  variant="secondary"
+                  type="button"
+                  onClick={() => setShowModal(false)}
+              >
+                  Annuler
+              </Button>
+
+              <Button              
+                  variant="primary"
+                  type="submit"
+              >
+                  {editingId ? "Enregistrer" : "Créer"}
+              </Button>
+
+          </div>
+          <br></br>
+
+      </form>
+
+      </Modal>
+
+      
 
     </Layout>
   );

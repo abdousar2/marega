@@ -4,43 +4,49 @@ export default function Layout({ children }) {
 
     return (
 
-        <div className="flex min-h-screen bg-slate-100">
+        <div className="h-screen bg-slate-100 flex">
 
             <Sidebar />
 
-            <div className="flex flex-col flex-1">
+            <div className="flex-1 flex flex-col overflow-hidden">
 
                 {/* Header */}
 
-                <header className="h-20 bg-white border-b border-slate-200 shadow-sm flex items-center justify-between px-8">
+                <header className="h-20 bg-white border-b border-slate-200 shadow-sm flex items-center justify-between px-10">
 
                     <div>
 
                         <h1 className="text-2xl font-bold text-slate-800">
-                            MAREGA
+
+                            MAREGA ERP
+
                         </h1>
 
                         <p className="text-sm text-slate-500">
-                            Plateforme de gestion immobilière
+
+                            Gestion Immobilière Professionnelle
+
                         </p>
 
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-6">
 
-                        <div className="text-right">
+                        <input
 
-                            <p className="font-semibold text-slate-700">
-                                Administrateur
-                            </p>
+                            placeholder="Rechercher..."
 
-                            <p className="text-sm text-slate-500">
-                                Connecté
-                            </p>
+                            className="w-80 rounded-xl border border-slate-300 px-4 py-2"
 
-                        </div>
+                        />
 
-                        <div className="w-12 h-12 rounded-full bg-blue-700 text-white flex items-center justify-center font-bold text-lg">
+                        <button className="text-2xl">
+
+                            🔔
+
+                        </button>
+
+                        <div className="w-11 h-11 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold">
 
                             A
 
@@ -50,11 +56,11 @@ export default function Layout({ children }) {
 
                 </header>
 
-                {/* Contenu */}
+                {/* CONTENU */}
 
-                <main className="flex-1 p-8 overflow-auto">
+                <main className="flex-1 overflow-y-auto">
 
-                    <div className="max-w-7xl mx-auto">
+                    <div className="max-w-7xl mx-auto py-10 px-10">
 
                         {children}
 

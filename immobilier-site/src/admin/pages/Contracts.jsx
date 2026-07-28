@@ -1,5 +1,16 @@
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import Layout from "../Layout";
+
+
+import {
+    PageHeader,
+    StatsCard,
+    SearchBar,
+    Modal,
+    Button,
+    Badge,
+Empty
+} from "../../components/ui";
 
 import { TenantsContext } from "../../context/TenantsContext";
 import { ApartmentsContext } from "../../context/ApartmentsContext";
@@ -28,6 +39,34 @@ export default function Contracts() {
 
   const [endDate, setEndDate] =
     useState("");
+
+  const [search, setSearch] = useState("");
+
+  const [showModal, setShowModal] = useState(false);
+
+  const activeContracts = contracts.filter(
+      c => c.status === "Actif"
+  );
+
+  const filteredContracts = useMemo(() => {
+
+      return contracts.filter(contract => {
+
+          const tenant = tenants.find(
+              t => t.id == contract.tenant_id
+          );
+
+          const fullname =
+              `${tenant?.first_name ?? ""} ${tenant?.last_name ?? ""}`
+                  .toLowerCase();
+
+          return fullname.includes(
+              search.toLowerCase()
+          );
+
+      });
+
+  }, [contracts, tenants, search]);
 
     if (loading) {
 
@@ -111,6 +150,7 @@ await LeasesService.create(payload);
           setStartDate("");
 
           setEndDate("");
+          setShowModal(false);
 
       }
 
@@ -127,164 +167,260 @@ await LeasesService.create(payload);
   return (
     <Layout>
 
-      <h1 className="text-4xl font-bold mb-8">
-        Contrats
-      </h1>
+      <PageHeader
+          title="Gestion des contrats"
+          subtitle="Créez et gérez les contrats de location."
+          buttonLabel="+ Nouveau contrat"
+          onButtonClick={() => {
 
-      <form
-        onSubmit={addContract}
-        className="bg-white p-6 rounded-xl shadow mb-8"
+              setTenantId("");
+              setStartDate("");
+              setEndDate("");
+
+              setShowModal(true);
+
+          }}
+      />
+      <br></br>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+          <StatsCard
+              title="Contrats"
+              value={contracts.length}
+              color="blue"
+          />
+
+          <StatsCard
+              title="Contrats actifs"
+              value={activeContracts.length}
+              color="green"
+          />
+
+          <StatsCard
+              title="Contrats terminés"
+              value={contracts.length - activeContracts.length}
+              color="orange"
+          />
+
+      </div>
+      <br></br>
+
+      <SearchBar
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher un locataire..."
+      />
+      <br></br><br></br>
+
+      <Modal
+          open={showModal}
+          title="Nouveau contrat"
+          onClose={() => setShowModal(false)}
       >
 
-        <select
-          value={tenantId}
-          onChange={(e) =>
-            setTenantId(
-              e.target.value
-            )
-          }
-          className="border p-3 w-full mb-4 rounded"
-        >
+          <form
+              onSubmit={addContract}
+              className="space-y-5"
+          >
 
-          <option value="">
-            Choisir locataire
-          </option>
-
-          {tenants
-            .filter(
-              (tenant) =>
-                tenant.status ===
-                "Actif"
-            )
-            .map((tenant) => (
-              <option
-                key={tenant.id}
-                value={tenant.id}
-              >
-                {tenant.first_name} {tenant.last_name}
+          <select
+              value={tenantId}
+              onChange={(e) => setTenantId(e.target.value)}
+              className="border p-3 w-full rounded-xl"
+          >
+              <option value="">
+                  Choisir un locataire
               </option>
-            ))}
 
-        </select>
+              {tenants
+                  .filter(t => t.status === "Actif")
+                  .map(tenant => (
+                      <option
+                          key={tenant.id}
+                          value={tenant.id}
+                      >
+                          {tenant.first_name} {tenant.last_name}
+                      </option>
+                  ))}
+          </select>
 
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) =>
-            setStartDate(
-              e.target.value
-            )
-          }
-          className="border p-3 w-full mb-4 rounded"
-        />
+          <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border p-3 w-full rounded-xl"
+          />
 
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) =>
-            setEndDate(
-              e.target.value
-            )
-          }
-          className="border p-3 w-full mb-4 rounded"
-        />
+          <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border p-3 w-full rounded-xl"
+          />
 
-        <button
-          className="bg-yellow-600 text-white px-6 py-3 rounded"
-        >
-          Créer Contrat
-        </button>
+      <div className="flex justify-end gap-3 pt-4">
+
+          <Button
+              type="button"
+              variant="secondary"
+              onClick={() => setShowModal(false)}
+          >
+              Annuler
+          </Button>
+
+          <Button
+              type="submit"
+              variant="primary"
+          >
+              Créer
+          </Button>
+
+      </div>
 
       </form>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      </Modal>
 
-        {contracts.map(
-          (contract) => {
 
-            const tenant =
-              tenants.find(
-                (t) =>
-                  t.id ==
-                  contract.tenant_id
-              );
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
 
-            const apartment =
-              apartments.find(
-                (a) =>
-                  a.id ==
-                  contract.apartment_id
-              );
+          {filteredContracts.length === 0 ? (
 
-            return (
-              <div
-                key={contract.id}
-                className="bg-white p-6 rounded-xl shadow"
-              >
+              <Empty
+                  title="Aucun contrat"
+                  subtitle="Aucun contrat ne correspond à votre recherche."
+              />
 
-                <h2 className="text-xl font-bold">
+          ) : (
 
-                  {contract.contract_number}
+              filteredContracts.map((contract) => {
 
-              </h2>
+                  const tenant = tenants.find(
+                      t => t.id == contract.tenant_id
+                  );
 
-                <p className="mt-3">
-                  👤 {tenant?.first_name} {tenant?.last_name}
-                </p>
+                  const apartment = apartments.find(
+                      a => a.id == contract.apartment_id
+                  );
 
-                <p className="mt-2">
-                  🏠 Appartement
-                  {" "}
-                  {apartment?.number}
-                </p>
+                  return (
 
-                <p className="mt-2">
-                  📅
-                  {" "}
-                  {contract.start_date}
-                </p>
+                      <div
+                          key={contract.id}
+                          className="
+                              bg-white
+                              rounded-3xl
+                              border
+                              border-slate-200
+                              shadow-sm
+                              hover:shadow-xl
+                              transition
+                              p-7
+                          "
+                      >
 
-                <p className="mt-2">
-                  📅
-                  {" "}
-                  {contract.end_date}
-                </p>
+                          <div className="flex justify-between items-start">
 
-                <p className="mt-2">
-                  💰
-                  {" "}
-                  {Number(
-                    contract.monthly_rent
-                  ).toLocaleString()}
-                  FCFA
-                </p>
+                              <div>
 
-                <p className="mt-2">
-                  🔐
-                  {" "}
-                  {Number(
-                    contract.deposit
-                  ).toLocaleString()}
-                  FCFA
-                </p>
+                                  <p className="text-slate-500 text-sm">
+                                      Contrat
+                                  </p>
 
-                {contract.pdf_path && (
+                                  <h2 className="text-2xl font-bold mt-1">
+                                      {contract.contract_number}
+                                  </h2>
 
-                    <a
-                        href={`http://localhost:5000${contract.pdf_path}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="mt-4 inline-block bg-blue-600 text-white px-4 py-2 rounded"
-                    >
-                        📄 Télécharger le contrat
-                    </a>
+                              </div>
 
-                )}
+                              <Badge
+                                  color={
+                                      contract.status === "Actif"
+                                          ? "green"
+                                          : "red"
+                                  }
+                              >
+                                  {contract.status}
+                              </Badge>
 
-              </div>
-            );
-          }
-        )}
+                          </div>
+
+                          <div className="mt-6 space-y-3">
+
+                              <p>
+                                  👤 <strong>{tenant?.first_name} {tenant?.last_name}</strong>
+                              </p>
+
+                              <p>
+                                  🏠 Appartement <strong>{apartment?.number}</strong>
+                              </p>
+
+                              <p>
+                                  📅 Début : {contract.start_date}
+                              </p>
+
+                              <p>
+                                  📅 Fin : {contract.end_date}
+                              </p>
+
+                          </div>
+
+                          <div className="mt-6 grid grid-cols-2 gap-4">
+
+                              <div className="bg-slate-50 rounded-2xl p-4">
+
+                                  <div className="text-slate-500 text-sm">
+                                      Loyer
+                                  </div>
+
+                                  <div className="text-xl font-bold text-green-700 mt-2">
+                                      {Number(contract.monthly_rent).toLocaleString()} FCFA
+                                  </div>
+
+                              </div>
+
+                              <div className="bg-slate-50 rounded-2xl p-4">
+
+                                  <div className="text-slate-500 text-sm">
+                                      Caution
+                                  </div>
+
+                                  <div className="text-xl font-bold mt-2">
+                                      {Number(contract.deposit).toLocaleString()} FCFA
+                                  </div>
+
+                              </div>
+
+                          </div>
+
+                          <div className="flex gap-2 mt-6">
+
+                              {contract.pdf_path && (
+
+                                  <Button
+                                      variant="primary"
+                                      onClick={() =>
+                                          window.open(
+                                              `http://localhost:5000${contract.pdf_path}`,
+                                              "_blank"
+                                          )
+                                      }
+                                  >
+                                      📄 Contrat PDF
+                                  </Button>
+
+                              )}
+
+                          </div>
+
+                      </div>
+
+                  );
+
+              })
+
+          )}
 
       </div>
 

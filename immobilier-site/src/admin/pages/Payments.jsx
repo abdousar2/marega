@@ -7,6 +7,18 @@ import RentsService from "../../services/rents.service";
 
 import Layout from "../Layout";
 
+import {
+    PageHeader,
+    StatsCard,
+    SearchBar,
+    Modal,
+    Button,
+    Badge,
+    Empty
+} from "../../components/ui";
+
+import { useMemo } from "react";
+
 import { TenantsContext } from "../../context/TenantsContext";
 import { ContractsContext } from "../../context/ContractsContext";
 import { PaymentsContext } from "../../context/PaymentsContext";
@@ -41,6 +53,10 @@ export default function Payments() {
     const rentId = searchParams.get("rent");
 
     const [selectedRent, setSelectedRent] = useState(null);
+
+    const [search, setSearch] = useState("");
+
+    const [showModal, setShowModal] = useState(false);
 
     console.log("Rent sélectionné :", rentId);
 
@@ -102,6 +118,7 @@ export default function Payments() {
 
             await reloadPayments();
             await reloadRents();
+            setShowModal(false);
             if (rentId) {
 
                 navigate("/admin/rents");
@@ -173,6 +190,30 @@ export default function Payments() {
 
     }, [rentId]);
 
+    const totalPaid = payments
+        .filter(p => p.status === "Payé")
+        .reduce((s, p) => s + Number(p.amount), 0);
+
+    const pendingPayments = payments.filter(
+        p => p.status !== "Payé"
+    );
+
+    const filteredPayments = useMemo(() => {
+
+        return payments.filter(payment => {
+
+            const name =
+                (payment.tenant_name || "")
+                    .toLowerCase();
+
+            return name.includes(
+                search.toLowerCase()
+            );
+
+        });
+
+    }, [payments, search]);
+
     if (loading) {
 
         return (
@@ -191,153 +232,222 @@ export default function Payments() {
 
         <Layout>
 
-            <h1 className="text-4xl font-bold mb-8">
+        <PageHeader
+            title="Gestion des paiements"
+            subtitle="Enregistrez les loyers et consultez l'historique."
+            buttonLabel="+ Nouveau paiement"
+            onButtonClick={() => {
 
-                Paiements des loyers
+                setTenantId("");
 
-            </h1>
+                setMonth("");
+
+                setPaymentDate("");
+
+                setAmount("");
+
+                setMethod("Espèces");
+
+                setStatus("Payé");
+
+                setShowModal(true);
+
+            }}
+        />
+        <br></br>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+
+            <StatsCard
+                title="Paiements"
+                value={payments.length}
+                color="blue"
+            />
+
+            <StatsCard
+                title="Montant encaissé"
+                value={totalPaid.toLocaleString()}
+                color="green"
+            />
+
+            <StatsCard
+                title="En attente"
+                value={pendingPayments.length}
+                color="orange"
+            />
+
+        </div>
+        <br></br>
+
+        <SearchBar
+            value={search}
+            onChange={(e)=>setSearch(e.target.value)}
+            placeholder="Rechercher un paiement..."
+        />
+        <br></br><br></br>
+
+        <Modal
+            open={showModal}
+            title="Nouveau paiement"
+            onClose={()=>setShowModal(false)}
+        >
 
             <form
-
                 onSubmit={addPayment}
+                className="space-y-5"
+            >            
 
-                className="bg-white rounded-xl shadow p-6 mb-8"
+                    <select
 
-            >
+                        value={tenantId}
 
-                <select
+                        onChange={(e)=>setTenantId(e.target.value)}
 
-                    value={tenantId}
+                        className="border p-3 rounded w-full mb-4"
 
-                    onChange={(e)=>setTenantId(e.target.value)}
+                    >
 
-                    className="border p-3 rounded w-full mb-4"
+                        <option value="">
 
-                >
+                            Choisir un locataire
 
-                    <option value="">
+                        </option>
 
-                        Choisir un locataire
+                        {
 
-                    </option>
+                            tenants.map(t=>(
 
-                    {
+                                <option
 
-                        tenants.map(t=>(
+                                    key={t.id}
 
-                            <option
+                                    value={t.id}
 
-                                key={t.id}
+                                >
 
-                                value={t.id}
+                                    {t.first_name} {t.last_name}
 
-                            >
+                                </option>
 
-                                {t.first_name} {t.last_name}
+                            ))
 
-                            </option>
+                        }
 
-                        ))
+                    </select>
 
-                    }
+                    <input
 
-                </select>
+                        type="date"
 
-                <input
+                        value={month}
 
-                    type="date"
+                        onChange={(e)=>setMonth(e.target.value)}
 
-                    value={month}
+                        className="border p-3 rounded w-full mb-4"
 
-                    onChange={(e)=>setMonth(e.target.value)}
+                    />
 
-                    className="border p-3 rounded w-full mb-4"
+                    <input
 
-                />
+                        type="date"
 
-                <input
+                        value={paymentDate}
 
-                    type="date"
+                        onChange={(e)=>setPaymentDate(e.target.value)}
 
-                    value={paymentDate}
+                        className="border p-3 rounded w-full mb-4"
 
-                    onChange={(e)=>setPaymentDate(e.target.value)}
+                    />
 
-                    className="border p-3 rounded w-full mb-4"
+                    <input
 
-                />
+                        type="number"
 
-                <input
+                        placeholder="Montant"
 
-                    type="number"
+                        value={amount}
 
-                    placeholder="Montant"
+                        onChange={(e)=>setAmount(e.target.value)}
 
-                    value={amount}
+                        className="border p-3 rounded w-full mb-4"
 
-                    onChange={(e)=>setAmount(e.target.value)}
+                    />
 
-                    className="border p-3 rounded w-full mb-4"
+                    <select
 
-                />
+                        value={method}
 
-                <select
+                        onChange={(e)=>setMethod(e.target.value)}
 
-                    value={method}
+                        className="border p-3 rounded w-full mb-4"
 
-                    onChange={(e)=>setMethod(e.target.value)}
+                    >
 
-                    className="border p-3 rounded w-full mb-4"
+                        <option>Espèces</option>
 
-                >
+                        <option>Wave</option>
 
-                    <option>Espèces</option>
+                        <option>Orange Money</option>
 
-                    <option>Wave</option>
+                        <option>Virement</option>
 
-                    <option>Orange Money</option>
+                        <option>Chèque</option>
 
-                    <option>Virement</option>
+                    </select>
 
-                    <option>Chèque</option>
+                    <select
 
-                </select>
+                        value={status}
 
-                <select
+                        onChange={(e)=>setStatus(e.target.value)}
 
-                    value={status}
+                        className="border p-3 rounded w-full mb-6"
 
-                    onChange={(e)=>setStatus(e.target.value)}
+                    >
 
-                    className="border p-3 rounded w-full mb-6"
+                        <option>Payé</option>
 
-                >
+                        <option>En attente</option>
 
-                    <option>Payé</option>
+                        <option>En retard</option>
 
-                    <option>En attente</option>
+                    </select>
 
-                    <option>En retard</option>
+                    <div className="flex justify-end gap-3 pt-4">
 
-                </select>
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() => setShowModal(false)}
+                        >
+                            Annuler
+                        </Button>
 
-                <button
+                        <Button
+                            type="submit"
+                            variant="primary"
+                        >
+                            Enregistrer
+                        </Button>
 
-                    className="bg-yellow-600 text-white px-6 py-3 rounded"
-
-                >
-
-                    Enregistrer le paiement
-
-                </button>
+                    </div>
 
             </form>
 
-            <div className="grid gap-6">
+        </Modal>
+            
 
-                {
+            <div className="grid gap-6 mt-8">
 
-                    payments.map(payment=>(
+                {filteredPayments.length === 0 ? (
+
+                    <Empty
+                        title="Aucun paiement"
+                        subtitle="Aucun paiement ne correspond à votre recherche."
+                    />
+
+                ) : (
+                    filteredPayments.map(payment => (
 
                         <div
 
@@ -388,7 +498,7 @@ export default function Payments() {
 
                     ))
 
-                }
+                )}
 
             </div>
 

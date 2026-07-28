@@ -1,9 +1,18 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useMemo } from "react";
 import Layout from "../Layout";
+
+import {
+    PageHeader,
+    StatsCard,
+    SearchBar,
+    Modal,
+    Button,
+} from "../../components/ui";
 
 import { ApartmentsContext } from "../../context/ApartmentsContext";
 import { TenantsContext } from "../../context/TenantsContext";
 import { BuildingsContext } from "../../context/BuildingsContext";
+
 import TenantsService from "../../services/tenants.service";
 
 export default function Tenants() {
@@ -54,13 +63,39 @@ export default function Tenants() {
   const [filter, setFilter] =
     useState("all");
 
+  const [showModal, setShowModal] = useState(false);
+
+  const filteredTenants = useMemo(() => {
+
+        return tenants
+            .filter((tenant) => {
+
+                if (filter === "active") return tenant.status === "Actif";
+
+                if (filter === "former") return tenant.status === "Parti";
+
+                return true;
+
+            })
+            .filter((tenant) => {
+
+                const fullname = `${tenant.first_name} ${tenant.last_name ?? ""}`.toLowerCase();
+
+                return fullname.includes(search.toLowerCase());
+
+            });
+
+    }, [tenants, search, filter]);
+
     if (loading) {
       return (
         <Layout>
           <h2>Chargement des locataires...</h2>
         </Layout>
       );
-    }
+    }  
+
+    
 
     const addTenant = async (e) => {
 
@@ -162,53 +197,86 @@ export default function Tenants() {
   return (
     <Layout>
 
-      <h1 className="text-4xl font-bold mb-8">
-        Gestion des Locataires
-      </h1>
+      <PageHeader
+          title="Gestion des locataires"
+          subtitle="Ajoutez, modifiez et gérez vos locataires."
+          buttonLabel="+ Nouveau locataire"
+          onButtonClick={() => {
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+              setEditingId(null);
 
-        <div className="bg-white rounded-2xl shadow p-6">
+              setName("");
 
-          <p className="text-slate-500">
-            Total Locataires
-          </p>
+              setPhone("");
 
-          <h2 className="text-4xl font-bold mt-2">
-            {tenants.length}
-          </h2>
+              setEmail("");
 
-        </div>
+              setProfession("");
 
-        <div className="bg-green-50 rounded-2xl shadow p-6">
+              setEntryDate("");
 
-          <p className="text-green-700">
-            Locataires Actifs
-          </p>
+              setDeposit("");
 
-          <h2 className="text-4xl font-bold mt-2 text-green-700">
-            {activeTenants.length}
-          </h2>
+              setStatus("Actif");
 
-        </div>
+              setApartmentId("");
 
-        <div className="bg-red-50 rounded-2xl shadow p-6">
+              setShowModal(true);
 
-          <p className="text-red-700">
-            Anciens Locataires
-          </p>
+          }}
+      />
+      <br></br>
 
-          <h2 className="text-4xl font-bold mt-2 text-red-700">
-            {formerTenants.length}
-          </h2>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
-        </div>
+          <StatsCard
+              title="Locataires"
+              value={tenants.length}
+              color="blue"
+          />
+
+          <StatsCard
+              title="Actifs"
+              value={activeTenants.length}
+              color="green"
+          />
+
+          <StatsCard
+              title="Partis"
+              value={formerTenants.length}
+              color="red"
+          />
 
       </div>
+      <br></br>
+
+      <SearchBar
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Rechercher un locataire..."
+          
+      />
+      <br></br><br></br>
+
+      <Modal
+          open={showModal}
+          title={
+              editingId
+                  ? "Modifier un locataire"
+                  : "Nouveau locataire"
+          }
+          onClose={() => {
+
+              setShowModal(false);
+
+              setEditingId(null);
+
+          }}
+      >
 
       <form
-        onSubmit={addTenant}
-        className="bg-white p-6 rounded-xl shadow mb-8"
+          onSubmit={addTenant}
+          className="space-y-5"
       >
 
         <input
@@ -326,19 +394,31 @@ export default function Tenants() {
               {apartment.number}
             </option>
           ))}
-        </select>
+        </select>        
 
-        <button
-          className="bg-yellow-600 text-white px-6 py-3 rounded"
-        >
-          {
-            editingId
-              ? "Mettre à jour"
-              : "Ajouter Locataire"
-          }
-        </button>
+          <div className="flex justify-end gap-3 pt-4">
+
+              <Button
+                  color="red"
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setShowModal(false)}
+              >
+                  Annuler
+              </Button>
+
+              <Button
+                  type="submit"
+                  variant="primary"
+              >
+                  {editingId ? "Enregistrer" : "Créer"}
+              </Button>
+
+          </div>
 
       </form>
+
+      </Modal>
 
       <div className="mb-6">
 
@@ -358,28 +438,7 @@ export default function Tenants() {
 
         </label>
 
-      </div>
-
-      <div className="mb-6">
-
-        <input
-          type="text"
-          placeholder="🔎 Rechercher un locataire..."
-          value={search}
-          onChange={(e) =>
-            setSearch(e.target.value)
-          }
-          className="
-            w-full
-            bg-white
-            border
-            p-4
-            rounded-xl
-            shadow-sm
-          "
-        />
-
-      </div>
+      </div>      
 
       <div className="flex gap-3 mb-6">
 
@@ -423,35 +482,12 @@ export default function Tenants() {
         </button>
 
       </div>
+      <br></br>
 
       <div className="grid md:grid-cols-3 gap-6">
 
-        {tenants
-          .filter((tenant) => {
-
-            if (filter === "active") {
-              return tenant.status === "Actif";
-            }
-
-            if (filter === "former") {
-              return tenant.status === "Parti";
-            }
-
-            return true;
-          })
-          .filter((tenant) => {
-
-              const fullname =
-                  `${tenant.first_name} ${tenant.last_name}`
-                      .toLowerCase();
-
-              return fullname.includes(
-                  search.toLowerCase()
-              );
-
-          })
-          .map((tenant) => {
-
+        {filteredTenants.map((tenant) => {
+        
           const apartment =
             apartments.find(
               (a) =>
@@ -489,25 +525,26 @@ export default function Tenants() {
 
               const editTenant = (tenant) => {
 
-                setName(
-                  `${tenant.first_name} ${tenant.last_name ?? ""}`.trim()
-                );
+                  setName(`${tenant.first_name} ${tenant.last_name ?? ""}`.trim());
 
-                setPhone(tenant.phone || "");
+                  setPhone(tenant.phone || "");
 
-                setEmail(tenant.email || "");
+                  setEmail(tenant.email || "");
 
-                setProfession(tenant.profession || "");
+                  setProfession(tenant.profession || "");
 
-                setEntryDate(tenant.entry_date || "");
+                  setEntryDate(tenant.entry_date || "");
 
-                setDeposit(tenant.deposit || "");
+                  setDeposit(tenant.deposit || "");
 
-                setStatus(tenant.status);
+                  setStatus(tenant.status);
 
-                setApartmentId(tenant.apartment_id);
+                  setApartmentId(tenant.apartment_id);
 
-                setEditingId(tenant.id);
+                  setEditingId(tenant.id);
+
+                  setShowModal(true);
+
               };
 
           return (
@@ -598,14 +635,18 @@ export default function Tenants() {
 
               <div className="flex gap-2 mt-4">
 
-                <button
-                  onClick={() =>
-                    editTenant(tenant)
-                  }
-                  className="bg-blue-600 text-white px-3 py-2 rounded"
+                <Button
+                    variant="primary"
+                    onClick={() => {
+
+                        editTenant(tenant);
+
+                        setShowModal(true);
+
+                    }}
                 >
-                  ✏️ Modifier
-                </button>
+                    ✏️ Modifier
+                </Button>
 
                 <button
                   onClick={() =>
@@ -692,6 +733,7 @@ export default function Tenants() {
 
             </div>
           );
+          
         })}
 
       </div>

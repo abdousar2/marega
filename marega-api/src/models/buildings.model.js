@@ -36,45 +36,45 @@ async function create(building) {
         floors,
         apartments_count,
         status,
+        deliveryDate,
         description
     } = building;
 
     const result = await pool.query(
+    `
+    INSERT INTO marega.buildings
+    (
+        code,
+        name,
+        address,
+        city,
+        country,
+        floors,
+        apartments_count,
+        status,
+        delivery_date,
+        description
+    )
 
-        `
-        INSERT INTO marega.buildings
-        (
-            code,
-            name,
-            address,
-            city,
-            country,
-            floors,
-            apartments_count,
-            status,
-            description
-        )
+    VALUES
+    (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10
+    )
 
-        VALUES
-        (
-            $1,$2,$3,$4,$5,$6,$7,$8,$9
-        )
-
-        RETURNING *
-        `,
-
-        [
-            code,
-            name,
-            address,
-            city,
-            country,
-            floors,
-            apartments_count,
-            status,
-            description
-        ]
-
+    RETURNING *
+    `,
+    [
+        code,
+        name,
+        address,
+        city,
+        country,
+        floors,
+        apartments_count,
+        status,
+        deliveryDate,
+        description
+    ]
     );
 
     return result.rows[0];
@@ -90,36 +90,39 @@ async function update(id, building) {
         floors,
         apartments_count,
         status,
+        deliveryDate,
         description
     } = building;
 
     const result = await pool.query(
-        `
-        UPDATE marega.buildings
-        SET
-            name=$1,
-            address=$2,
-            city=$3,
-            country=$4,
-            floors=$5,
-            apartments_count=$6,
-            status=$7,
-            description=$8,
-            updated_at=NOW()
-        WHERE id=$9
-        RETURNING *
-        `,
-        [
-            name,
-            address,
-            city,
-            country,
-            floors,
-            apartments_count,
-            status,
-            description,
-            id
-        ]
+    `
+    UPDATE marega.buildings
+    SET
+        name=$1,
+        address=$2,
+        city=$3,
+        country=$4,
+        floors=$5,
+        apartments_count=$6,
+        status=$7,
+        delivery_date=$8,
+        description=$9,
+        updated_at=NOW()
+    WHERE id=$10
+    RETURNING *
+    `,
+    [
+        name,
+        address,
+        city,
+        country,
+        floors,
+        apartments_count,
+        status,
+        deliveryDate,
+        description,
+        id
+    ]
     );
 
     return result.rows[0];

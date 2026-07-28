@@ -1,156 +1,336 @@
-import { useContext } from "react";
-import Layout from "../Layout";
-import { RentsContext } from "../../context/RentsContext";
+import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+
+import Layout from "../Layout";
+
+import {
+    PageHeader,
+    StatsCard,
+    SearchBar,
+    Badge,
+    Empty,
+    Button,
+} from "../../components/ui";
+
+import { RentsContext } from "../../context/RentsContext";
 
 export default function Rents() {
 
-  const { rents, loading } = useContext(RentsContext);
+    const { rents, loading } = useContext(RentsContext);
 
-  if (loading) {
+    const [search, setSearch] = useState("");
+
+    const [filter, setFilter] = useState("all");
+
+    if (loading) {
+
+        return (
+
+            <Layout>
+
+                <h2>Chargement des loyers...</h2>
+
+            </Layout>
+
+        );
+
+    }
+
+    const paidRents =
+        rents.filter(r => r.status === "Payé");
+
+    const waitingRents =
+        rents.filter(r => r.status === "En attente");
+
+    const lateRents =
+        rents.filter(r => r.status === "En retard");
+
+    const filteredRents = useMemo(() => {
+
+        return rents
+
+            .filter((rent) => {
+
+                if (filter === "paid")
+                    return rent.status === "Payé";
+
+                if (filter === "waiting")
+                    return rent.status === "En attente";
+
+                if (filter === "late")
+                    return rent.status === "En retard";
+
+                return true;
+
+            })
+
+            .filter((rent) =>
+
+                (rent.tenant_name || "")
+                    .toLowerCase()
+                    .includes(search.toLowerCase())
+
+            );
+
+    }, [rents, search, filter]);
+
     return (
-      <Layout>
-        <h2>Chargement des loyers...</h2>
-      </Layout>
-    );
-  }
 
-  return (
-    <Layout>
+        <Layout>
 
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h1 className="text-4xl font-bold">Échéances de loyers</h1>
-          <p className="text-slate-600 mt-2">
-            Suivi des loyers générés automatiquement par les contrats
-          </p>
-        </div>
-      </div>
+            <PageHeader
+                title="Gestion des loyers"
+                subtitle="Suivi automatique des échéances générées par les contrats."
+            />
+            <br></br>
 
-      <div className="bg-white rounded-2xl shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full text-sm">
-            <thead className="bg-slate-100 text-slate-700">
-              <tr>
-                <th className="text-left px-4 py-3">Locataire</th>
-                <th className="text-left px-4 py-3">Contrat</th>
-                <th className="text-left px-4 py-3">Mois</th>
-                <th className="text-left px-4 py-3">Échéance</th>
-                <th className="text-right px-4 py-3">Montant</th>
-                <th className="text-left px-4 py-3">Statut</th>
-                <th className="text-left p-3">Actions</th>
-              </tr>
-            </thead>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
-            <tbody className="divide-y">
-              {rents.map((rent) => (
-                <tr key={rent.id} className="hover:bg-slate-50">
-                  <td className="px-4 py-3 font-medium">
-                    {rent.tenant_name}
-                  </td>
+                <StatsCard
+                    title="Total"
+                    value={rents.length}
+                    color="blue"
+                />
 
-                  <td className="px-4 py-3">
-                    {rent.contract_number}
-                  </td>
+                <StatsCard
+                    title="Payés"
+                    value={paidRents.length}
+                    color="green"
+                />
 
-                  <td className="px-4 py-3">
-                    {new Date(rent.due_month).toLocaleDateString("fr-FR", {
-                      month: "long",
-                      year: "numeric"
-                    })}
-                  </td>
+                <StatsCard
+                    title="En attente"
+                    value={waitingRents.length}
+                    color="orange"
+                />
 
-                  <td className="px-4 py-3">
-                    {new Date(rent.due_date).toLocaleDateString("fr-FR")}
-                  </td>
+                <StatsCard
+                    title="En retard"
+                    value={lateRents.length}
+                    color="red"
+                />
 
-                  <td className="text-right px-4 py-3 font-semibold">
-                    {Number(rent.amount).toLocaleString()} FCFA
-                  </td>
+            </div>
+            <br></br>
 
-                  
-                    <td className="px-4 py-3">
+            <SearchBar
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Rechercher un locataire..."
+            />
+            <br></br><br></br>
 
-                        <span
-                            className={`
-                                px-3
-                                py-1
-                                rounded-full
-                                text-sm
-                                font-semibold
+            <div className="flex flex-wrap gap-3 mt-6 mb-8">
 
-                                ${
-                                    rent.status === "Payé"
-                                        ? "bg-green-100 text-green-700"
+                <Button
+                    variant={filter === "all" ? "primary" : "secondary"}
+                    onClick={() => setFilter("all")}
+                    color="blue"
+                >
+                    Tous
+                </Button>
 
-                                    : rent.status === "En attente"
-                                        ? "bg-yellow-100 text-yellow-700"
+                <Button
+                    variant={filter === "paid" ? "primary" : "secondary"}
+                    onClick={() => setFilter("paid")}
+                    color="green"
+                >
+                    Payés
+                </Button>
 
-                                    : "bg-red-100 text-red-700"
-                                }
-                            `}
-                        >
-                            {rent.status}
-                        </span>
+                <Button
+                    variant={filter === "waiting" ? "primary" : "secondary"}
+                    onClick={() => setFilter("waiting")}
+                    color="orange"
+                >
+                    En attente
+                </Button>
 
-                    </td>
+                <Button
+                    variant={filter === "late" ? "primary" : "secondary"}
+                    onClick={() => setFilter("late")}
+                    color="red"
+                >
+                    En retard
+                </Button>
 
-                    <td className="px-4 py-3">
+            </div>
+            <br></br>
 
-                        {
+            {filteredRents.length === 0 ? (
 
-                            rent.status === "Payé"
+                <Empty
+                    title="Aucun loyer"
+                    subtitle="Aucun résultat trouvé."
+                />
 
-                            ? (
+            ) : (
 
-                                rent.receipt_path && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
 
-                                    <a
+                                {filteredRents.map((rent) => (
 
-                                        href={`http://localhost:5000${rent.receipt_path}`}
-
-                                        target="_blank"
-
-                                        rel="noreferrer"
-
-                                        className="inline-block bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
-
+                                    <div
+                                        key={rent.id}
+                                        className="
+                                        bg-white
+                                        rounded-3xl
+                                        border
+                                        border-slate-200
+                                        shadow-sm
+                                        hover:shadow-xl
+                                        hover:-translate-y-1
+                                        transition
+                                        duration-300
+                                        p-7
+                                        "
                                     >
 
-                                        📄 Quittance
+                                        <div className="flex items-center gap-4">
 
-                                    </a>
+                                            <div
+                                                className="
+                                                    w-14 h-14
+                                                    rounded-full
+                                                    bg-yellow-600
+                                                    text-white
+                                                    flex
+                                                    items-center
+                                                    justify-center
+                                                    text-xl
+                                                    font-bold
+                                                "
+                                            >
+                                                {rent.tenant_name.charAt(0)}
+                                            </div>
 
-                                )
+                                            <div>
 
-                            )
+                                                <p className="text-slate-500 text-sm">
+                                                    Échéance
+                                                </p>
 
-                            : (
+                                                <h2 className="text-xl font-bold">
+                                                    {rent.tenant_name}
+                                                </h2>
 
-                                <Link
+                                            </div>
 
-                                    to={`/admin/payments?rent=${rent.id}`}
+                                        
 
-                                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg inline-block"
+                                            <Badge
+                                                color={
+                                                    rent.status === "Payé"
+                                                        ? "green"
+                                                        : rent.status === "En attente"
+                                                        ? "orange"
+                                                        : "red"
+                                                }
+                                            >
+                                                {rent.status}
+                                            </Badge>
 
-                                >
+                                        </div>
 
-                                    💳 Encaisser
+                                        <div className="mt-6 space-y-3">
 
-                                </Link>
+                                            <p>
+                                                📄 Contrat <strong>{rent.contract_number}</strong>
+                                            </p>
 
-                            )
+                                            <p>
+                                                📅 Mois :
+                                                <strong>
+                                                    {" "}
+                                                    {new Date(rent.due_month).toLocaleDateString(
+                                                        "fr-FR",
+                                                        {
+                                                            month: "long",
+                                                            year: "numeric",
+                                                        }
+                                                    )}
+                                                </strong>
+                                            </p>
 
-                        }
+                                            <p>
+                                                ⏰ Échéance :
+                                                <strong>
+                                                    {" "}
+                                                    {new Date(rent.due_date).toLocaleDateString(
+                                                        "fr-FR"
+                                                    )}
+                                                </strong>
+                                            </p>
 
-                    </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                                        </div>
 
-    </Layout>
-  );
-}
+                                        <div className="mt-6 bg-slate-50 rounded-2xl p-5">
+
+                                            <div className="text-slate-500 text-sm">
+                                                Montant
+                                            </div>
+
+                                            <div className="text-2xl font-bold text-green-700 mt-2">
+
+                                                {Number(rent.amount).toLocaleString()} FCFA
+
+                                            </div>
+
+                                        </div>
+
+                                        <div className="flex gap-3 mt-6">
+
+                                            {rent.status === "Payé" ? (
+
+                                                rent.receipt_path && (
+
+                                                    <Button
+                                                        variant="primary"
+                                                        className="w-full"
+                                                    >
+                                                        onClick={() =>
+                                                            window.open(
+                                                                `http://localhost:5000${rent.receipt_path}`,
+                                                                "_blank"
+                                                            )
+                                                        }
+                                                    
+                                                        📄 Quittance
+                                                    </Button>
+
+                                                )
+
+                                            ) : (
+
+                                                <Link
+                                                    to={`/admin/payments?rent=${rent.id}`}
+                                                >
+
+                                                    <Button
+                                                        variant="primary"
+                                                        className="w-full"
+                                                    >
+
+                                                        💳 Encaisser
+
+                                                    </Button>
+
+                                                </Link>
+
+                                            )}
+
+                                        </div>
+
+                                    </div>
+
+                                ))}
+
+                            </div>
+
+                        )}
+
+                    </Layout>
+
+                );
+
+            }

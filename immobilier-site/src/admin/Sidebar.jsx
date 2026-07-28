@@ -2,149 +2,145 @@ import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
 
-    const menu = [
+    const sections = [
 
         {
-            label: "Tableau de bord",
-            icon: "📊",
-            url: "/admin"
+
+            title: "GESTION",
+
+            items: [
+
+                ["📊", "Tableau de bord", "/admin"],
+
+                ["🏢", "Immeubles", "/admin/buildings"],
+
+                ["🏠", "Appartements", "/admin/apartments"],
+
+                ["👤", "Locataires", "/admin/tenants"],
+
+                ["📄", "Contrats", "/admin/contracts"],
+
+                ["📅", "Loyers", "/admin/rents"],
+
+                ["💳", "Paiements", "/admin/payments"]
+
+            ]
+
         },
 
         {
-            label: "Immeubles",
-            icon: "🏢",
-            url: "/admin/buildings"
-        },
 
-        {
-            label: "Appartements",
-            icon: "🏠",
-            url: "/admin/apartments"
-        },
+            title: "COMMUNICATION",
 
-        {
-            label: "Locataires",
-            icon: "👤",
-            url: "/admin/tenants"
-        },
+            items: [
 
-        {
-            label: "Contrats",
-            icon: "📄",
-            url: "/admin/contracts"
-        },
+                ["📩", "Messages", "/admin/messages"]
 
-        {
-            label: "Loyers",
-            icon: "📅",
-            url: "/admin/rents"
-        },
+            ]
 
-        {
-            label: "Paiements",
-            icon: "💳",
-            url: "/admin/payments"
-        },
-
-        {
-            label: "Messages",
-            icon: "📩",
-            url: "/admin/messages"
         }
 
     ];
 
     return (
 
-        <aside className="w-72 bg-slate-900 text-white flex flex-col shadow-xl">
+        <aside className="w-72 bg-slate-900 text-white flex flex-col">
 
-            {/* Logo */}
+            <div className="h-24 flex flex-col justify-center items-center border-b border-slate-700">
 
-            <div className="h-24 flex flex-col items-center justify-center border-b border-slate-700">
-
-                <div className="text-3xl font-extrabold tracking-wider">
+                <h1 className="text-3xl font-bold">
 
                     MAREGA
 
-                </div>
+                </h1>
 
-                <div className="text-sm text-slate-400">
+                <p className="text-slate-400 text-sm">
 
-                    Gestion Immobilière
+                    ERP Immobilier
 
-                </div>
+                </p>
 
             </div>
 
-            {/* Menu */}
-
-            <nav className="flex-1 mt-6">
+            <div className="flex-1 overflow-y-auto px-4 py-6">
 
                 {
 
-                    menu.map(item => (
+                    sections.map(section => (
 
-                        <NavLink
+                        <div
 
-                            key={item.url}
+                            key={section.title}
 
-                            to={item.url}
-
-                            end={item.url === "/admin"}
-
-                            className={({ isActive }) =>
-
-                                `flex items-center gap-4 mx-4 my-2 px-4 py-3 rounded-xl transition-all duration-200
-
-                                ${
-
-                                    isActive
-
-                                    ? "bg-blue-600 shadow-lg"
-
-                                    : "hover:bg-slate-800"
-
-                                }`
-
-                            }
+                            className="mb-8"
 
                         >
 
-                            <span className="text-xl">
+                            <p className="text-xs uppercase tracking-widest text-slate-500 mb-3">
 
-                                {item.icon}
+                                {section.title}
 
-                            </span>
+                            </p>
 
-                            <span>
+                            {
 
-                                {item.label}
+                                section.items.map(([icon, label, url]) => (
 
-                            </span>
+                                    <NavLink
 
-                        </NavLink>
+                                        key={url}
+
+                                        to={url}
+
+                                        end={url === "/admin"}
+
+                                        className={({ isActive }) =>
+
+                                            `flex items-center gap-4 px-4 py-3 rounded-xl mb-2 transition-all
+
+                                            ${
+
+                                                isActive
+
+                                                    ? "bg-blue-600"
+
+                                                    : "hover:bg-slate-800"
+
+                                            }`
+
+                                        }
+
+                                    >
+
+                                        <span className="text-xl">
+
+                                            {icon}
+
+                                        </span>
+
+                                        <span>
+
+                                            {label}
+
+                                        </span>
+
+                                    </NavLink>
+
+                                ))
+
+                            }
+
+                        </div>
 
                     ))
 
                 }
 
-            </nav>
+            </div>
 
-            {/* Footer */}
+            <div className="border-t border-slate-700 p-5 text-center text-sm text-slate-400">
 
-            <div className="border-t border-slate-700 p-5">
-
-                <div className="text-sm text-slate-400">
-
-                    MAREGA ERP
-
-                </div>
-
-                <div className="text-xs text-slate-500 mt-1">
-
-                    Version 1.0
-
-                </div>
+                Version 2.0
 
             </div>
 
