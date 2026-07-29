@@ -22,19 +22,7 @@ export default function Rents() {
 
     const [filter, setFilter] = useState("all");
 
-    if (loading) {
-
-        return (
-
-            <Layout>
-
-                <h2>Chargement des loyers...</h2>
-
-            </Layout>
-
-        );
-
-    }
+    
 
     const paidRents =
         rents.filter(r => r.status === "Payé");
@@ -73,6 +61,20 @@ export default function Rents() {
             );
 
     }, [rents, search, filter]);
+
+    if (loading) {
+
+        return (
+
+            <Layout>
+
+                <h2>Chargement des loyers...</h2>
+
+            </Layout>
+
+        );
+
+    }
 
     return (
 
@@ -201,7 +203,7 @@ export default function Rents() {
                                                     font-bold
                                                 "
                                             >
-                                                {rent.tenant_name.charAt(0)}
+                                                {(rent.tenant_name || "?").charAt(0)}
                                             </div>
 
                                             <div>
@@ -287,13 +289,14 @@ export default function Rents() {
                                                     <Button
                                                         variant="primary"
                                                         className="w-full"
-                                                    >
+                                                   
                                                         onClick={() =>
                                                             window.open(
-                                                                `http://localhost:5000${rent.receipt_path}`,
+                                                               `${import.meta.env.VITE_API_URL.replace("/api", "")}${rent.receipt_path}`,
                                                                 "_blank"
                                                             )
                                                         }
+                                                    >
                                                     
                                                         📄 Quittance
                                                     </Button>
