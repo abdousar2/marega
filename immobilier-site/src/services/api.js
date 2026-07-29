@@ -1,25 +1,23 @@
-const API_URL =
-    import.meta.env.VITE_API_URL ||
-    "http://localhost:5000/api";
+import { api } from "./api";
 
-export async function api(url, options = {}) {
+const RentsService = {
 
-    const response = await fetch(API_URL + url, {
-        headers: {
-            "Content-Type": "application/json",
-            ...(options.headers || {})
-        },
-        ...options
-    });
+    getAll() {
+        return api("/rents");
+    },
 
-    if (!response.ok) {
+    getById(id) {
+        return api(`/rents/${id}`);
+    },
 
-        const error = await response.json();
+    getPending() {
+        return api("/rents/pending");
+    },
 
-        throw new Error(error.message || "Erreur API");
-
+    getLate() {
+        return api("/rents/late");
     }
 
-    return response.json();
+};
 
-}
+export default RentsService;
