@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:5000/api/rents";
+const API_URL = "https://marega.onrender.com/api/rents";
 
 const RentsService = {
 
@@ -18,7 +18,7 @@ const RentsService = {
 
         const res = await fetch(
 
-            `http://localhost:5000/api/rents/${id}`
+            `https://marega.onrender.com/api/rents/${id}`
 
         );
 
