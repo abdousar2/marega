@@ -9,7 +9,7 @@ class PDFService {
         const folder = path.join(__dirname, "../../contracts");
 
         if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder);
+            fs.mkdirSync(folder, { recursive: true });
         }
 
         const filename = `${lease.contract_number}.pdf`;
@@ -21,19 +21,17 @@ class PDFService {
             margin: 50
         });
 
-        doc.pipe(fs.createWriteStream(filepath));
+        const stream = fs.createWriteStream(filepath);
+
+        doc.pipe(stream);
 
         doc.fontSize(22)
-            .text("MAREGA", {
-                align: "center"
-            });
+            .text("MAREGA", { align: "center" });
 
         doc.moveDown();
 
         doc.fontSize(18)
-            .text("CONTRAT DE LOCATION", {
-                align: "center"
-            });
+            .text("CONTRAT DE LOCATION", { align: "center" });
 
         doc.moveDown(2);
 
@@ -51,6 +49,11 @@ class PDFService {
         doc.text(`Caution : ${lease.deposit} FCFA`);
 
         doc.end();
+
+        await new Promise((resolve, reject) => {
+            stream.on("finish", resolve);
+            stream.on("error", reject);
+        });
 
         return `/contracts/${filename}`;
 
