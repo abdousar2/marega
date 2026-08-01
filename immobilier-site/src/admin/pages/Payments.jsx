@@ -73,10 +73,7 @@ export default function Payments() {
         useState("");
 
     const [method, setMethod] =
-        useState("Espèces");
-
-    const [status, setStatus] =
-        useState("Payé");
+        useState("Espèces");   
 
     async function addPayment(e) {
 
@@ -110,7 +107,7 @@ export default function Payments() {
 
                 reference: "",
 
-                status,
+                status: "Payé",
 
                 notes: ""
 
@@ -129,8 +126,7 @@ export default function Payments() {
             setMonth("");
             setPaymentDate("");
             setAmount("");
-            setMethod("Espèces");
-            setStatus("Payé");
+            setMethod("Espèces");            
             setSelectedRent(null);
 
         }
@@ -149,36 +145,31 @@ export default function Payments() {
 
         if (!rentId) return;
 
+        setShowModal(true);
+
         async function loadRent() {
 
             try {
 
-                const rent =
-                    await RentsService.getById(rentId);
+                const rent = await RentsService.getById(rentId);
 
                 setSelectedRent(rent);
 
-                setTenantId(
-                    String(rent.tenant_id)
-                );
+                setTenantId(String(rent.tenant_id));
 
-                setMonth(
-                    rent.due_month.substring(0,10)
-                );
+                setMonth(rent.due_month.substring(0, 10));
 
                 setPaymentDate(
                     new Date()
                         .toISOString()
-                        .substring(0,10)
+                        .substring(0, 10)
                 );
 
-                setAmount(
-                    rent.amount
-                );
+                setAmount(String(rent.amount));
 
-            }
+                setMethod("Espèces");                
 
-            catch(err){
+            } catch (err) {
 
                 console.error(err);
 
@@ -235,24 +226,28 @@ export default function Payments() {
         <PageHeader
             title="Gestion des paiements"
             subtitle="Enregistrez les loyers et consultez l'historique."
-            buttonLabel="+ Nouveau paiement"
-            onButtonClick={() => {
+            buttonLabel={rentId ? null : "+ Nouveau paiement"}
+            onButtonClick={
+                rentId
+                    ? undefined
+                    : () => {
 
-                setTenantId("");
+                        setSelectedRent(null);
 
-                setMonth("");
+                        setTenantId("");
 
-                setPaymentDate("");
+                        setMonth("");
 
-                setAmount("");
+                        setPaymentDate("");
 
-                setMethod("Espèces");
+                        setAmount("");
 
-                setStatus("Payé");
+                        setMethod("Espèces");                        
 
-                setShowModal(true);
+                        setShowModal(true);
 
-            }}
+                    }
+            }
         />
         <br></br>
 
@@ -288,7 +283,11 @@ export default function Payments() {
 
         <Modal
             open={showModal}
-            title="Nouveau paiement"
+            title={
+                rentId
+                    ? "Encaissement du loyer"
+                    : "Nouveau paiement"
+            }
             onClose={()=>setShowModal(false)}
         >
 
@@ -298,6 +297,7 @@ export default function Payments() {
             >            
 
                     <select
+                        disabled={!!rentId}
 
                         value={tenantId}
 
@@ -336,8 +336,8 @@ export default function Payments() {
                     </select>
 
                     <input
-
                         type="date"
+                        readOnly={!!rentId}
 
                         value={month}
 
@@ -360,8 +360,8 @@ export default function Payments() {
                     />
 
                     <input
-
                         type="number"
+                        readOnly={!!rentId}
 
                         placeholder="Montant"
 
@@ -395,23 +395,24 @@ export default function Payments() {
 
                     </select>
 
-                    <select
+                    {rentId && (
 
-                        value={status}
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4">
 
-                        onChange={(e)=>setStatus(e.target.value)}
+                            <h3 className="font-semibold text-green-700">
+                                Encaissement d'un loyer
+                            </h3>
 
-                        className="border p-3 rounded w-full mb-6"
+                            <p className="text-sm mt-2">
 
-                    >
+                                Le règlement de ce loyer sera enregistré comme
+                                <strong> Payé</strong>.
 
-                        <option>Payé</option>
+                            </p>
 
-                        <option>En attente</option>
+                        </div>
 
-                        <option>En retard</option>
-
-                    </select>
+                    )}
 
                     <div className="flex justify-end gap-3 pt-4">
 
@@ -427,7 +428,7 @@ export default function Payments() {
                             type="submit"
                             variant="primary"
                         >
-                            Enregistrer
+                            {rentId ? "💳 Encaisser le loyer" : "Enregistrer"}
                         </Button>
 
                     </div>
