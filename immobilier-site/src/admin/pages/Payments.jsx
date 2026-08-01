@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import RentsService from "../../services/rents.service";
+import { API_BASE } from "../../services/config";
 
 import Layout from "../Layout";
 
@@ -485,7 +486,7 @@ export default function Payments() {
                             {payment.receipt_path && (
 
                                 <a
-                                    href={`http://localhost:5000${payment.receipt_path}`}
+                                    href={`${API_BASE}${payment.receipt_path}`}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="inline-block mt-4 bg-green-600 text-white px-4 py-2 rounded"

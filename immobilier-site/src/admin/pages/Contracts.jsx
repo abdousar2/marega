@@ -1,4 +1,5 @@
 import { useContext, useMemo, useState } from "react";
+import { API_BASE } from "../../services/config";
 import Layout from "../Layout";
 
 
@@ -402,7 +403,7 @@ await LeasesService.create(payload);
                                       variant="primary"
                                       onClick={() =>
                                           window.open(
-                                              `http://localhost:5000${contract.pdf_path}`,
+                                              `${API_BASE}${contract.pdf_path}`,
                                               "_blank"
                                           )
                                       }
