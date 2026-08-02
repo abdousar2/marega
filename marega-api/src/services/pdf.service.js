@@ -4,13 +4,8 @@ const path = require("path");
 
 class PDFService {
 
-    static async generateLeasePDF(lease) {
+    static async generateLeasePDF(lease) {        
         
-        console.log(
-            "PDF enregistré dans :",
-            folder
-        );
-
        const folder = path.resolve(process.cwd(), "contracts");
 
         console.log("process.cwd() =", process.cwd());
