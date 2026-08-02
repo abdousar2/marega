@@ -5,7 +5,11 @@ const path = require("path");
 class PDFService {
 
     static async generateLeasePDF(lease) {
-        console.log("========== PDF SERVICE V2 ==========");
+        
+        console.log(
+            "PDF enregistré dans :",
+            folder
+        );
 
         const folder = path.join(__dirname, "../../contracts");
 

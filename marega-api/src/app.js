@@ -13,6 +13,10 @@ const rentsRoutes = require("./routes/rents.routes");
 
 const app = express();
 
+console.log(
+    "Express sert :",
+    path.join(__dirname, "../contracts")
+);
 app.use(cors());
 app.use(helmet());
 app.use(morgan("dev"));

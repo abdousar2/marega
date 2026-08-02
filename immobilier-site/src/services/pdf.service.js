@@ -5,7 +5,11 @@ const path = require("path");
 class PDFService {
 
     static async generateLeasePDF(lease) {
-        console.log("========== PDF SERVICE V2 ==========");
+        
+        console.log(
+            "PDF enregistré dans :",
+            folder
+        );
 
         const folder = path.join(__dirname, "../../contracts");
 
@@ -63,7 +67,9 @@ class PDFService {
             stream.on("error", reject);
         });
 
-        console.log("PDF enregistré :", filepath);
+        console.log(
+            fs.readdirSync(folder)
+        );
 
         return `/contracts/${filename}`;
 
