@@ -69,13 +69,47 @@ export default function Rents() {
 
             })
 
-            .filter((rent) =>
+            .filter((rent) => {
 
-                (rent.tenant_name || "")
-                    .toLowerCase()
-                    .includes(search.toLowerCase())
+                const keyword = search.toLowerCase();
 
-            );
+                return (
+
+                    (rent.tenant_name || "")
+                        .toLowerCase()
+                        .includes(keyword)
+
+                    ||
+
+                    (rent.contract_number || "")
+                        .toLowerCase()
+                        .includes(keyword)
+
+                    ||
+
+                    (rent.apartment_number || "")
+                        .toLowerCase()
+                        .includes(keyword)
+
+                    ||
+
+                    (rent.status || "")
+                        .toLowerCase()
+                        .includes(keyword)
+
+                    ||
+
+                    new Date(rent.due_month)
+                        .toLocaleDateString("fr-FR", {
+                            month: "long",
+                            year: "numeric"
+                        })
+                        .toLowerCase()
+                        .includes(keyword)
+
+                );
+
+            })
 
     }, [rents, search, filter]);
 
@@ -307,7 +341,7 @@ export default function Rents() {
 
                                                 <p className="text-red-600 font-semibold">
 
-                                                    🔥 Retard :
+                                                    🔥 En retard de
                                                     {getLateDays(rent.due_date)} jours
 
                                                 </p>
@@ -322,13 +356,19 @@ export default function Rents() {
                                                 Montant
                                             </div>
 
+                                            <div className="text-2xl font-bold text-green-700 mt-2">
+
+                                                {Number(rent.amount).toLocaleString()} FCFA
+
+                                            </div>
+
                                             {rent.status === "Payé" && (
 
                                                 <>
 
                                                     <div className="mt-3 text-sm text-slate-500">
 
-                                                        Paiement
+                                                        Mode de paiement
 
                                                     </div>
 
@@ -357,13 +397,7 @@ export default function Rents() {
 
                                             </div>
 
-                                            )}
-
-                                            <div className="text-2xl font-bold text-green-700 mt-2">
-
-                                                {Number(rent.amount).toLocaleString()} FCFA
-
-                                            </div>
+                                            )}                                            
 
                                         </div>
 
@@ -385,7 +419,7 @@ export default function Rents() {
                                                         }
                                                     >
                                                     
-                                                        📄 Quittance
+                                                        📄 Télécharger la quittance
                                                     </Button>
 
                                                 )
