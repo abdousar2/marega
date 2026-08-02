@@ -90,7 +90,7 @@ export default function Payments() {
 
         try {
 
-            await PaymentsService.create({
+            const payment = await PaymentsService.create({
 
                 tenant_id: Number(tenantId),
 
@@ -116,6 +116,17 @@ export default function Payments() {
 
             await reloadPayments();
             await reloadRents();
+            if (payment.receipt_path) {
+
+                window.open(
+
+                    `${API_BASE}${payment.receipt_path}`,
+
+                    "_blank"
+
+                );
+
+            }
             setShowModal(false);
             if (rentId) {
 
