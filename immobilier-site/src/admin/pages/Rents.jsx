@@ -1,9 +1,11 @@
-import { useContext, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { useContext, useMemo, useState, useEffect } from "react";
+import {
+    Link,
+    useLocation,
+    useNavigate
+} from "react-router-dom";
+
 import { API_BASE } from "../../services/config";
-import { useLocation } from "react-router-dom";
-import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
 
 import Layout from "../Layout";
 
@@ -27,6 +29,9 @@ export default function Rents() {
     const [filter, setFilter] = useState("all");
 
     const location = useLocation();
+    const navigate = useNavigate();
+
+    const [showSuccess, setShowSuccess] = useState(false);
 
     useEffect(() => {
 
@@ -36,7 +41,7 @@ export default function Rents() {
 
             setShowSuccess(true);
 
-            setTimeout(() => {
+            const timer = setTimeout(() => {
 
                 setShowSuccess(false);
 
@@ -46,32 +51,12 @@ export default function Rents() {
 
             }, 3000);
 
-        }
-
-    }, [location.search]);
-    const navigate = useNavigate();
-
-    const [showSuccess, setShowSuccess] = useState(false);
-
-    const [successMessage, setSuccessMessage] = useState("");
-
-    useEffect(() => {
-
-        if (location.state?.success) {
-
-            setSuccessMessage(location.state.success);
-
-            const timer = setTimeout(() => {
-
-                setSuccessMessage("");
-
-            }, 3000);
-
             return () => clearTimeout(timer);
 
         }
 
-    }, [location.state]);
+    }, [location.search, navigate]);
+   
 
     function getLateDays(dueDate) {
 
@@ -185,29 +170,7 @@ export default function Rents() {
                 title="Gestion des loyers"
                 subtitle="Suivi automatique des échéances générées par les contrats."
             />
-            <br></br>
-
-            {successMessage && (
-
-                <div
-                    className="
-                        mb-6
-                        rounded-xl
-                        bg-green-100
-                        border
-                        border-green-300
-                        text-green-800
-                        px-5
-                        py-4
-                        font-semibold
-                    "
-                >
-
-                    ✅ {successMessage}
-
-                </div>
-
-            )}
+            <br></br>            
 
             {showSuccess && (
 
