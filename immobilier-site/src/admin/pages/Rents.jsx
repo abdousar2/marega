@@ -342,6 +342,23 @@ export default function Rents() {
 
                                             )}
 
+                                            {rent.status === "Payé" &&
+                                            rent.payment_date && (
+
+                                            <div className="text-sm text-slate-500 mt-2">
+
+                                            Payé le
+
+                                            {" "}
+
+                                            {new Date(
+                                                rent.payment_date
+                                            ).toLocaleDateString("fr-FR")}
+
+                                            </div>
+
+                                            )}
+
                                             <div className="text-2xl font-bold text-green-700 mt-2">
 
                                                 {Number(rent.amount).toLocaleString()} FCFA
