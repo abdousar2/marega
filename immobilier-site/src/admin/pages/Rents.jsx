@@ -28,8 +28,6 @@ export default function Rents() {
 
     const location = useLocation();
 
-    const location = useLocation();
-
     useEffect(() => {
 
         const params = new URLSearchParams(location.search);
