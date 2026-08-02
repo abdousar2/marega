@@ -68,11 +68,17 @@ class LeasesController {
             const completeLease =
                 await Lease.getCompleteById(lease.id);
 
+            console.log("LEASE COMPLET");
+            console.log(completeLease);
+
             // Génération du PDF
+            console.log("Avant generateLeasePDF");
            const pdfPath =
                 await PDFService.generateLeasePDF(
                     completeLease
                 );
+
+            console.log("Après generateLeasePDF");
 
 
             // Sauvegarde du chemin
