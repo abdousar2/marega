@@ -11,7 +11,15 @@ class PDFService {
             folder
         );
 
-        const folder = path.join(__dirname, "../../contracts");
+       const folder = path.resolve(process.cwd(), "contracts");
+
+        console.log("process.cwd() =", process.cwd());
+        console.log("__dirname =", __dirname);
+        console.log("folder =", folder);
+
+        if (!fs.existsSync(folder)) {
+            fs.mkdirSync(folder, { recursive: true });
+        }
 
         console.log("Dossier PDF :", folder);
 
@@ -70,6 +78,8 @@ class PDFService {
         console.log(
             fs.readdirSync(folder)
         );
+
+        console.log("PDF enregistré :", filepath);
 
         return `/contracts/${filename}`;
 

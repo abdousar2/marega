@@ -22,8 +22,18 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 app.use(express.json());
-app.use("/contracts", express.static( path.join(__dirname, "../contracts")));
-app.use("/receipts", express.static( path.join(__dirname, "../receipts")));
+const contractsPath = path.resolve(process.cwd(), "contracts");
+
+console.log("Serving contracts from:", contractsPath);
+
+app.use("/contracts", express.static(contractsPath));
+
+const receiptsPath = path.resolve(process.cwd(), "receipts");
+
+console.log("Serving receipts from:", receiptsPath);
+
+app.use("/receipts", express.static(receiptsPath));
+
 app.use("/api/buildings", buildingsRoutes);
 app.use("/api/apartments", apartmentsRoutes);
 app.use("/api/tenants", tenantsRoutes);
