@@ -1,5 +1,6 @@
 import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE } from "../../services/config";
 
 import Layout from "../Layout";
 
@@ -21,6 +22,22 @@ export default function Rents() {
     const [search, setSearch] = useState("");
 
     const [filter, setFilter] = useState("all");
+
+    function getLateDays(dueDate) {
+
+        const today = new Date();
+
+        const due = new Date(dueDate);
+
+        const diff =
+            Math.floor(
+                (today - due) /
+                (1000 * 60 * 60 * 24)
+            );
+
+        return Math.max(diff, 0);
+
+    }
 
     
 
@@ -188,39 +205,58 @@ export default function Rents() {
                                         "
                                     >
 
-                                        <div className="flex items-center gap-4">
+                                        <div className="flex justify-between items-start">
 
-                                            <div
-                                                className="
-                                                    w-14 h-14
-                                                    rounded-full
-                                                    bg-yellow-600
-                                                    text-white
-                                                    flex
-                                                    items-center
-                                                    justify-center
-                                                    text-xl
-                                                    font-bold
-                                                "
-                                            >
-                                                {(rent.tenant_name || "?").charAt(0)}
+                                            <div className="flex items-center gap-4">
+
+                                                <div
+                                                    className={`
+
+                                                        w-14
+                                                        h-14
+                                                        rounded-full
+                                                        flex
+                                                        items-center
+                                                        justify-center
+                                                        text-xl
+                                                        font-bold
+                                                        text-white
+
+                                                        ${
+                                                            rent.status === "Payé"
+                                                                ? "bg-green-600"
+                                                                : rent.status === "En attente"
+                                                                ? "bg-yellow-500"
+                                                                : "bg-red-600"
+                                                        }
+
+                                                    `}
+                                                >
+
+                                                    {(rent.tenant_name || "?").charAt(0)}
+
+                                                </div>
+
+                                                <div>
+
+                                                    <h2 className="text-xl font-bold">
+
+                                                        {rent.tenant_name}
+
+                                                    </h2>
+
+                                                    <p className="text-slate-500">
+
+                                                        Appartement {rent.apartment_number}
+
+                                                    </p>
+
+                                                </div>
+
                                             </div>
-
-                                            <div>
-
-                                                <p className="text-slate-500 text-sm">
-                                                    Échéance
-                                                </p>
-
-                                                <h2 className="text-xl font-bold">
-                                                    {rent.tenant_name}
-                                                </h2>
-
-                                            </div>
-
-                                        
 
                                             <Badge
+
                                                 color={
                                                     rent.status === "Payé"
                                                         ? "green"
@@ -228,8 +264,11 @@ export default function Rents() {
                                                         ? "orange"
                                                         : "red"
                                                 }
+
                                             >
+
                                                 {rent.status}
+
                                             </Badge>
 
                                         </div>
@@ -264,6 +303,17 @@ export default function Rents() {
                                                 </strong>
                                             </p>
 
+                                            {rent.status === "En retard" && (
+
+                                                <p className="text-red-600 font-semibold">
+
+                                                    🔥 Retard :
+                                                    {getLateDays(rent.due_date)} jours
+
+                                                </p>
+
+                                            )}
+
                                         </div>
 
                                         <div className="mt-6 bg-slate-50 rounded-2xl p-5">
@@ -271,6 +321,26 @@ export default function Rents() {
                                             <div className="text-slate-500 text-sm">
                                                 Montant
                                             </div>
+
+                                            {rent.status === "Payé" && (
+
+                                                <>
+
+                                                    <div className="mt-3 text-sm text-slate-500">
+
+                                                        Paiement
+
+                                                    </div>
+
+                                                    <div className="font-semibold">
+
+                                                        {rent.payment_method}
+
+                                                    </div>
+
+                                                </>
+
+                                            )}
 
                                             <div className="text-2xl font-bold text-green-700 mt-2">
 
@@ -292,9 +362,9 @@ export default function Rents() {
                                                    
                                                         onClick={() =>
                                                             window.open(
-                                                               `${import.meta.env.VITE_API_URL.replace("/api", "")}${rent.receipt_path}`,
-                                                                "_blank"
-                                                            )
+                                                            `${API_BASE}${rent.receipt_path}`,
+                                                            "_blank"
+                                                        )
                                                         }
                                                     >
                                                     
