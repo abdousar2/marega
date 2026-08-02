@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import RentsService from "../../services/rents.service";
 import { API_BASE } from "../../services/config";
 
+
 import Layout from "../Layout";
 
 import {
@@ -130,7 +131,16 @@ export default function Payments() {
             setShowModal(false);
             if (rentId) {
 
-                navigate("/admin/rents");
+                navigate("/admin/rents", {
+
+                    state: {
+
+                        success:
+                            "Paiement enregistré avec succès."
+
+                    }
+
+                });
 
             }
 

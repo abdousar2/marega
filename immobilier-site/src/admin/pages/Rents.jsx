@@ -1,6 +1,8 @@
 import { useContext, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { API_BASE } from "../../services/config";
+import { useLocation } from "react-router-dom";
+import { useEffect } from "react";
 
 import Layout from "../Layout";
 
@@ -22,6 +24,28 @@ export default function Rents() {
     const [search, setSearch] = useState("");
 
     const [filter, setFilter] = useState("all");
+
+    const location = useLocation();
+
+    const [successMessage, setSuccessMessage] = useState("");
+
+    useEffect(() => {
+
+        if (location.state?.success) {
+
+            setSuccessMessage(location.state.success);
+
+            const timer = setTimeout(() => {
+
+                setSuccessMessage("");
+
+            }, 3000);
+
+            return () => clearTimeout(timer);
+
+        }
+
+    }, [location.state]);
 
     function getLateDays(dueDate) {
 
@@ -136,6 +160,28 @@ export default function Rents() {
                 subtitle="Suivi automatique des échéances générées par les contrats."
             />
             <br></br>
+
+            {successMessage && (
+
+                <div
+                    className="
+                        mb-6
+                        rounded-xl
+                        bg-green-100
+                        border
+                        border-green-300
+                        text-green-800
+                        px-5
+                        py-4
+                        font-semibold
+                    "
+                >
+
+                    ✅ {successMessage}
+
+                </div>
+
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
 
