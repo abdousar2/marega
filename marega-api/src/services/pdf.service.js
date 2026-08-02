@@ -5,6 +5,7 @@ const path = require("path");
 class PDFService {
 
     static async generateLeasePDF(lease) {
+        console.log("========== PDF SERVICE V2 ==========");
 
         const folder = path.join(__dirname, "../../contracts");
 
@@ -24,6 +25,11 @@ class PDFService {
         });
 
         const stream = fs.createWriteStream(filepath);
+
+        doc.fontSize(22)
+   .text("MAREGA VERSION 2", {
+       align: "center"
+   });
 
         doc.pipe(stream);
 
