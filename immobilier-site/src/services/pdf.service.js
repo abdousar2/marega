@@ -8,6 +8,8 @@ class PDFService {
 
         const folder = path.join(__dirname, "../../contracts");
 
+        console.log("Dossier PDF :", folder);
+
         if (!fs.existsSync(folder)) {
             fs.mkdirSync(folder, { recursive: true });
         }
@@ -54,6 +56,8 @@ class PDFService {
             stream.on("finish", resolve);
             stream.on("error", reject);
         });
+
+        console.log("PDF enregistré :", filepath);
 
         return `/contracts/${filename}`;
 
