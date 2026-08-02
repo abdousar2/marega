@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { API_BASE } from "../../services/config";
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import Layout from "../Layout";
 
@@ -26,6 +27,33 @@ export default function Rents() {
     const [filter, setFilter] = useState("all");
 
     const location = useLocation();
+
+    const location = useLocation();
+
+    useEffect(() => {
+
+        const params = new URLSearchParams(location.search);
+
+        if (params.get("success") === "1") {
+
+            setShowSuccess(true);
+
+            setTimeout(() => {
+
+                setShowSuccess(false);
+
+                navigate("/admin/rents", {
+                    replace: true
+                });
+
+            }, 3000);
+
+        }
+
+    }, [location.search]);
+    const navigate = useNavigate();
+
+    const [showSuccess, setShowSuccess] = useState(false);
 
     const [successMessage, setSuccessMessage] = useState("");
 
@@ -180,6 +208,27 @@ export default function Rents() {
                     ✅ {successMessage}
 
                 </div>
+
+            )}
+
+            {showSuccess && (
+
+            <div
+                className="
+                    mb-6
+                    bg-green-100
+                    text-green-700
+                    border
+                    border-green-300
+                    rounded-xl
+                    p-4
+                    font-semibold
+                "
+            >
+
+                ✅ Paiement enregistré avec succès.
+
+            </div>
 
             )}
 

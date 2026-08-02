@@ -131,16 +131,7 @@ export default function Payments() {
             setShowModal(false);
             if (rentId) {
 
-                navigate("/admin/rents", {
-
-                    state: {
-
-                        success:
-                            "Paiement enregistré avec succès."
-
-                    }
-
-                });
+                navigate("/admin/rents?success=1");
 
             }
 
@@ -441,7 +432,17 @@ export default function Payments() {
                         <Button
                             type="button"
                             variant="secondary"
-                            onClick={() => setShowModal(false)}
+                            onClick={() => {
+
+                            setShowModal(false);
+
+                            if (rentId) {
+
+                                navigate("/admin/rents");
+
+                            }
+
+                        }}
                         >
                             Annuler
                         </Button>
