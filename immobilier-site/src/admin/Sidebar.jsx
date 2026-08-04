@@ -1,6 +1,6 @@
 import { NavLink } from "react-router-dom";
 
-export default function Sidebar() {
+export default function Sidebar({ closeSidebar }) {
 
     const sections = [
 
@@ -93,6 +93,8 @@ export default function Sidebar() {
                                         to={url}
 
                                         end={url === "/admin"}
+                                        
+                                        onClick={() => closeSidebar?.()}
 
                                         className={({ isActive }) =>
 
