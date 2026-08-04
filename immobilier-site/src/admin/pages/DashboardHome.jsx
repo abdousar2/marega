@@ -98,6 +98,7 @@ export default function DashboardHome() {
                 subtitle="Bienvenue sur votre plateforme de gestion immobilière MAREGA."
 
             />
+            <br></br><br></br>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
 
