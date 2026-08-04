@@ -30,15 +30,7 @@ export default function Layout({ children }) {
 
                     </div>
 
-                    <div className="flex items-center gap-6">
-
-                        <input
-
-                            placeholder="Rechercher..."
-
-                            className="w-80 rounded-xl border border-slate-300 px-4 py-2"
-
-                        />
+                    <div className="flex items-center gap-6">                        
 
                         <button className="text-2xl">
 
