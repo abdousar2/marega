@@ -16,6 +16,25 @@ import { BuildingsContext } from "../../context/BuildingsContext";
 import TenantsService from "../../services/tenants.service";
 
 export default function Tenants() {
+
+  const formatDate = (date) => {
+
+    if (!date) return "—";
+
+    // On récupère uniquement la partie YYYY-MM-DD
+    // pour éviter les problèmes de décalage horaire.
+    const datePart = String(date).split("T")[0];
+
+    const [year, month, day] = datePart.split("-");
+
+    if (!year || !month || !day) {
+      return date;
+    }
+
+    return `${day}/${month}/${year}`;
+
+  };
+
   const { apartments } =
     useContext(ApartmentsContext);
 
@@ -94,6 +113,8 @@ export default function Tenants() {
         </Layout>
       );
     }  
+
+    
 
     
 
@@ -606,7 +627,7 @@ export default function Tenants() {
               </p>
 
               <p className="mt-1">
-                📅 Entrée : {tenant.entry_date}
+                📅 Entrée : {formatDate(tenant.entry_date)}
               </p>
 
               <p className="mt-1">

@@ -363,6 +363,7 @@ export default function Payments() {
                     <input
 
                         type="date"
+                        readOnly={!!rentId}
 
                         value={paymentDate}
 

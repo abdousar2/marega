@@ -20,6 +20,16 @@ import LeasesService from "../../services/leases.service";
 
 export default function Contracts() {
 
+    const formatDate = (date) => {
+
+        if (!date) return "—";
+
+        const [year, month, day] =
+            String(date).substring(0, 10).split("-");
+
+        return `${day}/${month}/${year}`;
+    };
+
   const { tenants } =
     useContext(TenantsContext);
 
@@ -421,6 +431,7 @@ export default function Contracts() {
 
           <Button
               type="button"
+              color="red"
               variant="secondary"
               onClick={() => setShowModal(false)}
           >
@@ -538,11 +549,11 @@ export default function Contracts() {
                               </p>
 
                               <p>
-                                  📅 Début : {contract.start_date}
+                                  📅 Début : {formatDate(contract.start_date)}
                               </p>
 
                               <p>
-                                  📅 Fin : {contract.end_date}
+                                  📅 Fin : {formatDate(contract.end_date)}
                               </p>
 
                           </div>

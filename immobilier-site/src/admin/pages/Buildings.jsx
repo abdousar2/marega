@@ -678,7 +678,7 @@ export default function Buildings() {
                         <div className="flex justify-end gap-3 pt-4">
 
                             <Button
-                                color="gray"
+                                color="red"
                                 type="button"
                                 onClick={() => {
                                     setShowModal(false);

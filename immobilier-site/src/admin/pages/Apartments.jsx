@@ -605,16 +605,37 @@ export default function Apartments() {
               }
               className="border p-3 w-full mb-4 rounded"
             />
+            
+              <select
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                        className="border p-3 w-full mb-4 rounded"
+                    >
+                        <option value="">
+                            Type (Studio, F2, F3...)
+                        </option>
 
-            <input
-                type="text"
-                placeholder="Type (Studio, F2, F3...)"
-                value={type}
-                onChange={(e) =>
-                  setType(e.target.value)
-                }
-                className="border p-3 w-full mb-4 rounded"
-              />
+                        <option value="F1">
+                            F1
+                        </option>
+
+                        <option value="F2">
+                            F2
+                        </option>
+
+                        <option value="F3">
+                            F3
+                        </option>
+
+                        <option value="F4">
+                            F4
+                        </option>
+
+                        <option value="F5">
+                            F5
+                        </option>
+                        
+                    </select>
 
               <input
                 type="number"
