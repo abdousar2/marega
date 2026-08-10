@@ -52,13 +52,13 @@ export default function Layout({ children }) {
 
                         <div>
 
-                            <h1 className="text-lg lg:text-2xl font-bold text-slate-800">
-                                MAREGA ERP
-                            </h1>
+                            <h1 className="text-2xl font-bold text-slate-800">
+                            IBM MAREGA
+                        </h1>
 
-                            <p className="hidden lg:block text-sm text-slate-500">
-                                Gestion Immobilière Professionnelle
-                            </p>
+                        <p className="text-sm text-slate-500">
+                            Agence Immobilière • Gestion locative
+                        </p>
 
                         </div>
 

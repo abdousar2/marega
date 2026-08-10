@@ -46,22 +46,15 @@ export default function Sidebar({ closeSidebar }) {
 
         <aside className="w-72 bg-slate-900 text-white flex flex-col">
 
-            <div className="h-24 flex flex-col justify-center items-center border-b border-slate-700">
+                    <div className="h-28 flex items-center justify-center border-b border-slate-700 bg-blue p-3">
 
-                <h1 className="text-3xl font-bold">
+            <img
+                src="/images/logo-ibm-marega.png"
+                alt="IBM MAREGA"
+                className="w-72 h-28"
+            />
 
-                    MAREGA
-
-                </h1>
-
-                <p className="text-slate-400 text-sm">
-
-                    ERP Immobilier
-
-                </p>
-
-            </div>
-
+        </div>
             <div className="flex-1 overflow-y-auto px-4 py-6">
 
                 {

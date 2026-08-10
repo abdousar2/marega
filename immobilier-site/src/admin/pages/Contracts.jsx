@@ -10,7 +10,7 @@ import {
     Modal,
     Button,
     Badge,
-Empty
+    Empty
 } from "../../components/ui";
 
 import { TenantsContext } from "../../context/TenantsContext";
@@ -35,11 +35,21 @@ export default function Contracts() {
   const [tenantId, setTenantId] =
     useState("");
 
+// ==========================================
+// NOUVELLES INFORMATIONS DU CONTRAT
+// ===========================================
+
+  const [identityNumber, setIdentityNumber] =
+    useState("");
+
+  const [level, setLevel] =
+    useState("");
+
   const [startDate, setStartDate] =
     useState("");
 
   const [endDate, setEndDate] =
-    useState("");
+    useState("");   
 
   const [search, setSearch] = useState("");
 
@@ -111,6 +121,26 @@ export default function Contracts() {
 
       }
 
+    // ==========================================
+    // VALIDATION DES NOUVELLES INFORMATIONS
+    // ==========================================
+
+      if (!identityNumber.trim()) {
+
+            alert("Veuillez renseigner le numéro de carte d'identité.");
+
+            return;
+
+        }
+
+        if (!level.trim()) {
+
+            alert("Veuillez renseigner le niveau de l'appartement.");
+
+            return;
+
+        }
+
       try {
 
         console.log("Appartement sélectionné :", apartment);
@@ -120,6 +150,10 @@ export default function Contracts() {
             tenant_id: tenant.id,
 
             apartment_id: apartment.id,
+
+            identity_number: identityNumber.trim(),
+
+            level: level.trim(),
 
             start_date: startDate,
 
@@ -139,33 +173,41 @@ export default function Contracts() {
 
         };
 
-        console.log(payload);
+        console.log("Contrat envoyé :", payload);
 
-await LeasesService.create(payload);
-           
+    await LeasesService.create(payload);
+            
 
-          await reloadContracts();
+            await reloadContracts();
 
-          setTenantId("");
+            // RESET DU FORMULAIRE
 
-          setStartDate("");
+            setTenantId("");
 
-          setEndDate("");
-          setShowModal(false);
+            setIdentityNumber("");
 
-      }
+            setLevel("");
 
-      catch(err){
+            setStartDate("");
 
-          console.error(err);
+            setEndDate("");
 
-          alert("Impossible de créer le contrat.");
+            setShowModal(false);
 
-      }
-      
+        }
 
-  };
-  return (
+        catch(err){
+
+            console.error(err);
+
+            alert("Impossible de créer le contrat.");
+
+        }
+        
+
+    };
+    return (
+
     <Layout>
 
       <PageHeader
@@ -174,13 +216,15 @@ await LeasesService.create(payload);
           buttonLabel="+ Nouveau contrat"
           onButtonClick={() => {
 
-              setTenantId("");
-              setStartDate("");
-              setEndDate("");
+            setTenantId("");
+            setIdentityNumber("");
+            setLevel("");
+            setStartDate("");
+            setEndDate("");
 
-              setShowModal(true);
+            setShowModal(true);
 
-          }}
+        }}
       />
       <br></br>
 
@@ -214,6 +258,10 @@ await LeasesService.create(payload);
       />
       <br></br><br></br>
 
+      {/* =====================================
+                        MODAL CONTRAT
+      ====================================== */}
+
       <Modal
           open={showModal}
           title="Nouveau contrat"
@@ -224,6 +272,13 @@ await LeasesService.create(payload);
               onSubmit={addContract}
               className="space-y-5"
           >
+            {/* LOCATAIRE */}
+
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+
+                Locataire
+
+            </label>
 
           <select
               value={tenantId}
@@ -246,17 +301,119 @@ await LeasesService.create(payload);
                   ))}
           </select>
 
+          {/* =================================
+            NUMÉRO CARTE D'IDENTITÉ
+          ================================== */}
+
+          <label className="block text-sm font-semibold text-slate-700 mb-2">
+
+              Numéro de carte d'identité
+
+          </label>
+
+          <input
+                type="text"
+                value={identityNumber}
+                onChange={(e) =>
+                    setIdentityNumber(
+                        e.target.value
+                    )
+                }
+                placeholder="Ex : 1 790 1997 00028"
+                className="border p-3 w-full rounded-xl"
+            />
+
+             {/* =================================
+                    NIVEAU
+             ================================== */}
+
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Niveau / Étage
+            </label>
+
+            <select
+                value={level}
+                onChange={(e) => setLevel(e.target.value)}
+                className="border p-3 w-full rounded-xl"
+            >
+                <option value="">
+                    Choisir le niveau
+                </option>
+
+                <option value="Rez-de-chaussée">
+                    Rez-de-chaussée
+                </option>
+
+                <option value="1er étage">
+                    1er étage
+                </option>
+
+                <option value="2ème étage">
+                    2ème étage
+                </option>
+
+                <option value="3ème étage">
+                    3ème étage
+                </option>
+
+                <option value="4ème étage">
+                    4ème étage
+                </option>
+
+                <option value="5ème étage">
+                    5ème étage
+                </option>
+
+                <option value="6ème étage">
+                    6ème étage
+                </option>
+
+                <option value="7ème étage">
+                    7ème étage
+                </option>
+
+                <option value="8ème étage">
+                    8ème étage
+                </option>
+
+                <option value="9ème étage">
+                    9ème étage
+                </option>
+
+                <option value="10ème étage">
+                    10ème étage
+                </option>
+            </select>
+
+            {/* DATE DEBUT */}
+
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+
+                Date de début
+
+            </label>
+
           <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              placeholder="Dâte de début"
               className="border p-3 w-full rounded-xl"
           />
+
+          {/* DATE FIN */}
+
+            <label className="block text-sm font-semibold text-slate-700 mb-2">
+
+                 Date de fin
+
+            </label>
 
           <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              placeholder="Dâte de fin"
               className="border p-3 w-full rounded-xl"
           />
 
@@ -282,6 +439,10 @@ await LeasesService.create(payload);
       </form>
 
       </Modal>
+
+      {/* =====================================
+                LISTE DES CONTRATS
+      ====================================== */}
 
 
       <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 mt-8">
@@ -353,8 +514,27 @@ await LeasesService.create(payload);
                                   👤 <strong>{tenant?.first_name} {tenant?.last_name}</strong>
                               </p>
 
+                               <p>
+
+                                    🪪 Carte d'identité :{" "}
+                                    <strong>
+                                        {contract.identity_number || "—"}
+                                    </strong>
+
+                               </p>
+
                               <p>
                                   🏠 Appartement <strong>{apartment?.number}</strong>
+                              </p>
+
+                              <p>
+
+                                    🏢 Niveau :{" "}
+
+                                    <strong>
+                                        {contract.level || "—"}
+                                    </strong>
+
                               </p>
 
                               <p>
