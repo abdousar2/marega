@@ -549,23 +549,70 @@ export default function Buildings() {
                             "
                             required
                         />
+                        
 
-                        <input
-                            type="text"
-                            placeholder="Nombre d'étages"
-                            value={floors}
-                            onChange={(e) => setFloors(e.target.value)}
-                            className="
-                            w-full
-                            border
-                            border-slate-300
-                            px-4
-                            py-3
-                            focus:ring-2
-                            focus:ring-blue-500
-                            outline-none
-                            "
-                        />
+                    <select
+                        value={floors}
+                        onChange={(e) => setFloors(e.target.value)}
+                        className="
+                                    w-full
+                                    border
+                                    border-slate-300
+                                    px-4
+                                    py-3
+                                    focus:ring-2
+                                    focus:ring-blue-500
+                                    outline-none
+                                    "
+                    >
+                        <option value="">
+                            Nombre d'étages
+                        </option>
+
+                        <option value="Rez-de-chaussée">
+                            Rez-de-chaussée
+                        </option>
+
+                        <option value="1er étage">
+                            R + 1
+                        </option>
+
+                        <option value="2ème étage">
+                            R + 2
+                        </option>
+
+                        <option value="3ème étage">
+                            R + 3
+                        </option>
+
+                        <option value="4ème étage">
+                            R + 4
+                        </option>
+
+                        <option value="5ème étage">
+                            R + 5
+                        </option>
+
+                        <option value="6ème étage">
+                            R + 6
+                        </option>
+
+                        <option value="7ème étage">
+                            R + 7
+                        </option>
+
+                        <option value="8ème étage">
+                            R + 8
+                        </option>
+
+                        <option value="9ème étage">
+                            R + 9
+                        </option>
+
+                        <option value="10ème étage">
+                            R + 10
+                        </option>
+                    </select>
 
                         <select
                             value={status}
