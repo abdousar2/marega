@@ -143,19 +143,20 @@ class Lease {
                 deposit,
                 payment_day,
                 status,
-                notes
+                notes,
+                identity_number,
+                level
             )
 
             VALUES
             (
-                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
+                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
             )
 
             RETURNING *
             `,
 
             [
-
                 data.apartment_id,
                 data.tenant_id,
                 contractNumber,
@@ -166,8 +167,9 @@ class Lease {
                 data.deposit,
                 data.payment_day,
                 data.status,
-                data.notes
-
+                data.notes,
+                data.identity_number,
+                data.level
             ]
 
         );
@@ -196,15 +198,16 @@ class Lease {
                 payment_day = $9,
                 status = $10,
                 notes = $11,
+                identity_number = $12,
+                level = $13,
                 updated_at = CURRENT_TIMESTAMP
 
-            WHERE id = $12
+            WHERE id = $14
 
             RETURNING *
             `,
 
             [
-
                 data.apartment_id,
                 data.tenant_id,
                 data.contract_number,
@@ -216,8 +219,9 @@ class Lease {
                 data.payment_day,
                 data.status,
                 data.notes,
+                data.identity_number,
+                data.level,
                 id
-
             ]
 
         );
