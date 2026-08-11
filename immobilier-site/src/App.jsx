@@ -10,6 +10,7 @@ import ApartmentDetails from "./admin/pages/ApartmentDetails";
 import Contracts from "./admin/pages/Contracts";
 import Rents from "./admin/pages/Rents";
 import Expenses from "./admin/pages/Expenses";
+import PaymentDetails from "./admin/pages/PaymentDetails";
 
 function App() {
   return (
@@ -48,13 +49,18 @@ function App() {
         />
 
         <Route
-          path="/admin/payments"
-          element={<Payments />}
+            path="/admin/payments"
+            element={<Payments />}
         />
 
         <Route
-          path="/admin/messages"
-          element={<Messages />}
+            path="/admin/payments/:id"
+            element={<PaymentDetails />}
+        />
+
+        <Route
+            path="/admin/messages"
+            element={<Messages />}
         />
 
         <Route

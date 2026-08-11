@@ -1,5 +1,7 @@
 import { useContext, useMemo } from "react";
 
+import { useNavigate } from "react-router-dom";
+
 import {
     BuildingsContext
 } from "../../context/BuildingsContext";
@@ -38,6 +40,8 @@ import {
 
 export default function DashboardHome() {
 
+    const navigate = useNavigate();
+
     const { buildings } = useContext(BuildingsContext);
 
     const { apartments } = useContext(ApartmentsContext);
@@ -50,8 +54,15 @@ export default function DashboardHome() {
 
     const { expenses } = useContext(ExpensesContext);
 
-    const occupied = tenants.length;
+    const activeContracts =
+        contracts.filter(
+            contract =>
+                contract.status === "Actif"
+        );
 
+    const occupied =
+        activeContracts.length;
+    
     const available = apartments.length - occupied;
 
     const occupationRate =
@@ -62,37 +73,25 @@ export default function DashboardHome() {
             : 0;
 
     const totalPaid = payments
-
         .filter(p => p.status === "Payé")
-
         .reduce(
-
             (total, payment) =>
-
                 total + Number(payment.amount),
-
             0
-
         );
 
+    const paidPayments = payments.filter(
+        payment => payment.status === "Payé"
+    );
+
     const totalUnpaid = payments
-
-    
-
         .filter(
-
             payment => payment.status !== "Payé"
-
         )
-
         .reduce(
-
             (total, payment) =>
-
                 total + Number(payment.amount),
-
             0
-
         );
 
     const totalExpenses = expenses.reduce(
@@ -119,7 +118,8 @@ export default function DashboardHome() {
                     label: payment.tenant_name
                         ? `Loyer - ${payment.tenant_name}`
                         : "Paiement de loyer",
-                    amount: Number(payment.amount || 0)
+                    amount: Number(payment.amount || 0),
+                    url: `/admin/payments/${payment.id}`
                 }));
 
             const expenseOperations = expenses
@@ -128,7 +128,8 @@ export default function DashboardHome() {
                     type: "sortie",
                     date: expense.expense_date,
                     label: expense.label || "Dépense",
-                    amount: Number(expense.amount || 0)
+                    amount: Number(expense.amount || 0),
+                    url: `/admin/expenses`
                 }));
 
             return [
@@ -313,6 +314,89 @@ export default function DashboardHome() {
 
                 </Card>
 
+                <Card className="mt-6">
+
+                    <h2 className="text-2xl font-bold mb-8">
+                        Indicateurs des loyers
+                    </h2>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+
+                        <div className="
+                            rounded-2xl
+                            bg-orange-50
+                            border
+                            border-orange-100
+                            p-8
+                        ">
+
+                            <p className="
+                                text-orange-700
+                                font-medium
+                            ">
+                                Loyers impayés
+                            </p>
+
+                            <h2 className="
+                                text-4xl
+                                font-bold
+                                text-orange-600
+                                mt-5
+                            ">
+
+                                {totalUnpaid.toLocaleString("fr-FR")}
+
+                            </h2>
+
+                            <p className="
+                                text-slate-500
+                                mt-3
+                            ">
+                                FCFA
+                            </p>
+
+                        </div>
+
+
+                        <div className="
+                            rounded-2xl
+                            bg-green-50
+                            border
+                            border-green-100
+                            p-8
+                        ">
+
+                            <p className="
+                                text-green-700
+                                font-medium
+                            ">
+                                Paiements encaissés
+                            </p>
+
+                            <h2 className="
+                                text-4xl
+                                font-bold
+                                text-green-600
+                                mt-5
+                            ">
+
+                                {paidPayments.length}
+
+                            </h2>
+
+                            <p className="
+                                text-slate-500
+                                mt-3
+                            ">
+                                paiements
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </Card>
+
                 <Card>
 
                     <h2 className="text-2xl font-bold mb-8">
@@ -444,7 +528,19 @@ export default function DashboardHome() {
 
                             <div
                                 key={operation.id}
-                                className="flex items-center justify-between py-5"
+                                onClick={() => navigate(operation.url)}
+                                className="
+                                    flex
+                                    items-center
+                                    justify-between
+                                    py-5
+                                    px-4
+                                    -mx-4
+                                    rounded-xl
+                                    cursor-pointer
+                                    hover:bg-slate-50
+                                    transition
+                                "
                             >
 
                                 <div className="flex items-center gap-4">
@@ -596,7 +692,7 @@ export default function DashboardHome() {
                             </span>
 
                             <Badge color="green">
-                                {contracts.length}
+                                {activeContracts.length}
                             </Badge>
 
                         </div>

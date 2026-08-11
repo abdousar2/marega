@@ -30,7 +30,10 @@ class PaymentsController {
 
         try {
 
-            const payment = await Payment.getById(req.params.id);
+            const payment =
+                await Payment.getCompleteById(
+                    req.params.id
+                );
 
             if (!payment) {
 
@@ -49,7 +52,8 @@ class PaymentsController {
             console.error(err);
 
             res.status(500).json({
-                error: "Erreur lors du chargement du paiement."
+                error:
+                    "Erreur lors du chargement du paiement."
             });
 
         }

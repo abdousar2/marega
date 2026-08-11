@@ -478,7 +478,20 @@ export default function Payments() {
 
                             key={payment.id}
 
-                            className="bg-white rounded-xl shadow p-5"
+                            onClick={() =>
+                                navigate(`/admin/payments/${payment.id}`)
+                            }
+
+                            className="
+                                bg-white
+                                rounded-xl
+                                shadow
+                                p-5
+                                cursor-pointer
+                                hover:shadow-lg
+                                hover:-translate-y-1
+                                transition-all
+                            "
 
                         >
 
@@ -509,10 +522,27 @@ export default function Payments() {
                             {payment.receipt_path && (
 
                                 <a
+
                                     href={`${API_BASE}${payment.receipt_path}`}
+
                                     target="_blank"
+
                                     rel="noreferrer"
-                                    className="inline-block mt-4 bg-green-600 text-white px-4 py-2 rounded"
+
+                                    onClick={(e) =>
+                                        e.stopPropagation()
+                                    }
+
+                                    className="
+                                        inline-block
+                                        mt-4
+                                        bg-green-600
+                                        text-white
+                                        px-4
+                                        py-2
+                                        rounded
+                                    "
+
                                 >
                                     📄 Télécharger la quittance
                                 </a>
