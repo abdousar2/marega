@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useMemo } from "react";
 
 import {
     BuildingsContext
@@ -19,6 +19,10 @@ import {
 import {
     PaymentsContext
 } from "../../context/PaymentsContext";
+
+import {
+    ExpensesContext
+} from "../../context/ExpensesContext";
 
 import {
 
@@ -43,6 +47,8 @@ export default function DashboardHome() {
     const { contracts } = useContext(ContractsContext);
 
     const { payments } = useContext(PaymentsContext);
+
+    const { expenses } = useContext(ExpensesContext);
 
     const occupied = tenants.length;
 
@@ -71,6 +77,8 @@ export default function DashboardHome() {
 
     const totalUnpaid = payments
 
+    
+
         .filter(
 
             payment => payment.status !== "Payé"
@@ -87,7 +95,65 @@ export default function DashboardHome() {
 
         );
 
+    const totalExpenses = expenses.reduce(
+
+            (total, expense) =>
+
+                total + Number(expense.amount || 0),
+
+            0
+
+        );
+
+        const netBalance =
+            totalPaid - totalExpenses;
+
+        const recentOperations = useMemo(() => {
+
+            const paymentOperations = payments
+                .filter(payment => payment.status === "Payé")
+                .map(payment => ({
+                    id: `payment-${payment.id}`,
+                    type: "entrée",
+                    date: payment.payment_date || payment.payment_month,
+                    label: payment.tenant_name
+                        ? `Loyer - ${payment.tenant_name}`
+                        : "Paiement de loyer",
+                    amount: Number(payment.amount || 0)
+                }));
+
+            const expenseOperations = expenses
+                .map(expense => ({
+                    id: `expense-${expense.id}`,
+                    type: "sortie",
+                    date: expense.expense_date,
+                    label: expense.label || "Dépense",
+                    amount: Number(expense.amount || 0)
+                }));
+
+            return [
+                ...paymentOperations,
+                ...expenseOperations
+            ]
+                .sort(
+                    (a, b) =>
+                        new Date(b.date) -
+                        new Date(a.date)
+                )
+                .slice(0, 8);
+
+        }, [payments, expenses]);
+
+        const expenseCount = expenses.length;
+
+        const averageExpense =
+            expenseCount > 0
+                ? totalExpenses / expenseCount
+                : 0;
+
     return (
+
+        
 
         <div className="space-y-10">
 
@@ -159,11 +225,11 @@ export default function DashboardHome() {
 
                     <h2 className="text-2xl font-bold mb-8">
 
-                        Revenus
+                        Situation financière
 
                     </h2>
 
-                    <div className="grid md:grid-cols-2 gap-6">
+                    <div className="grid md:grid-cols-3 gap-6">
 
                         <div className="rounded-2xl bg-green-50 border border-green-100 p-8">
 
@@ -173,7 +239,7 @@ export default function DashboardHome() {
 
                             </p>
 
-                            <h2 className="text-5xl font-bold text-green-600 mt-5">
+                            <h2 className="text-4xl font-bold text-green-600 mt-5">
 
                                 {totalPaid.toLocaleString()}
 
@@ -191,13 +257,13 @@ export default function DashboardHome() {
 
                             <p className="text-red-700 font-medium">
 
-                                Loyers impayés
+                                Dépenses
 
                             </p>
 
-                            <h2 className="text-5xl font-bold text-red-600 mt-5">
+                            <h2 className="text-4xl font-bold text-red-600 mt-5">
 
-                                {totalUnpaid.toLocaleString()}
+                                {totalExpenses.toLocaleString()}
 
                             </h2>
 
@@ -205,6 +271,40 @@ export default function DashboardHome() {
 
                                 FCFA
 
+                            </p>
+
+                        </div>
+
+                        <div
+                            className={`rounded-2xl border p-8 ${
+                                netBalance >= 0
+                                    ? "bg-blue-50 border-blue-100"
+                                    : "bg-orange-50 border-orange-100"
+                            }`}
+                        >
+
+                            <p
+                                className={`font-medium ${
+                                    netBalance >= 0
+                                        ? "text-blue-700"
+                                        : "text-orange-700"
+                                }`}
+                            >
+                                Solde net
+                            </p>
+
+                            <h2
+                                className={`text-4xl font-bold mt-5 ${
+                                    netBalance >= 0
+                                        ? "text-blue-600"
+                                        : "text-orange-600"
+                                }`}
+                            >
+                                {netBalance.toLocaleString()}
+                            </h2>
+
+                            <p className="text-slate-500 mt-3">
+                                FCFA
                             </p>
 
                         </div>
@@ -310,14 +410,145 @@ export default function DashboardHome() {
             </div>
             <br></br>
 
+            <Card>
+
+                <div className="flex items-center justify-between mb-6">
+
+                    <div>
+
+                        <h2 className="text-2xl font-bold">
+                            Dernières opérations
+                        </h2>
+
+                        <p className="text-slate-500 text-sm mt-1">
+                            Les dernières entrées et sorties d'argent
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {recentOperations.length === 0 ? (
+
+                    <div className="py-10 text-center text-slate-500">
+
+                        Aucune opération financière enregistrée.
+
+                    </div>
+
+                ) : (
+
+                    <div className="divide-y divide-slate-100">
+
+                        {recentOperations.map(operation => (
+
+                            <div
+                                key={operation.id}
+                                className="flex items-center justify-between py-5"
+                            >
+
+                                <div className="flex items-center gap-4">
+
+                                    <div
+                                        className={`
+                                            w-11
+                                            h-11
+                                            rounded-full
+                                            flex
+                                            items-center
+                                            justify-center
+                                            text-lg
+                                            ${
+                                                operation.type === "entrée"
+                                                    ? "bg-green-100"
+                                                    : "bg-red-100"
+                                            }
+                                        `}
+                                    >
+
+                                        {operation.type === "entrée"
+                                            ? "↓"
+                                            : "↑"}
+
+                                    </div>
+
+                                    <div>
+
+                                        <p className="font-semibold text-slate-800">
+
+                                            {operation.label}
+
+                                        </p>
+
+                                        <p className="text-sm text-slate-500 mt-1">
+
+                                            {operation.date
+                                                ? new Date(
+                                                    operation.date
+                                                ).toLocaleDateString("fr-FR")
+                                                : "Date inconnue"
+                                            }
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                                <div className="text-right">
+
+                                    <p
+                                        className={`
+                                            font-bold
+                                            ${
+                                                operation.type === "entrée"
+                                                    ? "text-green-600"
+                                                    : "text-red-600"
+                                            }
+                                        `}
+                                    >
+
+                                        {operation.type === "entrée"
+                                            ? "+"
+                                            : "-"
+                                        }
+
+                                        {operation.amount.toLocaleString(
+                                            "fr-FR"
+                                        )}
+
+                                        {" "}FCFA
+
+                                    </p>
+
+                                    <p className="text-xs text-slate-400 mt-1">
+
+                                        {operation.type === "entrée"
+                                            ? "Entrée"
+                                            : "Sortie"
+                                        }
+
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
+                )}
+
+            </Card>
+            <br></br>
+
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
                 <Card>
 
                     <h2 className="text-2xl font-bold mb-6">
-
                         Alertes
-
                     </h2>
 
                     <div className="space-y-4">
@@ -325,15 +556,47 @@ export default function DashboardHome() {
                         <div className="flex items-center justify-between">
 
                             <span>
+                                Dépenses enregistrées
+                            </span>
 
+                            <Badge color="orange">
+                                {expenses.length}
+                            </Badge>
+
+                        </div>
+
+                        <div className="flex items-center justify-between">
+
+                            <span>
+                                Total des dépenses
+                            </span>
+
+                            <strong className="text-red-600">
+                                {totalExpenses.toLocaleString()} FCFA
+                            </strong>
+
+                        </div>
+
+                        <div className="flex items-center justify-between">
+
+                            <span>
+                                Dépense moyenne
+                            </span>
+
+                            <strong>
+                                {Math.round(averageExpense).toLocaleString()} FCFA
+                            </strong>
+
+                        </div>
+
+                        <div className="flex items-center justify-between">
+
+                            <span>
                                 Contrats actifs
-
                             </span>
 
                             <Badge color="green">
-
                                 {contracts.length}
-
                             </Badge>
 
                         </div>
@@ -341,15 +604,11 @@ export default function DashboardHome() {
                         <div className="flex items-center justify-between">
 
                             <span>
-
                                 Appartements disponibles
-
                             </span>
 
                             <Badge color="blue">
-
                                 {available}
-
                             </Badge>
 
                         </div>
@@ -357,23 +616,15 @@ export default function DashboardHome() {
                         <div className="flex items-center justify-between">
 
                             <span>
-
                                 Paiements impayés
-
                             </span>
 
                             <Badge color="red">
-
                                 {
-
                                     payments.filter(
-
                                         p => p.status !== "Payé"
-
                                     ).length
-
                                 }
-
                             </Badge>
 
                         </div>

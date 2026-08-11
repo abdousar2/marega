@@ -9,6 +9,7 @@ const tenantsRoutes = require("./routes/tenants.routes");
 const leasesRoutes = require("./routes/leases.routes");
 const paymentsRoutes = require("./routes/payments.routes");
 const rentsRoutes = require("./routes/rents.routes");
+const expensesRoutes = require("./routes/expenses.routes");
 
 
 const app = express();
@@ -40,6 +41,7 @@ app.use("/api/tenants", tenantsRoutes);
 app.use("/api/leases", leasesRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/rents", rentsRoutes);
+app.use("/api/expenses", expensesRoutes);
 
 app.get("/", (req, res) => {
     res.json({
