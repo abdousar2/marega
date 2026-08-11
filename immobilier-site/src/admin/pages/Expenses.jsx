@@ -636,6 +636,7 @@ export default function Expenses() {
                 />
 
             </div>
+            <br></br>
 
 
             {/* =================================================
@@ -715,6 +716,7 @@ export default function Expenses() {
 
 
             </div>
+            <br></br>
 
 
             {/* =================================================
@@ -1572,6 +1574,7 @@ export default function Expenses() {
                         <Button
 
                             type="button"
+                            color="red"
 
                             variant="secondary"
 
