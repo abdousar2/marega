@@ -216,13 +216,93 @@ export default function Layout({ children }) {
                             onClick={handleLogout}
                             title="Se déconnecter"
                             className="
-                                text-slate-500
+                                group
+                                relative
+                                flex
+                                items-center
+                                gap-3
+                                px-3
+                                py-2.5
+                                rounded-2xl
+                                border
+                                border-blue-100
+                                bg-blue-50
+                                text-blue-700
+                                shadow-sm
+                                hover:border-red-200
+                                hover:bg-red-50
                                 hover:text-red-600
-                                transition
-                                text-xl
+                                hover:shadow-md
+                                active:scale-95
+                                transition-all
+                                duration-200
                             "
                         >
-                            ⏻
+                            {/* Icône */}
+
+                            <span
+                                className="
+                                    flex
+                                    items-center
+                                    justify-center
+                                    w-9
+                                    h-9
+                                    rounded-xl
+                                    bg-blue-100
+                                    text-blue-700
+                                    group-hover:bg-red-100
+                                    group-hover:text-red-600
+                                    transition-all
+                                    duration-200
+                                "
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    strokeWidth="2"
+                                    className="
+                                        w-5
+                                        h-5
+                                        transition-transform
+                                        duration-200
+                                        group-hover:translate-x-0.5
+                                    "
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15"
+                                    />
+
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="M18 12H9.75"
+                                    />
+
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        d="m15 9 3 3-3 3"
+                                    />
+                                </svg>
+                            </span>
+
+                            {/* Texte */}
+
+                            <span
+                                className="
+                                    hidden
+                                    lg:block
+                                    text-sm
+                                    font-semibold
+                                    whitespace-nowrap
+                                "
+                            >
+                                Déconnexion
+                            </span>
                         </button>
 
                     </div>
