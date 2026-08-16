@@ -8,6 +8,8 @@ export default function Button({
 
     color = "blue",
 
+    disabled = false,
+
     className = ""
 
 }) {
@@ -33,6 +35,8 @@ export default function Button({
             type={type}
 
             onClick={onClick}
+
+            disabled={disabled}
 
             className={`
 

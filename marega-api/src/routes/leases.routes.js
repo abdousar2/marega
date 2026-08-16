@@ -1,16 +1,85 @@
 const express = require("express");
+
 const router = express.Router();
 
-const LeasesController = require("../controllers/leases.controller");
+const LeasesController =
+    require("../controllers/leases.controller");
 
-router.get("/", LeasesController.getAll);
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
 
-router.get("/:id", LeasesController.getById);
 
-router.post("/", LeasesController.create);
+// =========================================================
+// LECTURE
+// TOUS LES RÔLES
+// =========================================================
 
-router.put("/:id", LeasesController.update);
+router.get(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    LeasesController.getAll
+);
 
-router.delete("/:id", LeasesController.remove);
+router.get(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    LeasesController.getById
+);
+
+
+// =========================================================
+// CRÉATION / MODIFICATION
+// ADMIN / RESPONSABLE
+// =========================================================
+
+router.post(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE"
+    ),
+    LeasesController.create
+);
+
+router.put(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE"
+    ),
+    LeasesController.update
+);
+
+
+// =========================================================
+// SUPPRESSION
+// ADMIN UNIQUEMENT
+// =========================================================
+
+router.delete(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN"
+    ),
+    LeasesController.remove
+);
+
 
 module.exports = router;

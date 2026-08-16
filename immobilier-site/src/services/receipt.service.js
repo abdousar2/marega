@@ -1,6 +1,7 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
+const { toUSVString } = require("util");
 
 
 const logo = path.join(
@@ -196,7 +197,7 @@ class ReceiptService {
         // MONTANT ENCAISSÉ
         //====================================
 
-        doc.roundedRect(50, 210, 460, 55, 12)
+        doc.roundedRect(50, 210, 470, 50, 12)
             .fillAndStroke("#EFF6FF", "#2563EB");
 
         doc
@@ -231,49 +232,208 @@ class ReceiptService {
         // ATTESTATION
         //====================================
 
+        
+        doc.roundedRect(50, 268, 350, 110, 8)
+            .fillAndStroke("#EFF6FF", "#2563EB");
+
+
         doc
             .fillColor("black")
             .font("Helvetica")
-            .fontSize(11)
+            .fontSize(7)
             .text(
-                "Nous certifions avoir reçu de : ",
-                50,
-                275,
+                "1 -  ",
+                
+                55,
+                273,
                 {
-                    continued: true
+                                        
+                    width: 320,
+                    align: "justify"               
                 }
-            )
-            .font("Helvetica-Bold")
-            .text(
-                payment.tenant_name,
-                {
-                    continued: true
-                }
-            )
-            .font("Helvetica")
-            .text(
-                " la somme de ",
-                {
-                    continued: true
-                }
-            )
-            .font("Helvetica-Bold")
-            .text(
-                `${this.money(payment.amount)} FCFA`,
-                {
-                    continued: true
-                }
-            )
-            .font("Helvetica")
-            .text(
-                " au titre du règlement du loyer correspondant à la période indiquée.",
-                50,
-                275,
-                {
-                    continued: true
-                }
+
             );
 
+            doc
+            .font("Helvetica")            
+            .text(
+                " Le locataire ne pourra pour quelles que raisons que ce soient céder ou" +
+                "sous louer en totalité ou en partie, les locaux loués sans le consentement écris du bailleur.",
+                65,
+                273,
+
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }                              
+                
+            );
+
+            doc
+            .fillColor("black")
+            .font("Helvetica")
+            .fontSize(7)
+            .text(
+                "2 -  ",
+                
+                55,
+                293,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }
+
+            );
+
+            doc
+            .font("Helvetica")            
+            .text(
+                " Le locataire ne peut pas déménager, sans : ",
+
+                65,
+                293,
+
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }                              
+                
+            );
+
+            doc
+            .fillColor("black")
+            .font("Helvetica")
+            .fontSize(7)
+            .text(
+                "a)-  ",
+                
+                65,
+                303,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }
+
+            );
+
+            doc
+            .font("Helvetica")            
+            .text(
+                " qu'il n'ait justifié au bailleur par une quittance " +
+                "du percepteur qu'il a acquitté toutes ses contributions de l'année courante",
+                75,
+                303,
+
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }                               
+                
+            );
+
+            doc
+            .fillColor("black")
+            .font("Helvetica")
+            .fontSize(7)
+            .text(
+                "b)-  ",
+                
+                65,
+                323,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }
+
+            );
+
+            doc
+            .font("Helvetica")            
+            .text(
+                " qu'il n'ait donné ou reçu congé par acte extra judiciaire suivant la législation" +
+                "en vigueur et dans les delais prescrits par la loi",
+                75,
+                323,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }                              
+                
+            );
+
+            doc
+            .fillColor("black")
+            .font("Helvetica")
+            .fontSize(7)
+            .text(
+                "c)-  ",
+                
+                65,
+                343,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }
+
+            );
+
+            doc
+            .font("Helvetica")            
+            .text(
+                " qu'il n'ait fait faire à ses frais, toutes les réparations locatives et la réfectiontotale" +
+                "des lieux, dans touS les corps de métier, suivant usage ou d'après l'état des lieux s'il en existe un," +
+                "seuls restant à la charge du bailleur les clos et le couvert.",
+
+                75,
+                343,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }                               
+                
+            );
+
+            doc
+            .fillColor("black")
+            .font("Helvetica")
+            .fontSize(7)
+            .text(
+                "3 - ",
+                
+                55,
+                370,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }
+
+            );
+
+            doc
+            .font("Helvetica")            
+            .text(
+                " Le paiement de la présente n'implique pas présomption du paiement des quittances antérieures. ",
+
+                65,
+                370,
+                {
+                                        
+                    width: 320,
+                    align: "justify"               
+                }                              
+                
+            );           
+            
 
         
         //====================================
@@ -282,12 +442,12 @@ class ReceiptService {
 
         doc
         .font("Helvetica")
-        .fontSize(11)
+        .fontSize(10)
         .fillColor("black")
         .text(
             "Fait à Dakar, le " +
             new Date(payment.payment_date).toLocaleDateString("fr-FR"),
-            170,
+            405,
             300
         );
 

@@ -1,52 +1,78 @@
-const Building = require("../models/buildings.model");
+const Building =
+    require("../models/buildings.model");
+
+const AuditService =
+    require("../services/audit.service");
+
 
 async function getAll(req, res) {
 
     try {
 
-        const buildings = await Building.getAll();
+        const buildings =
+            await Building.getAll();
 
         res.json(buildings);
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 
         res.status(500).json({
-            message: "Erreur serveur"
+
+            message:
+                "Erreur serveur"
+
         });
 
     }
 
 }
+
 
 async function getById(req, res) {
 
     try {
 
-        const building = await Building.getById(req.params.id);
+        const building =
+            await Building.getById(
+                req.params.id
+            );
+
 
         if (!building) {
 
             return res.status(404).json({
-                message: "Immeuble introuvable"
+
+                message:
+                    "Immeuble introuvable"
+
             });
 
         }
 
+
         res.json(building);
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 
         res.status(500).json({
-            message: "Erreur serveur"
+
+            message:
+                "Erreur serveur"
+
         });
 
     }
 
 }
+
 
 async function create(req, res) {
 
@@ -54,77 +80,193 @@ async function create(req, res) {
 
         if (!req.body.code) {
 
-            req.body.code = "BLD-" + Date.now();
+            req.body.code =
+                "BLD-" + Date.now();
 
         }
 
-        const building = await Building.create(req.body);
 
-        res.status(201).json(building);
+        const building =
+            await Building.create(
+                req.body
+            );
 
-    } catch (error) {
+
+        await AuditService.log(req, {
+
+            action: "CREATE",
+
+            module: "buildings",
+
+            entity_id:
+                building.id,
+
+            details: {
+
+                code:
+                    building.code
+
+            }
+
+        });
+
+
+        res.status(201).json(
+            building
+        );
+
+    }
+
+    catch (error) {
 
         console.error(error);
 
         res.status(500).json({
-            message: "Erreur lors de la création"
+
+            message:
+                "Erreur lors de la création"
+
         });
 
     }
 
 }
+
 
 async function update(req, res) {
 
     try {
 
-        const building = await Building.update(
-            req.params.id,
-            req.body
-        );
+        const building =
+            await Building.update(
+
+                req.params.id,
+
+                req.body
+
+            );
+
+
+        await AuditService.log(req, {
+
+            action: "UPDATE",
+
+            module: "buildings",
+
+            entity_id:
+                building.id,
+
+            details: {
+
+                code:
+                    building.code
+
+            }
+
+        });
+
 
         res.json(building);
 
-    } catch (error) {
+    }
+
+    catch (error) {
 
         console.error(error);
 
         res.status(500).json({
-            message: "Erreur lors de la modification"
+
+            message:
+                "Erreur lors de la modification"
+
         });
 
     }
 
 }
+
 
 async function remove(req, res) {
 
     try {
 
-        await Building.remove(req.params.id);
+        const building =
+            await Building.getById(
+                req.params.id
+            );
 
-        res.json({
-            message: "Immeuble supprimé"
+
+        if (!building) {
+
+            return res.status(404).json({
+
+                message:
+                    "Immeuble introuvable"
+
+            });
+
+        }
+
+
+        await Building.remove(
+            req.params.id
+        );
+
+
+        await AuditService.log(req, {
+
+            action: "DELETE",
+
+            module: "buildings",
+
+            entity_id:
+                building.id,
+
+            details: {
+
+                code:
+                    building.code
+
+            }
+
         });
 
-    } catch (error) {
+
+        res.json({
+
+            message:
+                "Immeuble supprimé"
+
+        });
+
+    }
+
+    catch (error) {
 
         console.error(error);
 
         res.status(500).json({
-            message: "Erreur lors de la suppression"
+
+            message:
+                "Erreur lors de la suppression"
+
         });
 
     }
 
 }
 
+
 module.exports = {
 
     getAll,
+
     getById,
+
     create,
+
     update,
+
     remove
 
 };

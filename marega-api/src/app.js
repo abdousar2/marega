@@ -10,6 +10,9 @@ const leasesRoutes = require("./routes/leases.routes");
 const paymentsRoutes = require("./routes/payments.routes");
 const rentsRoutes = require("./routes/rents.routes");
 const expensesRoutes = require("./routes/expenses.routes");
+const auditRoutes = require("./routes/audit.routes");
+const authRoutes = require("./routes/auth.routes");
+const usersRoutes = require("./routes/users.routes");
 
 
 const app = express();
@@ -35,6 +38,9 @@ console.log("Serving receipts from:", receiptsPath);
 
 app.use("/receipts", express.static(receiptsPath));
 
+app.use("/api/auth", authRoutes);
+app.use("/api/users", usersRoutes);
+
 app.use("/api/buildings", buildingsRoutes);
 app.use("/api/apartments", apartmentsRoutes);
 app.use("/api/tenants", tenantsRoutes);
@@ -42,6 +48,7 @@ app.use("/api/leases", leasesRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/rents", rentsRoutes);
 app.use("/api/expenses", expensesRoutes);
+app.use("/api/audit", auditRoutes);
 
 app.get("/", (req, res) => {
     res.json({

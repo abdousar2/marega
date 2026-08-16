@@ -1,4 +1,8 @@
-const Tenant = require("../models/tenants.model");
+const Tenant =
+    require("../models/tenants.model");
+
+const AuditService =
+    require("../services/audit.service");
 
 async function getAll(req, res) {
 
@@ -56,7 +60,21 @@ async function create(req, res) {
 
     try {
 
-        const tenant = await Tenant.create(req.body);
+        const tenant =
+            await Tenant.create(req.body);
+
+
+        await AuditService.log(req, {
+
+            action: "CREATE",
+
+            module: "tenants",
+
+            entity_id:
+                tenant.id
+
+        });
+
 
         res.status(201).json(tenant);
 
@@ -91,6 +109,17 @@ async function update(req, res) {
 
         }
 
+        await AuditService.log(req, {
+
+            action: "UPDATE",
+
+            module: "tenants",
+
+            entity_id:
+                tenant.id
+
+        });
+
         res.json(tenant);
 
     }
@@ -111,10 +140,46 @@ async function remove(req, res) {
 
     try {
 
-        await Tenant.remove(req.params.id);
+        const tenant =
+            await Tenant.getById(
+                req.params.id
+            );
+
+
+        if (!tenant) {
+
+            return res.status(404).json({
+
+                message:
+                    "Locataire introuvable."
+
+            });
+
+        }
+
+
+        await Tenant.remove(
+            req.params.id
+        );
+
+
+        await AuditService.log(req, {
+
+            action: "DELETE",
+
+            module: "tenants",
+
+            entity_id:
+                tenant.id
+
+        });
+
 
         res.json({
-            message: "Locataire supprimé."
+
+            message:
+                "Locataire supprimé."
+
         });
 
     }
@@ -124,7 +189,10 @@ async function remove(req, res) {
         console.error(err);
 
         res.status(500).json({
-            message: "Erreur lors de la suppression."
+
+            message:
+                "Erreur lors de la suppression."
+
         });
 
     }

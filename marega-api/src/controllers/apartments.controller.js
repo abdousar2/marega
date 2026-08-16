@@ -1,4 +1,8 @@
-const Apartment = require("../models/apartments.model");
+const Apartment =
+    require("../models/apartments.model");
+
+const AuditService =
+    require("../services/audit.service");
 
 async function getAll(req, res) {
 
@@ -72,7 +76,31 @@ async function create(req, res) {
 
     try {
 
-        const apartment = await Apartment.create(req.body);
+        const apartment =
+            await Apartment.create(req.body);
+
+
+        await AuditService.log(req, {
+
+            action: "CREATE",
+
+            module: "apartments",
+
+            entity_id:
+                apartment.id,
+
+            details: {
+
+                building_id:
+                    apartment.building_id,
+
+                number:
+                    apartment.number
+
+            }
+
+        });
+
 
         res.status(201).json(apartment);
 
@@ -92,18 +120,36 @@ async function update(req, res) {
 
     try {
 
-        const apartment = await Apartment.update(
-            req.params.id,
-            req.body
-        );
+        const apartment =
+            await Apartment.update(
+                req.params.id,
+                req.body
+            );
+
 
         if (!apartment) {
 
             return res.status(404).json({
-                message: "Appartement introuvable."
+
+                message:
+                    "Appartement introuvable."
+
             });
 
         }
+
+
+        await AuditService.log(req, {
+
+            action: "UPDATE",
+
+            module: "apartments",
+
+            entity_id:
+                apartment.id
+
+        });
+
 
         res.json(apartment);
 
@@ -123,18 +169,59 @@ async function remove(req, res) {
 
     try {
 
-        await Apartment.remove(req.params.id);
+        const apartment =
+            await Apartment.getById(
+                req.params.id
+            );
 
-        res.json({
-            message: "Appartement supprimé."
+
+        if (!apartment) {
+
+            return res.status(404).json({
+
+                message:
+                    "Appartement introuvable."
+
+            });
+
+        }
+
+
+        await Apartment.remove(
+            req.params.id
+        );
+
+
+        await AuditService.log(req, {
+
+            action: "DELETE",
+
+            module: "apartments",
+
+            entity_id:
+                apartment.id
+
         });
 
-    } catch (err) {
+
+        res.json({
+
+            message:
+                "Appartement supprimé."
+
+        });
+
+    }
+
+    catch (err) {
 
         console.error(err);
 
         res.status(500).json({
-            message: "Erreur serveur."
+
+            message:
+                "Erreur serveur."
+
         });
 
     }

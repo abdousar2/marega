@@ -2,16 +2,86 @@ const express = require("express");
 
 const router = express.Router();
 
-const controller = require("../controllers/tenants.controller");
+const controller =
+    require("../controllers/tenants.controller");
 
-router.get("/", controller.getAll);
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
 
-router.get("/:id", controller.getById);
 
-router.post("/", controller.create);
+// =========================================================
+// LECTURE
+// TOUS LES RÔLES
+// =========================================================
 
-router.put("/:id", controller.update);
+router.get(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    controller.getAll
+);
 
-router.delete("/:id", controller.remove);
+
+router.get(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    controller.getById
+);
+
+
+// =========================================================
+// CRÉATION / MODIFICATION
+// ADMIN / RESPONSABLE
+// =========================================================
+
+router.post(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE"
+    ),
+    controller.create
+);
+
+
+router.put(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE"
+    ),
+    controller.update
+);
+
+
+// =========================================================
+// SUPPRESSION
+// ADMIN UNIQUEMENT
+// =========================================================
+
+router.delete(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN"
+    ),
+    controller.remove
+);
+
 
 module.exports = router;

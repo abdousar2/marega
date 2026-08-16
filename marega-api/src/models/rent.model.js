@@ -141,6 +141,36 @@ class Rent {
 
     }
 
+        static async markAsUnpaidByPayment(paymentId) {
+
+            const result = await db.query(
+
+                `
+                UPDATE marega.rents
+
+                SET
+
+                    status = 'Impayé',
+
+                    payment_id = NULL,
+
+                    updated_at = CURRENT_TIMESTAMP
+
+                WHERE payment_id = $1
+
+                RETURNING *
+                `,
+
+                [
+                    paymentId
+                ]
+
+            );
+
+            return result.rows[0];
+
+        }
+
     static async getPending() {
 
         const result = await db.query(
@@ -178,6 +208,76 @@ class Rent {
 
             ORDER BY due_date ASC
             `
+
+        );
+
+        return result.rows;
+
+    }
+
+    // =========================================================
+    // VÉRIFIER SI UN CONTRAT POSSÈDE DES PAIEMENTS
+    // =========================================================
+
+    static async hasPayments(leaseId) {
+
+        const result = await db.query(
+
+            `
+            SELECT EXISTS (
+
+                SELECT 1
+
+                FROM marega.rents r
+
+                INNER JOIN marega.payments p
+                    ON p.id = r.payment_id
+
+                WHERE r.lease_id = $1
+
+            ) AS has_payments
+            `,
+
+            [leaseId]
+
+        );
+
+        return result.rows[0].has_payments;
+
+    }
+
+        // =========================================================
+    // SYNCHRONISATION DES LOYERS NON PAYÉS
+    // =========================================================
+
+    static async syncUnpaidFromLease(lease) {
+
+        const result = await db.query(
+
+            `
+            UPDATE marega.rents
+
+            SET
+
+                tenant_id = $1,
+                amount = $2,
+                updated_at = CURRENT_TIMESTAMP
+
+            WHERE lease_id = $3
+
+              AND payment_id IS NULL
+
+              AND status <> 'Payé'
+
+            RETURNING *
+
+            `,
+
+            [
+                lease.tenant_id,
+                lease.monthly_rent,
+                lease.id
+            ]
 
         );
 

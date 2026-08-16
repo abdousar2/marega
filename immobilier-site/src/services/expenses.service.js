@@ -1,123 +1,50 @@
-import { API_BASE } from "./config";
+import { api } from "./api";
 
 const ExpensesService = {
 
     async getAll() {
 
-        const response = await fetch(
-            `${API_BASE}/api/expenses`
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                "Erreur lors du chargement des dépenses."
-            );
-        }
-
-        return response.json();
+        return api("/expenses");
 
     },
 
     async getById(id) {
 
-        const response = await fetch(
-            `${API_BASE}/api/expenses/${id}`
-        );
-
-        if (!response.ok) {
-            throw new Error(
-                "Dépense introuvable."
-            );
-        }
-
-        return response.json();
+        return api(`/expenses/${id}`);
 
     },
 
     async create(data) {
 
-        const response = await fetch(
-            `${API_BASE}/api/expenses`,
-            {
-                method: "POST",
+        return api("/expenses", {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            method: "POST",
 
-                body: JSON.stringify(data)
-            }
-        );
+            body: JSON.stringify(data)
 
-        if (!response.ok) {
-
-            const error =
-                await response.json().catch(() => ({}));
-
-            throw new Error(
-                error.error ||
-                "Erreur lors de l'enregistrement de la dépense."
-            );
-
-        }
-
-        return response.json();
+        });
 
     },
 
     async update(id, data) {
 
-        const response = await fetch(
-            `${API_BASE}/api/expenses/${id}`,
-            {
-                method: "PUT",
+        return api(`/expenses/${id}`, {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            method: "PUT",
 
-                body: JSON.stringify(data)
-            }
-        );
+            body: JSON.stringify(data)
 
-        if (!response.ok) {
-
-            const error =
-                await response.json().catch(() => ({}));
-
-            throw new Error(
-                error.error ||
-                "Erreur lors de la mise à jour."
-            );
-
-        }
-
-        return response.json();
+        });
 
     },
 
     async delete(id) {
 
-        const response = await fetch(
-            `${API_BASE}/api/expenses/${id}`,
-            {
-                method: "DELETE"
-            }
-        );
+        return api(`/expenses/${id}`, {
 
-        if (!response.ok) {
+            method: "DELETE"
 
-            const error =
-                await response.json().catch(() => ({}));
-
-            throw new Error(
-                error.error ||
-                "Erreur lors de la suppression."
-            );
-
-        }
-
-        return response.json();
+        });
 
     }
 

@@ -2,16 +2,81 @@ const express = require("express");
 
 const router = express.Router();
 
-const controller = require("../controllers/buildings.controller");
+const controller =
+    require("../controllers/buildings.controller");
 
-router.get("/", controller.getAll);
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
 
-router.get("/:id", controller.getById);
 
-router.post("/", controller.create);
+// =========================================================
+// CONSULTATION
+// ADMIN / RESPONSABLE / COMPTABLE / AGENT
+// =========================================================
 
-router.put("/:id", controller.update);
+router.get(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    controller.getAll
+);
 
-router.delete("/:id", controller.remove);
+
+router.get(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    controller.getById
+);
+
+
+// =========================================================
+// MODIFICATION
+// ADMIN / RESPONSABLE
+// =========================================================
+
+router.post(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE"
+    ),
+    controller.create
+);
+
+
+router.put(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE"
+    ),
+    controller.update
+);
+
+
+router.delete(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+    ),
+    controller.remove
+);
+
 
 module.exports = router;

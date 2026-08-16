@@ -119,17 +119,38 @@ class Expense {
 
             SET
 
-                expense_date = $1,
-                label = $2,
-                category = $3,
-                amount = $4,
-                payment_method = $5,
-                beneficiary = $6,
-                reference = $7,
-                description = $8,
-                building_id = $9,
-                apartment_id = $10,
-                updated_at = CURRENT_TIMESTAMP
+                expense_date =
+                    COALESCE($1, expense_date),
+
+                label =
+                    COALESCE($2, label),
+
+                category =
+                    COALESCE($3, category),
+
+                amount =
+                    COALESCE($4, amount),
+
+                payment_method =
+                    COALESCE($5, payment_method),
+
+                beneficiary =
+                    COALESCE($6, beneficiary),
+
+                reference =
+                    COALESCE($7, reference),
+
+                description =
+                    COALESCE($8, description),
+
+                building_id =
+                    COALESCE($9, building_id),
+
+                apartment_id =
+                    COALESCE($10, apartment_id),
+
+                updated_at =
+                    CURRENT_TIMESTAMP
 
             WHERE id = $11
 
@@ -137,17 +158,29 @@ class Expense {
             `,
 
             [
-                data.expense_date,
-                data.label,
-                data.category,
-                data.amount,
-                data.payment_method,
-                data.beneficiary,
-                data.reference,
-                data.description,
-                data.building_id || null,
-                data.apartment_id || null,
+
+                data.expense_date ?? null,
+
+                data.label ?? null,
+
+                data.category ?? null,
+
+                data.amount ?? null,
+
+                data.payment_method ?? null,
+
+                data.beneficiary ?? null,
+
+                data.reference ?? null,
+
+                data.description ?? null,
+
+                data.building_id ?? null,
+
+                data.apartment_id ?? null,
+
                 id
+
             ]
 
         );

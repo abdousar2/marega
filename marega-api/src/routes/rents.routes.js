@@ -2,16 +2,84 @@ const express = require("express");
 
 const router = express.Router();
 
-const RentsController = require("../controllers/rents.controller");
+const RentsController =
+    require("../controllers/rents.controller");
 
-router.get("/", RentsController.getAll);
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
 
-router.get("/:id", RentsController.getById);
 
-router.get("/pending", RentsController.getPending);
+// =========================================================
+// CONSULTATION
+// TOUS LES RÔLES
+// =========================================================
 
-router.get("/late", RentsController.getLate);
+router.get(
+    "/",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    RentsController.getAll
+);
 
-router.post("/", RentsController.create);
+router.get(
+    "/:id",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    RentsController.getById
+);
+
+router.get(
+    "/pending",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    RentsController.getPending
+);
+
+router.get(
+    "/late",
+    authenticateToken,
+    authorizeRoles(
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+    ),
+    RentsController.getLate
+);
+
+
+// =========================================================
+// CRÉATION
+// ADMIN / RESPONSABLE / COMPTABLE
+// =========================================================
+
+// router.post(
+//    "/",
+//    authenticateToken,
+//    authorizeRoles(
+//        "ADMIN",
+//        "RESPONSABLE",
+//        "COMPTABLE"
+//    ),
+//    RentsController.create
+//);
+
 
 module.exports = router;
