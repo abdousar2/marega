@@ -115,7 +115,7 @@ class ReceiptService {
             50,
             130,
             200,
-            70,
+            73,
             10
         ).stroke();
 
@@ -156,7 +156,7 @@ class ReceiptService {
             310,
             130,
             200,
-            70,
+            73,
             10
         ).stroke();
 
@@ -178,19 +178,25 @@ class ReceiptService {
         doc.text(
             `Date : ${this.formatDate(payment.payment_date)}`,
             325,
-            155
+            148
         );
 
         doc.text(
             `Mois : ${this.formatMonth(payment.payment_month)}`,
             325,
-            170
+            163
         );
 
         doc.text(
             `Mode de paiement : ${payment.payment_method}`,
             325,
-            185
+            178
+        );
+
+        doc.text(
+            `Encaissé par : ${payment.cashier_name || "—"}`,
+            325,
+            191
         );
 
         //====================================

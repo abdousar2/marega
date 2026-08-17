@@ -82,12 +82,26 @@ class PaymentsController {
         try {
 
             // -------------------------------------------------
+            // IDENTITÉ DU COMPTABLE
+            // -------------------------------------------------
+
+            const paymentData = {
+
+                ...req.body,
+
+                cashier_user_id:
+                    req.user.id
+
+            };
+
+
+            // -------------------------------------------------
             // CRÉATION DU PAIEMENT
             // -------------------------------------------------
 
             const payment =
                 await Payment.create(
-                    req.body
+                    paymentData
                 );
 
 
@@ -187,7 +201,10 @@ class PaymentsController {
                             payment.reference,
 
                         status:
-                            payment.status
+                            payment.status,
+
+                        cashier_user_id:
+                            payment.cashier_user_id
 
                     }
 

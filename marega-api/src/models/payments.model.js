@@ -70,19 +70,19 @@ class Payment {
                 payment_method,
                 reference,
                 status,
-                notes
+                notes,
+                cashier_user_id
             )
 
             VALUES
             (
-                $1,$2,$3,$4,$5,$6,$7,$8,$9
+                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10
             )
 
             RETURNING *
             `,
 
             [
-
                 data.tenant_id,
                 data.lease_id,
                 data.payment_month,
@@ -91,8 +91,8 @@ class Payment {
                 data.payment_method,
                 data.reference,
                 data.status,
-                data.notes
-
+                data.notes,
+                data.cashier_user_id
             ]
 
         );
@@ -101,6 +101,7 @@ class Payment {
 
     }
 
+    
     static async update(id, data) {
 
         const result = await db.query(
@@ -213,12 +214,23 @@ class Payment {
                 a.rent,
 
                 b.name AS building_name,
-                b.address
+                b.address,
+
+                CONCAT(
+                    cashier.first_name,
+                    ' ',
+                    cashier.last_name
+                ) AS cashier_name,
+
+                cashier.role AS cashier_role
 
             FROM marega.payments p
 
             JOIN marega.tenants t
                 ON t.id = p.tenant_id
+
+            LEFT JOIN marega.users cashier
+                ON cashier.id = p.cashier_user_id
 
             LEFT JOIN marega.leases l
                 ON l.id = p.lease_id
