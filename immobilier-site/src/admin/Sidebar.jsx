@@ -78,6 +78,13 @@ export default function Sidebar({
                     label: "Dépenses",
                     url: "/admin/expenses",
                     module: "expenses"
+                },
+
+                {
+                    icon: "📊",
+                    label: "Situation financière",
+                    url: "/admin/finance",
+                    module: "finance"
                 }
 
             ]

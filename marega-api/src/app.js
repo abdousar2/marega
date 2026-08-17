@@ -13,6 +13,7 @@ const expensesRoutes = require("./routes/expenses.routes");
 const auditRoutes = require("./routes/audit.routes");
 const authRoutes = require("./routes/auth.routes");
 const usersRoutes = require("./routes/users.routes");
+const financeRoutes = require("./routes/finance.routes");
 
 
 const app = express();
@@ -48,6 +49,7 @@ app.use("/api/leases", leasesRoutes);
 app.use("/api/payments", paymentsRoutes);
 app.use("/api/rents", rentsRoutes);
 app.use("/api/expenses", expensesRoutes);
+app.use("/api/finance", financeRoutes);
 app.use("/api/audit", auditRoutes);
 
 app.get("/", (req, res) => {

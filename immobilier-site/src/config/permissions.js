@@ -60,6 +60,13 @@ export const PERMISSIONS = {
             delete: true
         },
 
+        finance: {
+            view: true,
+            create: false,
+            update: false,
+            delete: false
+        },
+
         messages: {
             view: true,
             create: true,
@@ -132,6 +139,13 @@ export const PERMISSIONS = {
             delete: false
         },
 
+        finance: {
+            view: true,
+            create: false,
+            update: false,
+            delete: false
+        },
+
         messages: {
             view: true,
             create: true,
@@ -200,6 +214,13 @@ export const PERMISSIONS = {
             delete: false
         },
 
+        finance: {
+            view: true,
+            create: false,
+            update: false,
+            delete: false
+        },
+
         messages: {
             view: false,
             create: false,
@@ -263,6 +284,13 @@ export const PERMISSIONS = {
 
         expenses: {
             view: true,
+            create: false,
+            update: false,
+            delete: false
+        },
+
+        finance: {
+            view: false,
             create: false,
             update: false,
             delete: false

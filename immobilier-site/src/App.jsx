@@ -11,6 +11,7 @@ import Contracts from "./admin/pages/Contracts";
 import Rents from "./admin/pages/Rents";
 import Expenses from "./admin/pages/Expenses";
 import Audit from "./admin/pages/Audit";
+import Finance from "./admin/pages/Finance";
 import PaymentDetails from "./admin/pages/PaymentDetails";
 import Login from "./admin/pages/Login";
 import ProtectedRoute from "./admin/ProtectedRoute";
@@ -93,6 +94,11 @@ function App() {
             <Route
               path="/admin/expenses"
               element={<Expenses />}
+            />
+
+            <Route
+                path="/admin/finance"
+                element={<Finance />}
             />
 
             <Route element={<AdminRoute />}>
