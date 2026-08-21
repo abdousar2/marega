@@ -1,25 +1,95 @@
+import { NavLink } from "react-router-dom";
+import "./Navbar.css";
+
 export default function Navbar() {
-  return (
-    <header className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
-      <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
 
-        <h1 className="text-3xl font-black tracking-wide text-slate-900">
-          MAREGA
-        </h1>
+    const links = [
+        {
+            label: "Accueil",
+            to: "/"
+        },
+        {
+            label: "La solution",
+            to: "/solution"
+        },
+        {
+            label: "Fonctionnalités",
+            to: "/fonctionnalites"
+        },
+        {
+            label: "Référence",
+            to: "/reference"
+        },
+        {
+            label: "Contact",
+            to: "/contact"
+        }
+    ];
 
-        <nav className="hidden md:flex gap-8">
-          <a href="#">Accueil</a>
-          <a href="#">Entreprise</a>
-          <a href="#">Réalisations</a>
-          <a href="#">Projets</a>
-          <a href="#">Contact</a>
-        </nav>
+    return (
+        <header className="navbar">
 
-        <button className="bg-yellow-600 text-white px-5 py-2 rounded-lg">
-          Nous contacter
-        </button>
+            <div className="navbar-container">
 
-      </div>
-    </header>
-  );
+                {/* LOGO */}
+                <NavLink
+                    to="/"
+                    className="navbar-logo"
+                >
+                    <span className="navbar-logo-name">
+                        TECHTRADISPORT
+                    </span>
+
+                    <span className="navbar-logo-subtitle">
+                        Solutions immobilières
+                    </span>
+                </NavLink>
+
+
+                {/* NAVIGATION */}
+                <nav className="navbar-links">
+
+                    {links.map((link) => (
+
+                        <NavLink
+                            key={link.to}
+                            to={link.to}
+                            end={link.to === "/"}
+                            className={({ isActive }) =>
+                                isActive
+                                    ? "navbar-link active"
+                                    : "navbar-link"
+                            }
+                        >
+                            {link.label}
+                        </NavLink>
+
+                    ))}
+
+                </nav>
+
+
+                {/* ACTIONS */}
+                <div className="navbar-actions">
+
+                    <NavLink
+                        to="/login"
+                        className="navbar-login"
+                    >
+                        Se connecter
+                    </NavLink>
+
+                    <NavLink
+                        to="/contact"
+                        className="navbar-demo"
+                    >
+                        Demander une démo
+                    </NavLink>
+
+                </div>
+
+            </div>
+
+        </header>
+    );
 }

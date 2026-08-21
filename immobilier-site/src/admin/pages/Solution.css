@@ -1,0 +1,154 @@
+/* =========================================================
+   PAGE SOLUTION
+========================================================= */
+
+.solution-page {
+    padding-top: 80px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.solution-hero {
+    background: #f8fafc;
+
+    padding: 112px 24px 104px;
+}
+
+
+.solution-hero-container {
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   PETIT TITRE
+========================================================= */
+
+.solution-eyebrow {
+    margin: 0 0 22px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.3em;
+}
+
+
+/* =========================================================
+   GRAND TITRE
+========================================================= */
+
+.solution-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 56px;
+
+    font-weight: 800;
+
+    line-height: 1.12;
+
+    letter-spacing: -1.8px;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.solution-description {
+    max-width: 720px;
+
+    margin: 28px auto 0;
+
+    color: #475569;
+
+    font-size: 19px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .solution-hero {
+        padding: 88px 24px 80px;
+    }
+
+
+    .solution-title {
+        font-size: 46px;
+
+        letter-spacing: -1.3px;
+    }
+
+
+    .solution-description {
+        font-size: 18px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .solution-page {
+        padding-top: 72px;
+    }
+
+
+    .solution-hero {
+        padding: 72px 20px 64px;
+    }
+
+
+    .solution-eyebrow {
+        margin-bottom: 18px;
+
+        font-size: 11px;
+
+        letter-spacing: 0.2em;
+    }
+
+
+    .solution-title {
+        font-size: 36px;
+
+        line-height: 1.18;
+
+        letter-spacing: -0.8px;
+    }
+
+
+    .solution-description {
+        margin-top: 20px;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+    }
+
+}

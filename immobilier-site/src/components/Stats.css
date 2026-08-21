@@ -1,0 +1,231 @@
+/* =========================================================
+   STATS
+========================================================= */
+
+.stats {
+    background: #ffffff;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+
+.stats-container {
+    width: 100%;
+
+    max-width: 1280px;
+
+    margin: 0 auto;
+
+    padding: 40px 32px;
+}
+
+
+/* =========================================================
+   GRILLE
+========================================================= */
+
+.stats-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+}
+
+
+/* =========================================================
+   ÉLÉMENT
+========================================================= */
+
+.stats-item {
+    padding: 20px 28px;
+
+    border-left: 1px solid #e2e8f0;
+}
+
+
+/*
+   Le premier élément n'a pas de séparation à gauche.
+*/
+
+.stats-item:first-child {
+    padding-left: 0;
+
+    border-left: none;
+}
+
+
+/*
+   Le dernier élément conserve un espace
+   confortable à droite.
+*/
+
+.stats-item:last-child {
+    padding-right: 0;
+}
+
+
+/* =========================================================
+   NUMÉRO
+========================================================= */
+
+.stats-number {
+    color: #2563eb;
+
+    font-size: 30px;
+
+    font-weight: 900;
+
+    line-height: 1.1;
+
+    letter-spacing: -0.5px;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.stats-title {
+    margin: 9px 0 0;
+
+    color: #0f172a;
+
+    font-size: 16px;
+
+    font-weight: 700;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.stats-text {
+    max-width: 250px;
+
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.65;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .stats-container {
+        padding: 32px 24px;
+    }
+
+
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .stats-item {
+        padding: 22px 24px;
+
+        border-left: none;
+
+        border-top: 1px solid #e2e8f0;
+    }
+
+
+    /*
+       Les deux premiers éléments sont sur la première ligne.
+    */
+
+    .stats-item:nth-child(-n + 2) {
+        border-top: none;
+    }
+
+
+    .stats-item:nth-child(odd) {
+        border-right: 1px solid #e2e8f0;
+    }
+
+
+    .stats-item:first-child {
+        padding-left: 0;
+    }
+
+
+    .stats-item:nth-child(2) {
+        padding-right: 0;
+    }
+
+
+    .stats-item:nth-child(3) {
+        padding-left: 0;
+    }
+
+
+    .stats-item:last-child {
+        padding-right: 0;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .stats-container {
+        padding: 20px;
+    }
+
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .stats-item {
+        padding: 24px 0;
+
+        border-right: none !important;
+
+        border-top: 1px solid #e2e8f0;
+    }
+
+
+    .stats-item:first-child {
+        padding-top: 10px;
+
+        padding-left: 0;
+    }
+
+
+    .stats-item:last-child {
+        padding-right: 0;
+
+        padding-bottom: 10px;
+    }
+
+
+    .stats-number {
+        font-size: 28px;
+    }
+
+
+    .stats-title {
+        font-size: 16px;
+    }
+
+
+    .stats-text {
+        max-width: 100%;
+    }
+
+}

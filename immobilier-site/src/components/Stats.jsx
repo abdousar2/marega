@@ -1,49 +1,73 @@
+import "./Stats.css";
+
 const stats = [
-  {
-    number: "10+",
-    label: "Immeubles réalisés",
-  },
-  {
-    number: "48",
-    label: "Collaborateurs",
-  },
-  {
-    number: "100+",
-    label: "Locataires",
-  },
-  {
-    number: "15+",
-    label: "Ans d'expérience",
-  },
+    {
+        number: "01",
+        title: "Plateforme centralisée",
+        text: "Un espace unique pour piloter votre patrimoine immobilier."
+    },
+
+    {
+        number: "06+",
+        title: "Modules de gestion",
+        text: "Du patrimoine immobilier aux finances et à la traçabilité."
+    },
+
+    {
+        number: "04",
+        title: "Niveaux d'accès",
+        text: "Une gestion adaptée aux différents profils de votre équipe."
+    },
+
+    {
+        number: "24/7",
+        title: "Accès aux données",
+        text: "Retrouvez vos informations de gestion depuis votre plateforme."
+    }
 ];
 
+
 export default function Stats() {
-  return (
-    <section className="py-24 bg-white">
 
-      <div className="max-w-7xl mx-auto px-6">
+    return (
 
-        <div className="grid md:grid-cols-4 gap-8">
+        <section className="stats">
 
-          {stats.map((item, index) => (
-            <div
-              key={index}
-              className="border rounded-xl p-8 text-center shadow-sm hover:shadow-lg transition"
-            >
-              <h2 className="text-5xl font-bold text-yellow-600 mb-4">
-                {item.number}
-              </h2>
+            <div className="stats-container">
 
-              <p className="text-slate-600">
-                {item.label}
-              </p>
+                <div className="stats-grid">
+
+                    {stats.map(item => (
+
+                        <div
+                            key={item.number}
+                            className="stats-item"
+                        >
+
+                            <div className="stats-number">
+                                {item.number}
+                            </div>
+
+
+                            <h3 className="stats-title">
+                                {item.title}
+                            </h3>
+
+
+                            <p className="stats-text">
+                                {item.text}
+                            </p>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
             </div>
-          ))}
 
-        </div>
+        </section>
 
-      </div>
+    );
 
-    </section>
-  );
 }

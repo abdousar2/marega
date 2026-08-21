@@ -1,0 +1,277 @@
+/* =========================================================
+   PAGE D'ACCUEIL
+========================================================= */
+
+.public-home {
+    min-height: 100vh;
+
+    background: #ffffff;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   CTA FINAL
+========================================================= */
+
+.home-cta {
+    position: relative;
+
+    overflow: hidden;
+
+    background: #020617;
+
+    padding: 112px 24px;
+}
+
+
+.home-cta-decoration {
+    position: absolute;
+
+    width: 380px;
+    height: 380px;
+
+    top: -190px;
+    right: -150px;
+
+    border-radius: 50%;
+
+    background: rgba(37, 99, 235, 0.20);
+
+    filter: blur(70px);
+
+    pointer-events: none;
+}
+
+
+.home-cta-container {
+    position: relative;
+
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.home-cta-eyebrow {
+    margin: 0;
+
+    color: #60a5fa;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.25em;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.home-cta-title {
+    margin: 20px 0 0;
+
+    color: #ffffff;
+
+    font-size: 52px;
+
+    font-weight: 800;
+
+    line-height: 1.15;
+
+    letter-spacing: -1.5px;
+}
+
+
+.home-cta-title span {
+    display: block;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.home-cta-description {
+    max-width: 680px;
+
+    margin: 24px auto 0;
+
+    color: #cbd5e1;
+
+    font-size: 18px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   BOUTONS
+========================================================= */
+
+.home-cta-actions {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-wrap: wrap;
+
+    gap: 16px;
+
+    margin-top: 40px;
+}
+
+
+.home-cta-primary,
+.home-cta-secondary {
+    display: inline-flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    min-height: 54px;
+
+    padding: 0 28px;
+
+    border-radius: 12px;
+
+    font-size: 15px;
+
+    font-weight: 700;
+
+    text-decoration: none;
+
+    transition:
+        transform 0.2s ease,
+        background-color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.home-cta-primary {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 10px 25px rgba(37, 99, 235, 0.25);
+}
+
+
+.home-cta-primary:hover {
+    background: #3b82f6;
+
+    transform: translateY(-2px);
+}
+
+
+.home-cta-secondary {
+    background: transparent;
+
+    border: 1px solid #334155;
+
+    color: #ffffff;
+}
+
+
+.home-cta-secondary:hover {
+    background: #1e293b;
+
+    border-color: #475569;
+
+    transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .home-cta {
+        padding: 88px 24px;
+    }
+
+
+    .home-cta-title {
+        font-size: 44px;
+    }
+
+
+    .home-cta-description {
+        font-size: 17px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .home-cta {
+        padding: 72px 20px;
+    }
+
+
+    .home-cta-eyebrow {
+        font-size: 11px;
+
+        letter-spacing: 0.18em;
+    }
+
+
+    .home-cta-title {
+        margin-top: 16px;
+
+        font-size: 36px;
+
+        line-height: 1.18;
+
+        letter-spacing: -0.8px;
+    }
+
+
+    .home-cta-description {
+        margin-top: 20px;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+    }
+
+
+    .home-cta-actions {
+        flex-direction: column;
+
+        width: 100%;
+
+        margin-top: 32px;
+    }
+
+
+    .home-cta-primary,
+    .home-cta-secondary {
+        width: 100%;
+    }
+
+}

@@ -1,5 +1,15 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+
+// PUBLIC
 import PublicHome from "./admin/pages/PublicHome";
+import Solution from "./admin/pages/Solution";
+import Features from "./admin/pages/Features";
+import Reference from "./admin/pages/Reference";
+import Contact from "./admin/pages/Contact";
+
+
+// ADMIN
 import Dashboard from "./admin/Dashboard";
 import Buildings from "./admin/pages/Buildings";
 import Apartments from "./admin/pages/Apartments";
@@ -18,103 +28,160 @@ import ProtectedRoute from "./admin/ProtectedRoute";
 import Users from "./admin/pages/Users";
 import AdminRoute from "./admin/AdminRoute";
 
+
 function App() {
-  return (
-    <BrowserRouter>
 
-      <Routes>
+    return (
 
-        <Route
-          path="/"
-          element={<PublicHome />}
-        />
+        <BrowserRouter>
 
-        <Route
-            path="/login"
-            element={<Login />}
-        />
+            <Routes>
 
-        <Route element={<ProtectedRoute />}>
 
-            <Route
-                path="/admin"
-                element={<Dashboard />}
-              />
+                {/* =========================================
+                    SITE PUBLIC
+                ========================================= */}
 
-            <Route
-                path="/admin/users"
-                element={<Users />}
-            />
+                <Route
+                    path="/"
+                    element={<PublicHome />}
+                />
 
-            <Route
-              path="/admin/buildings"
-              element={<Buildings />}
-            />
+                <Route
+                    path="/solution"
+                    element={<Solution />}
+                />
 
-            <Route
-              path="/admin/apartments"
-              element={<Apartments />}
-            />
+                <Route
+                    path="/fonctionnalites"
+                    element={<Features />}
+                />
 
-            <Route
-              path="/admin/apartments/:id"
-              element={<ApartmentDetails />}
-            />
+                <Route
+                    path="/reference"
+                    element={<Reference />}
+                />
 
-            <Route
-              path="/admin/tenants"
-              element={<Tenants />}
-            />
+                <Route
+                    path="/contact"
+                    element={<Contact />}
+                />
 
-            <Route
-                path="/admin/payments"
-                element={<Payments />}
-            />
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
 
-            <Route
-                path="/admin/payments/:id"
-                element={<PaymentDetails />}
-            />
 
-            <Route
-                path="/admin/messages"
-                element={<Messages />}
-            />
+                {/* =========================================
+                    CONNEXION
+                ========================================= */}
 
-            <Route
-              path="/admin/contracts"
-              element={<Contracts />}
-            />
+                <Route
+                    path="/login"
+                    element={<Login />}
+                />
 
-            <Route
-              path="/admin/rents"
-              element={<Rents />}
-            />
 
-            <Route
-              path="/admin/expenses"
-              element={<Expenses />}
-            />
+                {/* =========================================
+                    ESPACE ADMIN
+                ========================================= */}
 
-            <Route
-                path="/admin/finance"
-                element={<Finance />}
-            />
+                <Route
+                    element={<ProtectedRoute />}
+                >
 
-            <Route element={<AdminRoute />}>
+                    <Route
+                        path="/admin"
+                        element={<Dashboard />}
+                    />
 
-            <Route
-                path="/admin/audit"
-                element={<Audit />}
-            />
+                    <Route
+                        path="/admin/users"
+                        element={<Users />}
+                    />
 
-        </Route>    
-        </Route>      
+                    <Route
+                        path="/admin/buildings"
+                        element={<Buildings />}
+                    />
 
-      </Routes>
+                    <Route
+                        path="/admin/apartments"
+                        element={<Apartments />}
+                    />
 
-    </BrowserRouter>
-  );
+                    <Route
+                        path="/admin/apartments/:id"
+                        element={<ApartmentDetails />}
+                    />
+
+                    <Route
+                        path="/admin/tenants"
+                        element={<Tenants />}
+                    />
+
+                    <Route
+                        path="/admin/payments"
+                        element={<Payments />}
+                    />
+
+                    <Route
+                        path="/admin/payments/:id"
+                        element={<PaymentDetails />}
+                    />
+
+                    <Route
+                        path="/admin/messages"
+                        element={<Messages />}
+                    />
+
+                    <Route
+                        path="/admin/contracts"
+                        element={<Contracts />}
+                    />
+
+                    <Route
+                        path="/admin/rents"
+                        element={<Rents />}
+                    />
+
+                    <Route
+                        path="/admin/expenses"
+                        element={<Expenses />}
+                    />
+
+                    <Route
+                        path="/admin/finance"
+                        element={<Finance />}
+                    />
+
+
+                    {/* =====================================
+                        ADMIN UNIQUEMENT
+                    ===================================== */}
+
+                    <Route
+                        element={<AdminRoute />}
+                    >
+
+                        <Route
+                            path="/admin/audit"
+                            element={<Audit />}
+                        />
+
+                    </Route>
+
+                </Route>
+
+
+            </Routes>
+
+        </BrowserRouter>
+
+    );
+
 }
+
 
 export default App;

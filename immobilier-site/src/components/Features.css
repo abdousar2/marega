@@ -1,0 +1,291 @@
+/* =========================================================
+   FEATURES
+========================================================= */
+
+.features {
+    background: #f8fafc;
+
+    padding: 96px 0;
+}
+
+
+.features-container {
+    width: 100%;
+
+    max-width: 1280px;
+
+    margin: 0 auto;
+
+    padding: 0 32px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.features-intro {
+    max-width: 760px;
+
+    margin: 0 auto 64px;
+
+    text-align: center;
+}
+
+
+.features-eyebrow {
+    margin: 0 0 16px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.25em;
+}
+
+
+.features-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 48px;
+
+    font-weight: 800;
+
+    line-height: 1.15;
+
+    letter-spacing: -1.5px;
+}
+
+
+.features-description {
+    max-width: 680px;
+
+    margin: 24px auto 0;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   GRILLE
+========================================================= */
+
+.features-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
+
+.feature-card {
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    padding: 28px;
+
+    box-shadow:
+        0 2px 5px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+.feature-card:hover {
+    transform: translateY(-5px);
+
+    border-color: #bfdbfe;
+
+    box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+
+/* =========================================================
+   ICÔNE
+========================================================= */
+
+.feature-icon {
+    width: 56px;
+
+    height: 56px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    margin-bottom: 22px;
+
+    border-radius: 16px;
+
+    background: #eff6ff;
+
+    font-size: 25px;
+
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+.feature-card:hover .feature-icon {
+    background: #2563eb;
+
+    transform: translateY(-2px);
+}
+
+
+.feature-icon span {
+    display: block;
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+.feature-card:hover .feature-icon span {
+    transform: scale(1.1);
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.feature-title {
+    margin: 0 0 10px;
+
+    color: #0f172a;
+
+    font-size: 20px;
+
+    font-weight: 700;
+
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   TEXTE
+========================================================= */
+
+.feature-text {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .features-container {
+        padding: 0 24px;
+    }
+
+
+    .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .features-title {
+        font-size: 42px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .features {
+        padding: 72px 0;
+    }
+
+
+    .features-container {
+        padding: 0 20px;
+    }
+
+
+    .features-intro {
+        margin-bottom: 44px;
+    }
+
+
+    .features-eyebrow {
+        font-size: 11px;
+
+        letter-spacing: 0.18em;
+    }
+
+
+    .features-title {
+        font-size: 34px;
+
+        line-height: 1.2;
+
+        letter-spacing: -0.8px;
+    }
+
+
+    .features-title-break {
+        display: none;
+    }
+
+
+    .features-description {
+        margin-top: 18px;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+    }
+
+
+    .features-grid {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+
+    .feature-card {
+        padding: 24px;
+    }
+
+}

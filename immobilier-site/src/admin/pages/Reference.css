@@ -1,0 +1,150 @@
+/* =========================================================
+   PAGE RÉFÉRENCE
+========================================================= */
+
+.reference-page {
+    padding-top: 80px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.reference-hero {
+    background: #f8fafc;
+
+    padding: 104px 24px 96px;
+}
+
+
+.reference-hero-container {
+    width: 100%;
+
+    max-width: 900px;
+
+    margin: 0 auto;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   EYEBROW
+========================================================= */
+
+.reference-eyebrow {
+    margin: 0 0 20px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.25em;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.reference-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 56px;
+
+    font-weight: 800;
+
+    line-height: 1.1;
+
+    letter-spacing: -1.8px;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.reference-description {
+    max-width: 720px;
+
+    margin: 24px auto 0;
+
+    color: #475569;
+
+    font-size: 19px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .reference-hero {
+        padding: 88px 24px 80px;
+    }
+
+
+    .reference-title {
+        font-size: 46px;
+    }
+
+
+    .reference-description {
+        font-size: 18px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .reference-page {
+        padding-top: 72px;
+    }
+
+
+    .reference-hero {
+        padding: 72px 20px 64px;
+    }
+
+
+    .reference-eyebrow {
+        margin-bottom: 16px;
+
+        font-size: 11px;
+
+        letter-spacing: 0.18em;
+    }
+
+
+    .reference-title {
+        font-size: 38px;
+
+        letter-spacing: -1px;
+    }
+
+
+    .reference-description {
+        margin-top: 18px;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+    }
+
+}

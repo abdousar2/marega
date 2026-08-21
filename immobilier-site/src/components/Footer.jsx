@@ -1,57 +1,174 @@
+import "./Footer.css";
+
 export default function Footer() {
-  return (
-    <footer className="bg-slate-900 text-white py-16">
+    return (
+        <footer className="site-footer">
 
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-10">
+            <div className="site-footer-container">
 
-        <div>
-          <h3 className="text-2xl font-bold mb-4">
-            MAREGA
-          </h3>
+                <div className="site-footer-grid">
 
-          <p className="text-slate-300">
-            Promoteur immobilier, constructeur et gestionnaire
-            de biens immobiliers à Dakar.
-          </p>
-        </div>
+                    {/* =========================================
+                        ENTREPRISE
+                    ========================================= */}
 
-        <div>
-          <h4 className="font-bold mb-4">
-            Entreprise
-          </h4>
+                    <div className="footer-column footer-company">
 
-          <ul className="space-y-2">
-            <li>À propos</li>
-            <li>Réalisations</li>
-            <li>Projets</li>
-          </ul>
-        </div>
+                        <h3>
+                            TECHTRADISPORT
+                        </h3>
 
-        <div>
-          <h4 className="font-bold mb-4">
-            Contact
-          </h4>
+                        <p>
+                            Des solutions numériques conçues pour
+                            accompagner les professionnels de
+                            l'immobilier dans la gestion de leur
+                            patrimoine.
+                        </p>
 
-          <ul className="space-y-2">
-            <li>📞 +221 XX XXX XX XX</li>
-            <li>✉️ contact@marega.sn</li>
-            <li>📍 Dakar, Sénégal</li>
-          </ul>
-        </div>
+                    </div>
 
-        <div>
-          <h4 className="font-bold mb-4">
-            Horaires
-          </h4>
 
-          <ul className="space-y-2">
-            <li>Lundi - Vendredi</li>
-            <li>08h00 - 18h00</li>
-          </ul>
-        </div>
+                    {/* =========================================
+                        LA SOLUTION
+                    ========================================= */}
 
-      </div>
+                    <div className="footer-column">
 
-    </footer>
-  );
+                        <h4>
+                            La solution
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="/solution">
+                                    Gestion immobilière
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/solution">
+                                    Gestion locative
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/solution">
+                                    Gestion financière
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/audit">
+                                    Rapports &amp; audit
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                    {/* =========================================
+                        TECHTRADISPORT
+                    ========================================= */}
+
+                    <div className="footer-column">
+
+                        <h4>
+                            TECHTRADISPORT
+                        </h4>
+
+                        <ul>
+
+                            <li>
+                                <a href="/solution">
+                                    À propos
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/solution">
+                                    Nos solutions
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/reference">
+                                    Nos clients
+                                </a>
+                            </li>
+
+                            <li>
+                                <a href="/contact">
+                                    Contact
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+
+                    {/* =========================================
+                        CONTACT
+                    ========================================= */}
+
+                    <div className="footer-column">
+
+                        <h4>
+                            Contact
+                        </h4>
+
+                        <ul className="footer-contact-list">
+
+                            <li>
+                                <span>☎</span>
+                                <a href="tel:+221338228839">
+                                    +221 33 822 88 39
+                                </a>
+                            </li>
+
+                            <li>
+                                <span>✉</span>
+                                <a href="mailto:contact@techtradisport.com">
+                                    contact@techtradisport.com
+                                </a>
+                            </li>
+
+                            <li>
+                                <span>●</span>
+                                <span>
+                                    Dakar, Sénégal
+                                </span>
+                            </li>
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                {/* =========================================
+                    BAS DE PAGE
+                ========================================= */}
+
+                <div className="footer-bottom">
+
+                    <p>
+                        © 2026 TECHTRADISPORT.
+                        Tous droits réservés.
+                    </p>
+
+                    <p>
+                        Plateforme de gestion immobilière
+                    </p>
+
+                </div>
+
+            </div>
+
+        </footer>
+    );
 }

@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
+import "./styles/public.css";
 import ApartmentsProvider from "./context/ApartmentsContext";
 
 import ProjectsProvider from "./context/ProjectsContext";

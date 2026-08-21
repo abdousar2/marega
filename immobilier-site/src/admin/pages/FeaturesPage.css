@@ -1,0 +1,135 @@
+/* =========================================================
+   PAGE FONCTIONNALITÉS
+========================================================= */
+
+.features-page {
+    padding-top: 80px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.features-page-hero {
+    background: #ffffff;
+    padding: 96px 24px 80px;
+}
+
+
+.features-page-hero-container {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+
+/* =========================================================
+   PETIT TITRE
+========================================================= */
+
+.features-page-eyebrow {
+    margin: 0 0 18px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.25em;
+}
+
+
+/* =========================================================
+   GRAND TITRE
+========================================================= */
+
+.features-page-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 56px;
+    font-weight: 800;
+
+    line-height: 1.12;
+
+    letter-spacing: -1.8px;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.features-page-description {
+    max-width: 680px;
+
+    margin: 24px auto 0;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .features-page-hero {
+        padding-top: 80px;
+        padding-bottom: 64px;
+    }
+
+
+    .features-page-title {
+        font-size: 46px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .features-page {
+        padding-top: 72px;
+    }
+
+
+    .features-page-hero {
+        padding: 64px 20px 56px;
+    }
+
+
+    .features-page-eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.18em;
+    }
+
+
+    .features-page-title {
+        font-size: 36px;
+        line-height: 1.18;
+        letter-spacing: -1px;
+    }
+
+
+    .features-page-description {
+        margin-top: 18px;
+        font-size: 16px;
+        line-height: 1.65;
+    }
+
+}

@@ -1,0 +1,315 @@
+/* =========================================================
+   HOW IT WORKS
+========================================================= */
+
+.how-it-works {
+    background: #ffffff;
+
+    padding: 112px 0;
+}
+
+
+.how-it-works-container {
+    width: 100%;
+
+    max-width: 1280px;
+
+    margin: 0 auto;
+
+    padding: 0 32px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.how-it-works-intro {
+    max-width: 760px;
+
+    margin: 0 auto 80px;
+
+    text-align: center;
+}
+
+
+.how-it-works-eyebrow {
+    margin: 0 0 20px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.3em;
+}
+
+
+.how-it-works-title {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 48px;
+
+    font-weight: 800;
+
+    line-height: 1.15;
+
+    letter-spacing: -1.5px;
+}
+
+
+.how-it-works-description {
+    max-width: 700px;
+
+    margin: 24px auto 0;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   GRILLE
+========================================================= */
+
+.how-it-works-grid {
+    display: grid;
+
+    grid-template-columns: repeat(4, 1fr);
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
+
+.how-it-works-card {
+    position: relative;
+
+    min-height: 300px;
+
+    padding: 32px;
+
+    background: #f8fafc;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 24px;
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+.how-it-works-card:hover {
+    transform: translateY(-5px);
+
+    border-color: #bfdbfe;
+
+    box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+
+/* =========================================================
+   PARTIE SUPÉRIEURE
+========================================================= */
+
+.how-it-works-card-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 40px;
+}
+
+
+.how-it-works-number {
+    color: #2563eb;
+
+    font-size: 60px;
+
+    font-weight: 900;
+
+    line-height: 1;
+
+    letter-spacing: -2px;
+}
+
+
+.how-it-works-badge {
+    width: 44px;
+
+    height: 44px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 50%;
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.how-it-works-card-title {
+    margin: 0 0 14px;
+
+    color: #0f172a;
+
+    font-size: 22px;
+
+    font-weight: 750;
+
+    line-height: 1.35;
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.how-it-works-card-text {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+
+    line-height: 1.75;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 1050px) {
+
+    .how-it-works-container {
+        padding: 0 24px;
+    }
+
+
+    .how-it-works-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+
+    .how-it-works-title {
+        font-size: 42px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .how-it-works {
+        padding: 72px 0;
+    }
+
+
+    .how-it-works-container {
+        padding: 0 20px;
+    }
+
+
+    .how-it-works-intro {
+        margin-bottom: 48px;
+    }
+
+
+    .how-it-works-eyebrow {
+        font-size: 11px;
+
+        letter-spacing: 0.18em;
+    }
+
+
+    .how-it-works-title {
+        font-size: 34px;
+
+        line-height: 1.2;
+
+        letter-spacing: -0.8px;
+    }
+
+
+    .how-it-works-title-break {
+        display: none;
+    }
+
+
+    .how-it-works-description {
+        margin-top: 18px;
+
+        font-size: 16px;
+
+        line-height: 1.7;
+    }
+
+
+    .how-it-works-grid {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+
+    .how-it-works-card {
+        min-height: auto;
+
+        padding: 26px;
+    }
+
+
+    .how-it-works-card-top {
+        margin-bottom: 30px;
+    }
+
+
+    .how-it-works-number {
+        font-size: 50px;
+    }
+
+
+    .how-it-works-card-title {
+        font-size: 20px;
+    }
+
+}
