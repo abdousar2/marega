@@ -1,0 +1,660 @@
+/* =========================================================
+   DASHBOARD
+========================================================= */
+
+.dashboard-home {
+    width: 100%;
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 32px;
+
+    padding-bottom: 40px;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.dashboard-header {
+    width: 100%;
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.dashboard-stats-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+
+/* =========================================================
+   GRILLE PRINCIPALE
+========================================================= */
+
+.dashboard-main-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+
+    align-items: stretch;
+}
+
+.dashboard-financial-card {
+    grid-column: span 2;
+}
+
+
+/* =========================================================
+   TITRES
+========================================================= */
+
+.dashboard-section-title {
+    margin: 0 0 24px;
+
+    color: #0f172a;
+
+    font-size: 23px;
+    font-weight: 700;
+
+    line-height: 1.25;
+}
+
+
+/* =========================================================
+   FINANCES
+========================================================= */
+
+.financial-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.financial-box {
+    min-height: 170px;
+
+    box-sizing: border-box;
+
+    padding: 24px;
+
+    border-radius: 18px;
+    border: 1px solid;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.financial-box p,
+.rent-box p {
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.financial-box h2,
+.rent-box h2 {
+    margin: 16px 0 4px;
+
+    font-size: 32px;
+    font-weight: 700;
+
+    line-height: 1.1;
+}
+
+.financial-box span,
+.rent-box span {
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.financial-income {
+    background: #f0fdf4;
+    border-color: #dcfce7;
+}
+
+.financial-income p {
+    color: #15803d;
+}
+
+.financial-income h2 {
+    color: #16a34a;
+}
+
+.financial-expense {
+    background: #fef2f2;
+    border-color: #fee2e2;
+}
+
+.financial-expense p {
+    color: #b91c1c;
+}
+
+.financial-expense h2 {
+    color: #dc2626;
+}
+
+.financial-balance-positive {
+    background: #eff6ff;
+    border-color: #dbeafe;
+}
+
+.financial-balance-positive p {
+    color: #1d4ed8;
+}
+
+.financial-balance-positive h2 {
+    color: #2563eb;
+}
+
+.financial-balance-negative {
+    background: #fff7ed;
+    border-color: #ffedd5;
+}
+
+.financial-balance-negative p {
+    color: #c2410c;
+}
+
+.financial-balance-negative h2 {
+    color: #ea580c;
+}
+
+
+/* =========================================================
+   LOYERS
+========================================================= */
+
+.rent-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+.rent-box {
+    min-height: 170px;
+
+    box-sizing: border-box;
+
+    padding: 24px;
+
+    border-radius: 18px;
+
+    border: 1px solid;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.rent-unpaid {
+    background: #fff7ed;
+    border-color: #ffedd5;
+}
+
+.rent-unpaid p {
+    color: #c2410c;
+}
+
+.rent-unpaid h2 {
+    color: #ea580c;
+}
+
+.rent-paid {
+    background: #f0fdf4;
+    border-color: #dcfce7;
+}
+
+.rent-paid p {
+    color: #15803d;
+}
+
+.rent-paid h2 {
+    color: #16a34a;
+}
+
+
+/* =========================================================
+   OCCUPATION
+========================================================= */
+
+.occupation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    margin-bottom: 12px;
+
+    color: #475569;
+
+    font-size: 14px;
+}
+
+.occupation-header strong {
+    color: #0f172a;
+
+    font-size: 16px;
+}
+
+.occupation-progress {
+    width: 100%;
+    height: 14px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+
+    background: #e2e8f0;
+}
+
+.occupation-progress-bar {
+    height: 100%;
+
+    border-radius: inherit;
+
+    background: #2563eb;
+
+    transition: width 0.7s ease;
+}
+
+.occupation-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 12px;
+
+    margin-top: 28px;
+}
+
+.occupation-stats > div {
+    padding: 16px;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    text-align: center;
+}
+
+.occupation-stats strong {
+    display: block;
+
+    color: #0f172a;
+
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.occupation-stats span {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   OPÉRATIONS
+========================================================= */
+
+.dashboard-operations-card {
+    width: 100%;
+}
+
+.dashboard-card-header {
+    margin-bottom: 8px;
+}
+
+.dashboard-card-header h2 {
+    margin-bottom: 5px;
+}
+
+.dashboard-card-header p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.dashboard-empty {
+    padding: 40px 20px;
+
+    color: #64748b;
+
+    text-align: center;
+
+    font-size: 14px;
+}
+
+.operations-list {
+    width: 100%;
+}
+
+.operation-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 17px 12px;
+
+    border-top: 1px solid #f1f5f9;
+
+    border-radius: 12px;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease;
+}
+
+.operation-row:hover {
+    background: #f8fafc;
+}
+
+.operation-left {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 14px;
+}
+
+.operation-icon {
+    width: 44px;
+    height: 44px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    font-size: 19px;
+    font-weight: 700;
+}
+
+.operation-income {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.operation-expense {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.operation-label {
+    max-width: 500px;
+
+    margin: 0;
+
+    overflow: hidden;
+
+    color: #1e293b;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.operation-date {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.operation-right {
+    flex-shrink: 0;
+
+    text-align: right;
+}
+
+.operation-amount {
+    margin: 0;
+
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.operation-amount-income {
+    color: #16a34a;
+}
+
+.operation-amount-expense {
+    color: #dc2626;
+}
+
+.operation-right span {
+    display: block;
+
+    margin-top: 4px;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+}
+
+
+/* =========================================================
+   BAS DE PAGE
+========================================================= */
+
+.dashboard-bottom-grid {
+    width: 100%;
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 24px;
+}
+
+.dashboard-alert-list,
+.dashboard-summary {
+    display: flex;
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+.dashboard-alert-list > div,
+.dashboard-summary > div {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+.dashboard-alert-list span,
+.dashboard-summary span {
+    color: #475569;
+
+    font-size: 14px;
+}
+
+.dashboard-alert-list strong,
+.dashboard-summary strong {
+    color: #0f172a;
+
+    font-size: 14px;
+}
+
+.dashboard-danger {
+    color: #dc2626 !important;
+}
+
+.dashboard-primary {
+    color: #2563eb !important;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .dashboard-stats-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-main-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .dashboard-financial-card {
+        grid-column: span 2;
+    }
+
+}
+
+
+/* =========================================================
+   TABLETTE PETITE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .dashboard-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-financial-card {
+        grid-column: auto;
+    }
+
+    .financial-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .dashboard-home {
+        gap: 22px;
+    }
+
+    .dashboard-stats-grid {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+    .financial-grid,
+    .rent-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .occupation-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .operation-row {
+        align-items: flex-start;
+    }
+
+    .operation-label {
+        max-width: 190px;
+    }
+
+    .operation-right {
+        min-width: 100px;
+    }
+
+    .operation-amount {
+        font-size: 12px;
+    }
+
+}
+
+
+/* =========================================================
+   TRÈS PETIT MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+
+    .operation-row {
+        gap: 10px;
+        padding-left: 6px;
+        padding-right: 6px;
+    }
+
+    .operation-icon {
+        width: 38px;
+        height: 38px;
+
+        font-size: 16px;
+    }
+
+    .operation-left {
+        gap: 9px;
+    }
+
+    .operation-label {
+        max-width: 145px;
+        font-size: 13px;
+    }
+
+    .operation-date {
+        font-size: 11px;
+    }
+
+}

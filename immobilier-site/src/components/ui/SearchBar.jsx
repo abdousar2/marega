@@ -1,3 +1,5 @@
+import "./SearchBar.css";
+
 export default function SearchBar({
 
     value,
@@ -10,30 +12,33 @@ export default function SearchBar({
 
     return (
 
-        <input
+        <div className="ui-search-bar">
 
-            type="text"
+            <span
+                className="ui-search-icon"
+                aria-hidden="true"
+            >
 
-            value={value}
+                🔎
 
-            onChange={onChange}
+            </span>
 
-            placeholder={placeholder}
 
-            className="
-                w-full
-                md:w-80
-                border
-                border-slate-300
-                rounded-xl
-                px-4
-                py-3
-                focus:outline-none
-                focus:ring-2
-                focus:ring-blue-500
-            "
+            <input
 
-        />
+                type="text"
+
+                value={value}
+
+                onChange={onChange}
+
+                placeholder={placeholder}
+
+                aria-label={placeholder}
+
+            />
+
+        </div>
 
     );
 

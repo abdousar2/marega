@@ -1,0 +1,165 @@
+/* =========================================================
+   BUTTON
+========================================================= */
+
+.ui-button {
+
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 8px;
+
+    box-sizing: border-box;
+
+    min-height: 46px;
+
+    padding: 12px 20px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    line-height: 1.2;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.08);
+
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        transform 0.2s ease,
+        opacity 0.2s ease;
+
+}
+
+
+/* =========================================================
+   BLEU
+========================================================= */
+
+.ui-button-blue {
+    background: #2563eb;
+}
+
+.ui-button-blue:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================================
+   VERT
+========================================================= */
+
+.ui-button-green {
+    background: #16a34a;
+}
+
+.ui-button-green:hover {
+    background: #15803d;
+}
+
+
+/* =========================================================
+   ROUGE
+========================================================= */
+
+.ui-button-red {
+    background: #dc2626;
+}
+
+.ui-button-red:hover {
+    background: #b91c1c;
+}
+
+
+/* =========================================================
+   ORANGE
+========================================================= */
+
+.ui-button-orange {
+    background: #f97316;
+}
+
+.ui-button-orange:hover {
+    background: #ea580c;
+}
+
+
+/* =========================================================
+   GRIS
+========================================================= */
+
+.ui-button-gray {
+    background: #475569;
+}
+
+.ui-button-gray:hover {
+    background: #334155;
+}
+
+
+/* =========================================================
+   ÉTAT HOVER
+========================================================= */
+
+.ui-button:hover:not(:disabled) {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 5px 12px rgba(15, 23, 42, 0.12);
+
+}
+
+
+/* =========================================================
+   ÉTAT ACTIVE
+========================================================= */
+
+.ui-button:active:not(:disabled) {
+
+    transform: translateY(0);
+
+}
+
+
+/* =========================================================
+   ÉTAT DISABLED
+========================================================= */
+
+.ui-button:disabled {
+
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+
+    box-shadow: none;
+
+}
+
+
+/* =========================================================
+   FOCUS
+========================================================= */
+
+.ui-button:focus-visible {
+
+    outline: 3px solid rgba(37, 99, 235, 0.25);
+
+    outline-offset: 2px;
+
+}

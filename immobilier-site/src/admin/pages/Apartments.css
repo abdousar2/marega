@@ -1,0 +1,437 @@
+/* =========================================================
+   APARTMENTS PAGE
+========================================================= */
+
+.apartments-page {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   CHARGEMENT
+========================================================= */
+
+.apartments-loading {
+
+    min-height: 384px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    color: #334155;
+
+    font-size: 18px;
+
+    font-weight: 600;
+
+}
+
+
+/* =========================================================
+   FILTRES
+========================================================= */
+
+.apartment-status-filters {
+
+    display: flex;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 12px;
+
+    margin-top: 32px;
+
+    margin-bottom: 32px;
+
+}
+
+
+.apartment-filter {
+
+    height: 42px;
+
+    padding: 0 20px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 999px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.apartment-filter:hover {
+
+    border-color: #cbd5e1;
+
+    background: #f8fafc;
+
+}
+
+
+.apartment-filter.active-all {
+
+    background: #0f172a;
+
+    border-color: #0f172a;
+
+    color: #ffffff;
+
+}
+
+
+.apartment-filter.active-available {
+
+    background: #16a34a;
+
+    border-color: #16a34a;
+
+    color: #ffffff;
+
+}
+
+
+.apartment-filter.active-occupied {
+
+    background: #dc2626;
+
+    border-color: #dc2626;
+
+    color: #ffffff;
+
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.apartments-stats {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+
+    margin-bottom: 32px;
+
+}
+
+
+/* =========================================================
+   RECHERCHE
+========================================================= */
+
+.apartments-search-row {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 32px;
+
+}
+
+
+/* =========================================================
+   TABLEAU
+========================================================= */
+
+.apartments-table-wrapper {
+
+    width: 100%;
+
+    overflow-x: auto;
+
+}
+
+
+.apartments-table-wrapper table {
+
+    min-width: 900px;
+
+}
+
+
+.apartments-table-wrapper td {
+
+    padding:
+        16px 24px;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    vertical-align: middle;
+
+    white-space: nowrap;
+
+}
+
+
+.apartment-number-cell {
+
+    font-weight: 700;
+
+    color: #1e293b !important;
+
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.apartment-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+}
+
+
+.apartment-actions button {
+
+    min-width: 44px;
+
+    min-height: 42px;
+
+    padding:
+        0 12px;
+
+}
+
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+.apartment-form {
+
+    width: 100%;
+
+}
+
+
+.apartment-form-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+}
+
+
+.apartment-form input,
+.apartment-form select {
+
+    width: 100%;
+
+    height: 50px;
+
+    box-sizing: border-box;
+
+    padding:
+        0 16px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+
+}
+
+
+.apartment-form input::placeholder {
+
+    color: #94a3b8;
+
+}
+
+
+.apartment-form input:hover,
+.apartment-form select:hover {
+
+    border-color: #94a3b8;
+
+}
+
+
+.apartment-form input:focus,
+.apartment-form select:focus {
+
+    border-color: #2563eb;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            37,
+            99,
+            235,
+            0.12
+        );
+
+}
+
+
+/* =========================================================
+   ACTIONS FORMULAIRE
+========================================================= */
+
+.apartment-form-actions {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 28px;
+
+    padding-top: 24px;
+
+    border-top:
+        1px solid #e2e8f0;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .apartments-stats {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+
+    .apartment-form-grid {
+
+        grid-template-columns: 1fr;
+
+    }
+
+}
+
+
+@media (max-width: 640px) {
+
+    .apartment-status-filters {
+
+        gap: 8px;
+
+    }
+
+
+    .apartment-filter {
+
+        flex: 1;
+
+        min-width: 100px;
+
+        padding:
+            0 14px;
+
+    }
+
+
+    .apartments-stats {
+
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+
+    }
+
+
+    .apartments-search-row {
+
+        margin-bottom: 20px;
+
+    }
+
+
+    .apartments-table-wrapper {
+
+        margin-left: -4px;
+
+        margin-right: -4px;
+
+    }
+
+
+    .apartment-form-actions {
+
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+
+    }
+
+
+    .apartment-form-actions button {
+
+        width: 100%;
+
+    }
+
+}

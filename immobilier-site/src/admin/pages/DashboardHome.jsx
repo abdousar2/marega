@@ -28,15 +28,11 @@ import {
 
 import {
 
-    Card,
-
-    StatsCard,
-
-    PageHeader,
-
-    Badge
+    Card, StatsCard, PageHeader, Badge
 
 } from "../../components/ui";
+
+import "./DashboardHome.css";
 
 export default function DashboardHome() {
 
@@ -63,7 +59,10 @@ export default function DashboardHome() {
     const occupied =
         activeContracts.length;
     
-    const available = apartments.length - occupied;
+    const available = Math.max(
+        0,
+        apartments.length - occupied
+    );
 
     const occupationRate =
         apartments.length > 0
@@ -154,474 +153,332 @@ export default function DashboardHome() {
 
     return (
 
-        
+    <div className="dashboard-home">
 
-        <div className="space-y-10">
+        {/* =====================================================
+            EN-TÊTE
+        ===================================================== */}
+
+        <div className="dashboard-header">
 
             <PageHeader
-
                 title="Tableau de bord"
-
                 subtitle="Bienvenue sur votre plateforme de gestion immobilière MAREGA."
-
             />
-            <br></br>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        </div>
 
-                <StatsCard
 
-                    title="Immeubles"
+        {/* =====================================================
+            STATISTIQUES
+        ===================================================== */}
 
-                    value={buildings.length}
+        <section className="dashboard-stats-grid">
 
-                    icon="🏢"
+            <StatsCard
+                title="Immeubles"
+                value={buildings.length}
+                icon="🏢"
+                color="blue"
+            />
 
-                    color="blue"
+            <StatsCard
+                title="Appartements"
+                value={apartments.length}
+                icon="🏠"
+                color="green"
+            />
 
-                />
+            <StatsCard
+                title="Locataires"
+                value={tenants.length}
+                icon="👤"
+                color="orange"
+            />
 
-                <StatsCard
+            <StatsCard
+                title="Contrats"
+                value={contracts.length}
+                icon="📄"
+                color="purple"
+            />
 
-                    title="Appartements"
+        </section>
 
-                    value={apartments.length}
 
-                    icon="🏠"
+        {/* =====================================================
+            BLOCS PRINCIPAUX
+        ===================================================== */}
 
-                    color="green"
+        <section className="dashboard-main-grid">
 
-                />
+            {/* SITUATION FINANCIÈRE */}
 
-                <StatsCard
+            <Card className="dashboard-financial-card">
 
-                    title="Locataires"
+                <h2 className="dashboard-section-title">
+                    Situation financière
+                </h2>
 
-                    value={tenants.length}
+                <div className="financial-grid">
 
-                    icon="👤"
+                    <div className="financial-box financial-income">
 
-                    color="orange"
+                        <p>
+                            Revenus encaissés
+                        </p>
 
-                />
-
-                <StatsCard
-
-                    title="Contrats"
-
-                    value={contracts.length}
-
-                    icon="📄"
-
-                    color="purple"
-
-                />
-
-            </div>
-            <br></br>
-
-                        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-
-                <Card className="xl:col-span-2">
-
-                    <h2 className="text-2xl font-bold mb-8">
-
-                        Situation financière
-
-                    </h2>
-
-                    <div className="grid md:grid-cols-3 gap-6">
-
-                        <div className="rounded-2xl bg-green-50 border border-green-100 p-8">
-
-                            <p className="text-green-700 font-medium">
-
-                                Revenus encaissés
-
-                            </p>
-
-                            <h2 className="text-4xl font-bold text-green-600 mt-5">
-
-                                {totalPaid.toLocaleString()}
-
-                            </h2>
-
-                            <p className="text-slate-500 mt-3">
-
-                                FCFA
-
-                            </p>
-
-                        </div>
-
-                        <div className="rounded-2xl bg-red-50 border border-red-100 p-8">
-
-                            <p className="text-red-700 font-medium">
-
-                                Dépenses
-
-                            </p>
-
-                            <h2 className="text-4xl font-bold text-red-600 mt-5">
-
-                                {totalExpenses.toLocaleString()}
-
-                            </h2>
-
-                            <p className="text-slate-500 mt-3">
-
-                                FCFA
-
-                            </p>
-
-                        </div>
-
-                        <div
-                            className={`rounded-2xl border p-8 ${
-                                netBalance >= 0
-                                    ? "bg-blue-50 border-blue-100"
-                                    : "bg-orange-50 border-orange-100"
-                            }`}
-                        >
-
-                            <p
-                                className={`font-medium ${
-                                    netBalance >= 0
-                                        ? "text-blue-700"
-                                        : "text-orange-700"
-                                }`}
-                            >
-                                Solde net
-                            </p>
-
-                            <h2
-                                className={`text-4xl font-bold mt-5 ${
-                                    netBalance >= 0
-                                        ? "text-blue-600"
-                                        : "text-orange-600"
-                                }`}
-                            >
-                                {netBalance.toLocaleString()}
-                            </h2>
-
-                            <p className="text-slate-500 mt-3">
-                                FCFA
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </Card>
-
-                <Card className="mt-6">
-
-                    <h2 className="text-2xl font-bold mb-8">
-                        Indicateurs des loyers
-                    </h2>
-
-                    <div className="grid md:grid-cols-2 gap-6">
-
-                        <div className="
-                            rounded-2xl
-                            bg-orange-50
-                            border
-                            border-orange-100
-                            p-8
-                        ">
-
-                            <p className="
-                                text-orange-700
-                                font-medium
-                            ">
-                                Loyers impayés
-                            </p>
-
-                            <h2 className="
-                                text-4xl
-                                font-bold
-                                text-orange-600
-                                mt-5
-                            ">
-
-                                {totalUnpaid.toLocaleString("fr-FR")}
-
-                            </h2>
-
-                            <p className="
-                                text-slate-500
-                                mt-3
-                            ">
-                                FCFA
-                            </p>
-
-                        </div>
-
-
-                        <div className="
-                            rounded-2xl
-                            bg-green-50
-                            border
-                            border-green-100
-                            p-8
-                        ">
-
-                            <p className="
-                                text-green-700
-                                font-medium
-                            ">
-                                Paiements encaissés
-                            </p>
-
-                            <h2 className="
-                                text-4xl
-                                font-bold
-                                text-green-600
-                                mt-5
-                            ">
-
-                                {paidPayments.length}
-
-                            </h2>
-
-                            <p className="
-                                text-slate-500
-                                mt-3
-                            ">
-                                paiements
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </Card>
-
-                <Card>
-
-                    <h2 className="text-2xl font-bold mb-8">
-
-                        Occupation
-
-                    </h2>
-
-                    <div className="flex justify-between mb-4">
-
-                        <span className="text-slate-600">
-
-                            Taux d'occupation
-
-                        </span>
-
-                        <strong>
-
-                            {occupationRate}%
-
-                        </strong>
-
-                    </div>
-
-                    <div className="w-full h-4 rounded-full bg-slate-200 overflow-hidden">
-
-                        <div
-
-                            className="h-4 bg-blue-600 transition-all duration-700"
-
-                            style={{
-
-                                width: `${occupationRate}%`
-
-                            }}
-
-                        />
-
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4 mt-10">
-
-                        <div className="bg-slate-50 rounded-xl p-5 text-center">
-
-                            <div className="text-3xl font-bold">
-
-                                {occupied}
-
-                            </div>
-
-                            <div className="text-sm text-slate-500 mt-2">
-
-                                Occupés
-
-                            </div>
-
-                        </div>
-
-                        <div className="bg-slate-50 rounded-xl p-5 text-center">
-
-                            <div className="text-3xl font-bold">
-
-                                {available}
-
-                            </div>
-
-                            <div className="text-sm text-slate-500 mt-2">
-
-                                Libres
-
-                            </div>
-
-                        </div>
-
-                        <div className="bg-slate-50 rounded-xl p-5 text-center">
-
-                            <div className="text-3xl font-bold">
-
-                                {apartments.length}
-
-                            </div>
-
-                            <div className="text-sm text-slate-500 mt-2">
-
-                                Total
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-                </Card>
-
-            </div>
-            <br></br>
-
-            <Card>
-
-                <div className="flex items-center justify-between mb-6">
-
-                    <div>
-
-                        <h2 className="text-2xl font-bold">
-                            Dernières opérations
+                        <h2>
+                            {totalPaid.toLocaleString("fr-FR")}
                         </h2>
 
-                        <p className="text-slate-500 text-sm mt-1">
-                            Les dernières entrées et sorties d'argent
+                        <span>
+                            FCFA
+                        </span>
+
+                    </div>
+
+
+                    <div className="financial-box financial-expense">
+
+                        <p>
+                            Dépenses
                         </p>
+
+                        <h2>
+                            {totalExpenses.toLocaleString("fr-FR")}
+                        </h2>
+
+                        <span>
+                            FCFA
+                        </span>
+
+                    </div>
+
+
+                    <div
+                        className={
+                            netBalance >= 0
+                                ? "financial-box financial-balance-positive"
+                                : "financial-box financial-balance-negative"
+                        }
+                    >
+
+                        <p>
+                            Solde net
+                        </p>
+
+                        <h2>
+                            {netBalance.toLocaleString("fr-FR")}
+                        </h2>
+
+                        <span>
+                            FCFA
+                        </span>
 
                     </div>
 
                 </div>
 
-                {recentOperations.length === 0 ? (
+            </Card>
 
-                    <div className="py-10 text-center text-slate-500">
 
-                        Aucune opération financière enregistrée.
+            {/* INDICATEURS LOYERS */}
+
+            <Card className="dashboard-rent-card">
+
+                <h2 className="dashboard-section-title">
+                    Indicateurs des loyers
+                </h2>
+
+                <div className="rent-grid">
+
+                    <div className="rent-box rent-unpaid">
+
+                        <p>
+                            Loyers impayés
+                        </p>
+
+                        <h2>
+                            {totalUnpaid.toLocaleString("fr-FR")}
+                        </h2>
+
+                        <span>
+                            FCFA
+                        </span>
 
                     </div>
 
-                ) : (
 
-                    <div className="divide-y divide-slate-100">
+                    <div className="rent-box rent-paid">
 
-                        {recentOperations.map(operation => (
+                        <p>
+                            Paiements encaissés
+                        </p>
 
-                            <div
-                                key={operation.id}
-                                onClick={() => navigate(operation.url)}
-                                className="
-                                    flex
-                                    items-center
-                                    justify-between
-                                    py-5
-                                    px-4
-                                    -mx-4
-                                    rounded-xl
-                                    cursor-pointer
-                                    hover:bg-slate-50
-                                    transition
-                                "
-                            >
+                        <h2>
+                            {paidPayments.length}
+                        </h2>
 
-                                <div className="flex items-center gap-4">
+                        <span>
+                            paiements
+                        </span>
 
-                                    <div
-                                        className={`
-                                            w-11
-                                            h-11
-                                            rounded-full
-                                            flex
-                                            items-center
-                                            justify-center
-                                            text-lg
-                                            ${
-                                                operation.type === "entrée"
-                                                    ? "bg-green-100"
-                                                    : "bg-red-100"
-                                            }
-                                        `}
-                                    >
+                    </div>
 
-                                        {operation.type === "entrée"
-                                            ? "↓"
-                                            : "↑"}
+                </div>
 
-                                    </div>
+            </Card>
 
-                                    <div>
 
-                                        <p className="font-semibold text-slate-800">
+            {/* OCCUPATION */}
 
-                                            {operation.label}
+            <Card className="dashboard-occupation-card">
 
-                                        </p>
+                <h2 className="dashboard-section-title">
+                    Occupation
+                </h2>
 
-                                        <p className="text-sm text-slate-500 mt-1">
+                <div className="occupation-header">
 
-                                            {operation.date
-                                                ? new Date(
-                                                    operation.date
-                                                ).toLocaleDateString("fr-FR")
-                                                : "Date inconnue"
-                                            }
+                    <span>
+                        Taux d'occupation
+                    </span>
 
-                                        </p>
+                    <strong>
+                        {occupationRate}%
+                    </strong>
 
-                                    </div>
+                </div>
 
+
+                <div className="occupation-progress">
+
+                    <div
+                        className="occupation-progress-bar"
+                        style={{
+                            width: `${occupationRate}%`
+                        }}
+                    />
+
+                </div>
+
+
+                <div className="occupation-stats">
+
+                    <div>
+                        <strong>
+                            {occupied}
+                        </strong>
+
+                        <span>
+                            Occupés
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            {available}
+                        </strong>
+
+                        <span>
+                            Libres
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            {apartments.length}
+                        </strong>
+
+                        <span>
+                            Total
+                        </span>
+                    </div>
+
+                </div>
+
+            </Card>
+
+        </section>
+
+
+        {/* =====================================================
+            DERNIÈRES OPÉRATIONS
+        ===================================================== */}
+
+        <Card className="dashboard-operations-card">
+
+            <div className="dashboard-card-header">
+
+                <div>
+
+                    <h2 className="dashboard-section-title">
+                        Dernières opérations
+                    </h2>
+
+                    <p>
+                        Les dernières entrées et sorties d'argent
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            {recentOperations.length === 0 ? (
+
+                <div className="dashboard-empty">
+                    Aucune opération financière enregistrée.
+                </div>
+
+            ) : (
+
+                <div className="operations-list">
+
+                    {recentOperations.map(operation => (
+
+                        <div
+                            key={operation.id}
+                            onClick={() =>
+                                navigate(operation.url)
+                            }
+                            className="operation-row"
+                        >
+
+                            <div className="operation-left">
+
+                                <div
+                                    className={
+                                        operation.type === "entrée"
+                                            ? "operation-icon operation-income"
+                                            : "operation-icon operation-expense"
+                                    }
+                                >
+                                    {operation.type === "entrée"
+                                        ? "↓"
+                                        : "↑"
+                                    }
                                 </div>
 
-                                <div className="text-right">
 
-                                    <p
-                                        className={`
-                                            font-bold
-                                            ${
-                                                operation.type === "entrée"
-                                                    ? "text-green-600"
-                                                    : "text-red-600"
-                                            }
-                                        `}
-                                    >
+                                <div>
 
-                                        {operation.type === "entrée"
-                                            ? "+"
-                                            : "-"
-                                        }
-
-                                        {operation.amount.toLocaleString(
-                                            "fr-FR"
-                                        )}
-
-                                        {" "}FCFA
-
+                                    <p className="operation-label">
+                                        {operation.label}
                                     </p>
 
-                                    <p className="text-xs text-slate-400 mt-1">
+                                    <p className="operation-date">
 
-                                        {operation.type === "entrée"
-                                            ? "Entrée"
-                                            : "Sortie"
+                                        {operation.date
+                                            ? new Date(
+                                                operation.date
+                                            ).toLocaleDateString(
+                                                "fr-FR"
+                                            )
+                                            : "Date inconnue"
                                         }
 
                                     </p>
@@ -630,188 +487,199 @@ export default function DashboardHome() {
 
                             </div>
 
-                        ))}
 
+                            <div className="operation-right">
+
+                                <p
+                                    className={
+                                        operation.type === "entrée"
+                                            ? "operation-amount operation-amount-income"
+                                            : "operation-amount operation-amount-expense"
+                                    }
+                                >
+
+                                    {operation.type === "entrée"
+                                        ? "+"
+                                        : "-"
+                                    }
+
+                                    {operation.amount.toLocaleString(
+                                        "fr-FR"
+                                    )}
+
+                                    {" "}FCFA
+
+                                </p>
+
+                                <span>
+                                    {operation.type === "entrée"
+                                        ? "Entrée"
+                                        : "Sortie"
+                                    }
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    ))}
+
+                </div>
+
+            )}
+
+        </Card>
+
+
+        {/* =====================================================
+            ALERTES + RÉSUMÉ
+        ===================================================== */}
+
+        <section className="dashboard-bottom-grid">
+
+            <Card>
+
+                <h2 className="dashboard-section-title">
+                    Alertes
+                </h2>
+
+                <div className="dashboard-alert-list">
+
+                    <div>
+                        <span>
+                            Dépenses enregistrées
+                        </span>
+
+                        <Badge color="orange">
+                            {expenses.length}
+                        </Badge>
                     </div>
 
-                )}
+
+                    <div>
+                        <span>
+                            Total des dépenses
+                        </span>
+
+                        <strong className="dashboard-danger">
+                            {totalExpenses.toLocaleString("fr-FR")} FCFA
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Dépense moyenne
+                        </span>
+
+                        <strong>
+                            {Math.round(
+                                averageExpense
+                            ).toLocaleString("fr-FR")} FCFA
+                        </strong>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Contrats actifs
+                        </span>
+
+                        <Badge color="green">
+                            {activeContracts.length}
+                        </Badge>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Appartements disponibles
+                        </span>
+
+                        <Badge color="blue">
+                            {available}
+                        </Badge>
+                    </div>
+
+
+                    <div>
+                        <span>
+                            Paiements impayés
+                        </span>
+
+                        <Badge color="red">
+                            {
+                                payments.filter(
+                                    p => p.status !== "Payé"
+                                ).length
+                            }
+                        </Badge>
+                    </div>
+
+                </div>
 
             </Card>
-            <br></br>
 
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 
-                <Card>
+            <Card>
 
-                    <h2 className="text-2xl font-bold mb-6">
-                        Alertes
-                    </h2>
+                <h2 className="dashboard-section-title">
+                    Résumé
+                </h2>
 
-                    <div className="space-y-4">
+                <div className="dashboard-summary">
 
-                        <div className="flex items-center justify-between">
+                    <div>
+                        <span>
+                            Immeubles
+                        </span>
 
-                            <span>
-                                Dépenses enregistrées
-                            </span>
-
-                            <Badge color="orange">
-                                {expenses.length}
-                            </Badge>
-
-                        </div>
-
-                        <div className="flex items-center justify-between">
-
-                            <span>
-                                Total des dépenses
-                            </span>
-
-                            <strong className="text-red-600">
-                                {totalExpenses.toLocaleString()} FCFA
-                            </strong>
-
-                        </div>
-
-                        <div className="flex items-center justify-between">
-
-                            <span>
-                                Dépense moyenne
-                            </span>
-
-                            <strong>
-                                {Math.round(averageExpense).toLocaleString()} FCFA
-                            </strong>
-
-                        </div>
-
-                        <div className="flex items-center justify-between">
-
-                            <span>
-                                Contrats actifs
-                            </span>
-
-                            <Badge color="green">
-                                {activeContracts.length}
-                            </Badge>
-
-                        </div>
-
-                        <div className="flex items-center justify-between">
-
-                            <span>
-                                Appartements disponibles
-                            </span>
-
-                            <Badge color="blue">
-                                {available}
-                            </Badge>
-
-                        </div>
-
-                        <div className="flex items-center justify-between">
-
-                            <span>
-                                Paiements impayés
-                            </span>
-
-                            <Badge color="red">
-                                {
-                                    payments.filter(
-                                        p => p.status !== "Payé"
-                                    ).length
-                                }
-                            </Badge>
-
-                        </div>
-
+                        <strong>
+                            {buildings.length}
+                        </strong>
                     </div>
 
-                </Card>
 
-                <Card>
+                    <div>
+                        <span>
+                            Appartements
+                        </span>
 
-                    <h2 className="text-2xl font-bold mb-6">
-
-                        Résumé
-
-                    </h2>
-
-                    <div className="space-y-5">
-
-                        <div className="flex justify-between">
-
-                            <span className="text-slate-500">
-
-                                Immeubles
-
-                            </span>
-
-                            <strong>
-
-                                {buildings.length}
-
-                            </strong>
-
-                        </div>
-
-                        <div className="flex justify-between">
-
-                            <span className="text-slate-500">
-
-                                Appartements
-
-                            </span>
-
-                            <strong>
-
-                                {apartments.length}
-
-                            </strong>
-
-                        </div>
-
-                        <div className="flex justify-between">
-
-                            <span className="text-slate-500">
-
-                                Locataires
-
-                            </span>
-
-                            <strong>
-
-                                {tenants.length}
-
-                            </strong>
-
-                        </div>
-
-                        <div className="flex justify-between">
-
-                            <span className="text-slate-500">
-
-                                Taux d'occupation
-
-                            </span>
-
-                            <strong className="text-blue-600">
-
-                                {occupationRate}%
-
-                            </strong>
-
-                        </div>
-
+                        <strong>
+                            {apartments.length}
+                        </strong>
                     </div>
 
-                </Card>
-                <br></br><br></br>
 
-            </div>
+                    <div>
+                        <span>
+                            Locataires
+                        </span>
 
-        </div>
+                        <strong>
+                            {tenants.length}
+                        </strong>
+                    </div>
 
-    );
+
+                    <div>
+                        <span>
+                            Taux d'occupation
+                        </span>
+
+                        <strong className="dashboard-primary">
+                            {occupationRate}%
+                        </strong>
+                    </div>
+
+                </div>
+
+            </Card>
+
+        </section>
+
+    </div>
+
+);
 
 }

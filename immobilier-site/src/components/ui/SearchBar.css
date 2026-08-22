@@ -1,0 +1,123 @@
+/* =========================================================
+   SEARCH BAR
+========================================================= */
+
+.ui-search-bar {
+
+    position: relative;
+
+    width: 320px;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   ICÔNE
+========================================================= */
+
+.ui-search-icon {
+
+    position: absolute;
+
+    top: 50%;
+    left: 14px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    width: 20px;
+    height: 20px;
+
+    transform:
+        translateY(-50%);
+
+    color: #94a3b8;
+
+    font-size: 15px;
+
+    pointer-events: none;
+
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.ui-search-bar input {
+
+    width: 100%;
+
+    height: 46px;
+
+    box-sizing: border-box;
+
+    padding:
+        0 16px 0 42px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+
+}
+
+
+.ui-search-bar input::placeholder {
+
+    color: #94a3b8;
+
+}
+
+
+.ui-search-bar input:hover {
+
+    border-color: #94a3b8;
+
+}
+
+
+.ui-search-bar input:focus {
+
+    border-color: #2563eb;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px rgba(37, 99, 235, 0.12);
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .ui-search-bar {
+
+        width: 100%;
+
+    }
+
+}

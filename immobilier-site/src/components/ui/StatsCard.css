@@ -1,0 +1,149 @@
+/* =========================================================
+   STAT CARD
+========================================================= */
+
+.ui-stat-card {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    overflow: hidden;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 16px;
+
+    box-shadow:
+        0 1px 2px rgba(15, 23, 42, 0.04);
+}
+
+
+/* =========================================================
+   BARRE SUPÉRIEURE
+========================================================= */
+
+.ui-stat-card-top {
+    width: 100%;
+    height: 8px;
+}
+
+
+/* =========================================================
+   COULEURS
+========================================================= */
+
+.ui-stat-blue {
+    background: #2563eb;
+}
+
+.ui-stat-green {
+    background: #16a34a;
+}
+
+.ui-stat-orange {
+    background: #f97316;
+}
+
+.ui-stat-red {
+    background: #dc2626;
+}
+
+.ui-stat-purple {
+    background: #9333ea;
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
+.ui-stat-card-content {
+    min-height: 120px;
+
+    box-sizing: border-box;
+
+    padding: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   INFORMATIONS
+========================================================= */
+
+.ui-stat-card-info {
+    min-width: 0;
+}
+
+.ui-stat-card-title {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.ui-stat-card-value {
+    margin: 8px 0 0;
+
+    color: #0f172a;
+
+    font-size: 36px;
+    font-weight: 700;
+
+    line-height: 1.1;
+}
+
+
+/* =========================================================
+   ICÔNE
+========================================================= */
+
+.ui-stat-card-icon {
+    width: 56px;
+    height: 56px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #f1f5f9;
+
+    border-radius: 16px;
+
+    font-size: 28px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 650px) {
+
+    .ui-stat-card-content {
+        padding: 20px;
+    }
+
+    .ui-stat-card-value {
+        font-size: 30px;
+    }
+
+    .ui-stat-card-icon {
+        width: 48px;
+        height: 48px;
+
+        font-size: 24px;
+    }
+
+}

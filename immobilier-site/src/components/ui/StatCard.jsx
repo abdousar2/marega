@@ -1,42 +1,45 @@
+import "./StatsCard.css";
+
 export default function StatCard({
-  title,
-  value,
-  color = "blue",
-  icon = "📊",
+    title,
+    value,
+    color = "blue",
+    icon = "📊"
 }) {
-  const colors = {
-    blue: "bg-blue-600",
-    green: "bg-green-600",
-    orange: "bg-orange-500",
-    red: "bg-red-600",
-    purple: "bg-purple-600",
-  };
 
-  return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
+    return (
 
-      <div className={`h-2 ${colors[color]}`} />
+        <div className="ui-stat-card">
 
-      <div className="p-6 flex items-center justify-between">
+            <div
+                className={`ui-stat-card-top ui-stat-${color}`}
+            />
 
-        <div>
+            <div className="ui-stat-card-content">
 
-          <p className="text-slate-500 text-sm">
-            {title}
-          </p>
+                <div className="ui-stat-card-info">
 
-          <h2 className="text-4xl font-bold mt-2">
-            {value}
-          </h2>
+                    <p className="ui-stat-card-title">
+                        {title}
+                    </p>
+
+                    <h2 className="ui-stat-card-value">
+                        {value}
+                    </h2>
+
+                </div>
+
+
+                <div className="ui-stat-card-icon">
+
+                    {icon}
+
+                </div>
+
+            </div>
 
         </div>
 
-        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center text-3xl">
-          {icon}
-        </div>
+    );
 
-      </div>
-
-    </div>
-  );
 }

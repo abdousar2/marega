@@ -1,3 +1,5 @@
+import "./PageHeader.css";
+
 export default function PageHeader({
 
     title,
@@ -12,43 +14,38 @@ export default function PageHeader({
 
     return (
 
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 mb-8">
+        <div className="ui-page-header">
 
-            <div>
+            <div className="ui-page-header-content">
 
-                <h1 className="text-4xl font-bold text-slate-800">
-
+                <h1 className="ui-page-header-title">
                     {title}
-
                 </h1>
 
-                <p className="text-slate-500 mt-2">
+                {subtitle && (
 
-                    {subtitle}
+                    <p className="ui-page-header-subtitle">
+                        {subtitle}
+                    </p>
 
-                </p>
+                )}
 
             </div>
 
-            {
 
-                buttonLabel && (
+            {buttonLabel && (
 
-                    <button
+                <button
+                    type="button"
+                    onClick={onButtonClick}
+                    className="ui-page-header-button"
+                >
 
-                        onClick={onButtonClick}
+                    {buttonLabel}
 
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow"
+                </button>
 
-                    >
-
-                        {buttonLabel}
-
-                    </button>
-
-                )
-
-            }
+            )}
 
         </div>
 

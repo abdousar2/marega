@@ -12,65 +12,81 @@ import {
 } from "../../components/ui";
 
 import {
-  BuildingsContext,
+    BuildingsContext,
 } from "../../context/BuildingsContext";
 
 import {
-  ApartmentsContext,
+    ApartmentsContext,
 } from "../../context/ApartmentsContext";
 
 import { TenantsContext } from "../../context/TenantsContext";
+
 import ApartmentsService from "../../services/apartments.service";
 
+import "./Apartments.css";
+
+
 export default function Apartments() {
-  const { buildings } =
-    useContext(BuildingsContext);
 
-  const {
-      apartments,
-      loading,
-      reloadApartments,
-  } = useContext(ApartmentsContext);
+    const { buildings } =
+        useContext(BuildingsContext);
 
-  const { tenants } =
-    useContext(TenantsContext);
+    const {
+        apartments,
+        loading,
+        reloadApartments,
+    } = useContext(ApartmentsContext);
 
-  const [search, setSearch] =
-    useState("");
+    const { tenants } =
+        useContext(TenantsContext);
 
-  const [buildingId, setBuildingId] =
-    useState("");
 
-  const [number, setNumber] =
-    useState("");
+    const [search, setSearch] =
+        useState("");
 
-  const [type, setType] =
-    useState("");
+    const [buildingId, setBuildingId] =
+        useState("");
 
-  const [surface, setSurface] =
-    useState("");
+    const [number, setNumber] =
+        useState("");
 
-  const [rent, setRent] =
-    useState("");
+    const [type, setType] =
+        useState("");
 
-  const [deposit, setDeposit] =
-    useState("");
+    const [surface, setSurface] =
+        useState("");
 
-  const [editingId, setEditingId] =
-    useState(null);
+    const [rent, setRent] =
+        useState("");
 
-  const [showModal, setShowModal] = useState(false);
+    const [deposit, setDeposit] =
+        useState("");
 
-  const [statusFilter, setStatusFilter] =
-    useState("all");
-  
+    const [editingId, setEditingId] =
+        useState(null);
+
+    const [showModal, setShowModal] =
+        useState(false);
+
+    const [statusFilter, setStatusFilter] =
+        useState("all");
+
+
+    /* =========================================================
+       CHARGEMENT
+    ========================================================= */
+
     if (loading) {
 
         return (
 
             <Layout>
 
-                <h2>Chargement des appartements...</h2>
+                <div className="apartments-loading">
+
+                    Chargement des appartements...
+
+                </div>
 
             </Layout>
 
@@ -78,647 +94,960 @@ export default function Apartments() {
 
     }
 
-  const occupiedApartments =
-    apartments.filter((apartment) =>
-      tenants.some(
-        (tenant) =>
-          tenant.apartmentId == apartment.id &&
-          tenant.status === "Actif"
-      )
-    );
 
-  const availableApartments =
-    apartments.filter((apartment) =>
-      !tenants.some(
-        (tenant) =>
-          tenant.apartmentId == apartment.id &&
-          tenant.status === "Actif"
-      )
-    );
+    /* =========================================================
+       OCCUPATION
+    ========================================================= */
 
-  const addApartment = async (e) => {
+    const occupiedApartments =
+        apartments.filter((apartment) =>
+            tenants.some(
+                (tenant) =>
+                    tenant.apartmentId == apartment.id &&
+                    tenant.status === "Actif"
+            )
+        );
 
-    e.preventDefault();
 
-    if (!buildingId) {
+    const availableApartments =
+        apartments.filter((apartment) =>
+            !tenants.some(
+                (tenant) =>
+                    tenant.apartmentId == apartment.id &&
+                    tenant.status === "Actif"
+            )
+        );
 
-        alert("Veuillez choisir un immeuble.");
 
-        return;
+    /* =========================================================
+       RÉINITIALISATION DU FORMULAIRE
+    ========================================================= */
 
-    }
+    const resetForm = () => {
 
-    try {
+        setEditingId(null);
 
-        const apartment = {
+        setBuildingId("");
 
-              building_id: Number(buildingId),
+        setNumber("");
 
-              number,
+        setType("");
 
-              floor: "",
+        setSurface("");
 
-              type,
+        setRent("");
 
-              surface: Number(surface),
+        setDeposit("");
 
-              rent: Number(rent),
+    };
 
-              charges: 0,
 
-              deposit: Number(deposit),
+    /* =========================================================
+       AJOUT / MODIFICATION
+    ========================================================= */
 
-              status: "Disponible",
+    const addApartment = async (e) => {
 
-              description: ""
+        e.preventDefault();
 
-          };
 
-          if (editingId) {
+        if (!buildingId) {
 
-              await ApartmentsService.update(
-                  editingId,
-                  apartment
-              );
+            alert(
+                "Veuillez choisir un immeuble."
+            );
 
-          }
+            return;
 
-          else {
+        }
 
-              await ApartmentsService.create(
-                  apartment
-              );
 
-          }
+        try {
 
-          await reloadApartments();
+            const apartment = {
 
-          setEditingId(null);
+                building_id:
+                    Number(buildingId),
 
-          setBuildingId("");
-          setNumber("");
-          setType("");
-          setSurface("");
-          setRent("");
-          setDeposit("");
+                number,
 
-      }
+                floor: "",
 
-      catch (err) {
+                type,
 
-          console.error(err);
+                surface:
+                    Number(surface),
 
-          alert("Erreur lors de l'enregistrement.");
+                rent:
+                    Number(rent),
 
-      }
+                charges: 0,
 
-  };
+                deposit:
+                    Number(deposit),
 
-  const editApartment = (apartment) => {
+                status: "Disponible",
 
-      setEditingId(apartment.id);
+                description: ""
 
-      setBuildingId(apartment.building_id);
+            };
 
-      setNumber(apartment.number);
 
-      setType(apartment.type);
+            if (editingId) {
 
-      setSurface(apartment.surface);
+                await ApartmentsService.update(
+                    editingId,
+                    apartment
+                );
 
-      setRent(apartment.rent);
+            }
 
-      setDeposit(apartment.deposit);
+            else {
 
-  };
+                await ApartmentsService.create(
+                    apartment
+                );
 
-  const deleteApartment = async (id) => {
+            }
 
-      const occupied = tenants.some(
 
-          tenant =>
-              tenant.apartmentId == id &&
-              tenant.status === "Actif"
+            await reloadApartments();
 
-      );
+            resetForm();
 
-      if (occupied) {
+            setShowModal(false);
 
-          alert("Impossible de supprimer un appartement occupé.");
+        }
 
-          return;
+        catch (err) {
 
-      }
+            console.error(err);
 
-      if (!window.confirm("Supprimer cet appartement ?"))
-          return;
+            alert(
+                "Erreur lors de l'enregistrement."
+            );
 
-      try {
+        }
 
-          await ApartmentsService.remove(id);
+    };
 
-          await reloadApartments();
 
-      }
+    /* =========================================================
+       MODIFICATION
+    ========================================================= */
 
-      catch (err) {
+    const editApartment = (apartment) => {
 
-          console.error(err);
+        setEditingId(apartment.id);
 
-          alert("Impossible de supprimer un appartement occupé.");
+        setBuildingId(
+            apartment.building_id
+        );
 
-      }
+        setNumber(
+            apartment.number
+        );
 
-  };
-          
+        setType(
+            apartment.type
+        );
 
-  return (
-    <Layout>
-      
+        setSurface(
+            apartment.surface
+        );
 
-      <PageHeader
-          title="Gestion des appartements"
-          subtitle="Consultez, ajoutez et gérez tous les appartements."
-          buttonLabel="+ Nouvel appartement"
-          onButtonClick={() => {
+        setRent(
+            apartment.rent
+        );
 
-            setEditingId(null);
+        setDeposit(
+            apartment.deposit
+        );
 
-            setBuildingId("");
+        setShowModal(true);
 
-            setNumber("");
+    };
 
-            setType("");
 
-            setSurface("");
+    /* =========================================================
+       SUPPRESSION
+    ========================================================= */
 
-            setRent("");
+    const deleteApartment = async (id) => {
 
-            setDeposit("");
+        const occupied =
+            tenants.some(
 
-            setShowModal(true);
+                tenant =>
+                    tenant.apartmentId == id &&
+                    tenant.status === "Actif"
 
-        }}
-      />   
-      <br></br>
+            );
 
-      
 
-      <div className="flex flex-wrap gap-3 mb-8">
+        if (occupied) {
 
-        <button
-          onClick={() =>
-            setStatusFilter("all")
-          }
-          className={`px-5 py-2 rounded-full ${
-            statusFilter === "all"
-              ? "bg-slate-900 text-white"
-              : "bg-white"
-          }`}
-        >
-          Tous
-        </button>
+            alert(
+                "Impossible de supprimer un appartement occupé."
+            );
 
-        <button
-          onClick={() =>
-            setStatusFilter("available")
-          }
-          className={`px-5 py-2 rounded-full ${
-            statusFilter === "available"
-              ? "bg-green-600 text-white"
-              : "bg-white"
-          }`}
-        >
-          Disponibles
-        </button>
+            return;
 
-        <button
-          onClick={() =>
-            setStatusFilter("occupied")
-          }
-          className={`px-5 py-2 rounded-full ${
-            statusFilter === "occupied"
-              ? "bg-red-600 text-white"
-              : "bg-white"
-          }`}
-        >
-          Occupés
-        </button>
+        }
 
-      </div> 
-      <br></br>     
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        if (
+            !window.confirm(
+                "Supprimer cet appartement ?"
+            )
+        ) {
 
-          <StatsCard
-              title="Appartements"
-              value={apartments.length}
-              color="blue"
-          />
+            return;
 
-          <StatsCard
-              title="Disponibles"
-              value={availableApartments.length}
-              color="green"
-          />
+        }
 
-          <StatsCard
-              title="Occupés"
-              value={occupiedApartments.length}
-              color="red"
-          />
 
-      </div>   
-      <br></br> 
+        try {
 
-      <div className="flex justify-between items-start mb-8">
-        <br></br>
+            await ApartmentsService.remove(id);
 
-        <SearchBar
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Rechercher un appartement..."
-        />
-        
+            await reloadApartments();
 
-      </div>    
-          <br></br>
-          
+        }
 
-      <Table
-          headers={[
-              "Appartement",
-              "Immeuble",
-              "Type",
-              "Surface",
-              "Loyer",
-              "Statut",
-              "Actions"
-          ]}
-      >
+        catch (err) {
 
-      {
-      apartments
+            console.error(err);
 
-      .filter((apartment) => {
+            alert(
+                "Impossible de supprimer l'appartement."
+            );
 
-          const occupied =
-              tenants.some(
+        }
 
-                  tenant =>
+    };
 
-                      tenant.apartmentId == apartment.id &&
 
-                      tenant.status === "Actif"
+    /* =========================================================
+       OUVERTURE NOUVEL APPARTEMENT
+    ========================================================= */
 
-              );
+    const openCreateModal = () => {
 
-          if (statusFilter === "available" && occupied)
+        resetForm();
 
-              return false;
+        setShowModal(true);
 
-          if (statusFilter === "occupied" && !occupied)
+    };
 
-              return false;
 
-          return true;
+    /* =========================================================
+       FILTRAGE
+    ========================================================= */
 
-      })
+    const filteredApartments =
+        apartments
 
-      .filter((apartment) => {
+            .filter((apartment) => {
 
-          const query = search.toLowerCase();
+                const occupied =
+                    tenants.some(
 
-          return (
+                        tenant =>
 
-              apartment.number.toLowerCase().includes(query) ||
+                            tenant.apartmentId ==
+                                apartment.id &&
 
-              apartment.type.toLowerCase().includes(query)
+                            tenant.status === "Actif"
 
-          );
+                    );
 
-      })
 
-      .map(apartment => {
+                if (
+                    statusFilter === "available" &&
+                    occupied
+                ) {
 
-          const building =
+                    return false;
 
-              buildings.find(
+                }
 
-                  b => b.id == apartment.building_id
 
-              );
+                if (
+                    statusFilter === "occupied" &&
+                    !occupied
+                ) {
 
-          const activeTenant =
+                    return false;
 
-              tenants.find(
+                }
 
-                  t =>
 
-                      t.apartmentId == apartment.id &&
+                return true;
 
-                      t.status === "Actif"
+            })
 
-              );
+            .filter((apartment) => {
 
-          return (
+                const query =
+                    search.toLowerCase();
 
-      <tr key={apartment.id}>
 
-      <td className="px-8 py-14 font-semibold ">
+                return (
 
-          {apartment.number}
+                    String(
+                        apartment.number || ""
+                    )
+                        .toLowerCase()
+                        .includes(query)
 
-      </td>
+                    ||
 
-      <td className="px-6 py-4">
+                    String(
+                        apartment.type || ""
+                    )
+                        .toLowerCase()
+                        .includes(query)
 
-          {building?.name}
+                );
 
-      </td>
+            });
 
-      <td className="px-6 py-4">
 
-          {apartment.type}
+    return (
 
-      </td>
+        <Layout>
 
-      <td className="px-6 py-4">
+            <div className="apartments-page">
 
-          {apartment.surface} m²
 
-      </td>
+                {/* =====================================================
+                    HEADER
+                ====================================================== */}
 
-      <td className="px-6 py-4">
+                <PageHeader
 
-          {Number(apartment.rent).toLocaleString()} FCFA
+                    title="Gestion des appartements"
 
-      </td>
+                    subtitle="Consultez, ajoutez et gérez tous les appartements."
 
-      <td className="px-6 py-4">
+                    buttonLabel="+ Nouvel appartement"
 
-      <Badge
+                    onButtonClick={
+                        openCreateModal
+                    }
 
-      color={
+                />
 
-      activeTenant
 
-      ? "red"
+                {/* =====================================================
+                    FILTRES DE STATUT
+                ====================================================== */}
 
-      : "green"
+                <div className="apartment-status-filters">
 
-      }
+                    <button
 
-      >
+                        type="button"
 
-      {
+                        onClick={() =>
+                            setStatusFilter("all")
+                        }
 
-      activeTenant
+                        className={
+                            statusFilter === "all"
+                                ? "apartment-filter active-all"
+                                : "apartment-filter"
+                        }
 
-      ?
-
-      "Occupé"
-
-      :
-
-      "Disponible"
-
-      }
-
-      </Badge>
-
-      </td>
-
-      <td className="px-6 py-4">
-
-      <div className="flex gap-2">
-
-      <Button
-
-      variant="primary"
-
-     onClick={() => {
-
-          editApartment(apartment);
-
-          setShowModal(true);
-
-      }}
-
-      >
-
-      ✏️
-
-      </Button>
-
-      <Button
-
-      variant="danger"
-
-      onClick={() =>
-
-      deleteApartment(apartment.id)
-
-      }
-
-      >
-
-      🗑️
-
-      </Button>
-
-      </div>
-
-      </td>
-
-      </tr>
-
-          );
-
-      })
-
-      }
-
-      </Table>
-
-      <Modal
-
-          open={showModal}
-
-          title={editingId ? "Modifier un appartement" : "Nouvel appartement"}
-
-          onClose={() => {
-
-              setShowModal(false);
-
-              setEditingId(null);
-
-          }}
-
-      >
-
-      <form
-          onSubmit={addApartment}
-          className="space-y-5"
-      >
-
-          <form
-            onSubmit={addApartment}
-            className="
-              bg-white
-              rounded-3xl
-              shadow-lg
-              p-8
-              mb-8
-            "
-          >
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-
-            <select
-              value={buildingId}
-              onChange={(e) =>
-                setBuildingId(e.target.value)
-              }
-              className="border p-3 w-full mb-4 rounded"
-            >
-              <option value="">
-                Choisir un immeuble
-              </option>
-
-              {buildings.map((building) => (
-                <option
-                  key={building.id}
-                  value={building.id}
-                >
-                  {building.name}
-                </option>
-              ))}
-            </select>
-
-            <input
-              type="text"
-              placeholder="Numéro appartement"          
-              value={number}
-              onChange={(e) =>
-                setNumber(e.target.value)
-              }
-              className="border p-3 w-full mb-4 rounded"
-            />
-            
-              <select
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        className="border p-3 w-full mb-4 rounded"
                     >
-                        <option value="">
-                            Type (Studio, F2, F3...)
-                        </option>
 
-                        <option value="F1">
-                            F1
-                        </option>
+                        Tous
 
-                        <option value="F2">
-                            F2
-                        </option>
+                    </button>
 
-                        <option value="F3">
-                            F3
-                        </option>
 
-                        <option value="F4">
-                            F4
-                        </option>
+                    <button
 
-                        <option value="F5">
-                            F5
-                        </option>
-                        
-                    </select>
+                        type="button"
 
-              <input
-                type="number"
-                placeholder="Surface en m²"
-                value={surface}
-                onChange={(e) =>
-                  setSurface(e.target.value)
-                }
-                className="border p-3 w-full mb-4 rounded"
-              />
+                        onClick={() =>
+                            setStatusFilter("available")
+                        }
 
-              <input
-                type="number"
-                placeholder="Loyer mensuel"
-                value={rent}
-                onChange={(e) =>
-                  setRent(e.target.value)
-                }
-                className="border p-3 w-full mb-4 rounded"
-              />
+                        className={
+                            statusFilter === "available"
+                                ? "apartment-filter active-available"
+                                : "apartment-filter"
+                        }
 
-              <input
-                type="number"
-                placeholder="Montant caution"
-                value={deposit}
-                onChange={(e) =>
-                  setDeposit(e.target.value)
-                }
-                className="border p-3 w-full mb-4 rounded"
-              />
+                    >
 
-              </div>
-              <br></br>
+                        Disponibles
 
-            <button
-              className="
-                mt-6
-                bg-yellow-600
-                hover:bg-yellow-700
-                text-white
-                px-8
-                py-3
-                rounded-xl
-                transition
-                font-semibold
-              "
-            >
-              {editingId
-                ? "💾 Mettre à jour"
-                : "➕ Ajouter Appartement"}
-            </button>
-            
+                    </button>
 
-          </form>  
-          <br></br>
 
-          <div className="flex justify-end gap-3 pt-5">
+                    <button
 
-              <Button
-                  color="red"
-                  variant="secondary"
-                  type="button"
-                  onClick={() => setShowModal(false)}
-              >
-                  Annuler
-              </Button>
+                        type="button"
 
-              <Button              
-                  variant="primary"
-                  type="submit"
-              >
-                  {editingId ? "Enregistrer" : "Créer"}
-              </Button>
+                        onClick={() =>
+                            setStatusFilter("occupied")
+                        }
 
-          </div>
-          <br></br>
+                        className={
+                            statusFilter === "occupied"
+                                ? "apartment-filter active-occupied"
+                                : "apartment-filter"
+                        }
 
-      </form>
+                    >
 
-      </Modal>
+                        Occupés
 
-      
+                    </button>
 
-    </Layout>
-  );
+                </div>
+
+
+                {/* =====================================================
+                    STATISTIQUES
+                ====================================================== */}
+
+                <div className="apartments-stats">
+
+                    <StatsCard
+
+                        title="Appartements"
+
+                        value={
+                            apartments.length
+                        }
+
+                        color="blue"
+
+                    />
+
+
+                    <StatsCard
+
+                        title="Disponibles"
+
+                        value={
+                            availableApartments.length
+                        }
+
+                        color="green"
+
+                    />
+
+
+                    <StatsCard
+
+                        title="Occupés"
+
+                        value={
+                            occupiedApartments.length
+                        }
+
+                        color="red"
+
+                    />
+
+                </div>
+
+
+                {/* =====================================================
+                    RECHERCHE
+                ====================================================== */}
+
+                <div className="apartments-search-row">
+
+                    <SearchBar
+
+                        value={search}
+
+                        onChange={(e) =>
+                            setSearch(
+                                e.target.value
+                            )
+                        }
+
+                        placeholder="Rechercher un appartement..."
+
+                    />
+
+                </div>
+
+
+                {/* =====================================================
+                    TABLEAU
+                ====================================================== */}
+
+                <div className="apartments-table-wrapper">
+
+                    <Table
+
+                        headers={[
+                            "Appartement",
+                            "Immeuble",
+                            "Type",
+                            "Surface",
+                            "Loyer",
+                            "Statut",
+                            "Actions"
+                        ]}
+
+                    >
+
+                        {
+                            filteredApartments.map(
+                                apartment => {
+
+                                    const building =
+                                        buildings.find(
+                                            b =>
+                                                b.id ==
+                                                apartment.building_id
+                                        );
+
+
+                                    const activeTenant =
+                                        tenants.find(
+                                            t =>
+                                                t.apartmentId ==
+                                                    apartment.id &&
+                                                t.status === "Actif"
+                                        );
+
+
+                                    return (
+
+                                        <tr
+                                            key={
+                                                apartment.id
+                                            }
+                                        >
+
+                                            <td className="apartment-number-cell">
+
+                                                {
+                                                    apartment.number
+                                                }
+
+                                            </td>
+
+
+                                            <td>
+
+                                                {
+                                                    building?.name ||
+                                                    "-"
+                                                }
+
+                                            </td>
+
+
+                                            <td>
+
+                                                {
+                                                    apartment.type ||
+                                                    "-"
+                                                }
+
+                                            </td>
+
+
+                                            <td>
+
+                                                {
+                                                    apartment.surface ||
+                                                    "-"
+                                                }
+
+                                                {" "}m²
+
+                                            </td>
+
+
+                                            <td>
+
+                                                {
+                                                    Number(
+                                                        apartment.rent ||
+                                                        0
+                                                    ).toLocaleString()
+                                                }
+
+                                                {" "}FCFA
+
+                                            </td>
+
+
+                                            <td>
+
+                                                <Badge
+
+                                                    color={
+                                                        activeTenant
+                                                            ? "red"
+                                                            : "green"
+                                                    }
+
+                                                >
+
+                                                    {
+                                                        activeTenant
+                                                            ? "Occupé"
+                                                            : "Disponible"
+                                                    }
+
+                                                </Badge>
+
+                                            </td>
+
+
+                                            <td>
+
+                                                <div className="apartment-actions">
+
+                                                    <Button
+
+                                                        color="blue"
+
+                                                        onClick={() =>
+                                                            editApartment(
+                                                                apartment
+                                                            )
+                                                        }
+
+                                                    >
+
+                                                        ✏️
+
+                                                    </Button>
+
+
+                                                    <Button
+
+                                                        color="red"
+
+                                                        onClick={() =>
+                                                            deleteApartment(
+                                                                apartment.id
+                                                            )
+                                                        }
+
+                                                    >
+
+                                                        🗑️
+
+                                                    </Button>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+
+                                    );
+
+                                }
+                            )
+                        }
+
+                    </Table>
+
+                </div>
+
+
+                {/* =====================================================
+                    MODAL
+                ====================================================== */}
+
+                <Modal
+
+                    open={
+                        showModal
+                    }
+
+                    title={
+                        editingId
+                            ? "Modifier un appartement"
+                            : "Nouvel appartement"
+                    }
+
+                    onClose={() => {
+
+                        setShowModal(false);
+
+                        resetForm();
+
+                    }}
+
+                >
+
+                    <form
+
+                        onSubmit={
+                            addApartment
+                        }
+
+                        className="apartment-form"
+
+                    >
+
+                        <div className="apartment-form-grid">
+
+
+                            {/* IMMEUBLE */}
+
+                            <select
+
+                                value={
+                                    buildingId
+                                }
+
+                                onChange={(e) =>
+                                    setBuildingId(
+                                        e.target.value
+                                    )
+                                }
+
+                                required
+
+                            >
+
+                                <option value="">
+                                    Choisir un immeuble
+                                </option>
+
+
+                                {
+                                    buildings.map(
+                                        (building) => (
+
+                                            <option
+                                                key={
+                                                    building.id
+                                                }
+                                                value={
+                                                    building.id
+                                                }
+                                            >
+
+                                                {
+                                                    building.name
+                                                }
+
+                                            </option>
+
+                                        )
+                                    )
+                                }
+
+                            </select>
+
+
+                            {/* NUMÉRO */}
+
+                            <input
+
+                                type="text"
+
+                                placeholder="Numéro appartement"
+
+                                value={
+                                    number
+                                }
+
+                                onChange={(e) =>
+                                    setNumber(
+                                        e.target.value
+                                    )
+                                }
+
+                                required
+
+                            />
+
+
+                            {/* TYPE */}
+
+                            <select
+
+                                value={
+                                    type
+                                }
+
+                                onChange={(e) =>
+                                    setType(
+                                        e.target.value
+                                    )
+                                }
+
+                                required
+
+                            >
+
+                                <option value="">
+                                    Type (Studio, F2, F3...)
+                                </option>
+
+                                <option value="F1">
+                                    F1
+                                </option>
+
+                                <option value="F2">
+                                    F2
+                                </option>
+
+                                <option value="F3">
+                                    F3
+                                </option>
+
+                                <option value="F4">
+                                    F4
+                                </option>
+
+                                <option value="F5">
+                                    F5
+                                </option>
+
+                            </select>
+
+
+                            {/* SURFACE */}
+
+                            <input
+
+                                type="number"
+
+                                placeholder="Surface en m²"
+
+                                value={
+                                    surface
+                                }
+
+                                onChange={(e) =>
+                                    setSurface(
+                                        e.target.value
+                                    )
+                                }
+
+                                min="0"
+
+                                required
+
+                            />
+
+
+                            {/* LOYER */}
+
+                            <input
+
+                                type="number"
+
+                                placeholder="Loyer mensuel"
+
+                                value={
+                                    rent
+                                }
+
+                                onChange={(e) =>
+                                    setRent(
+                                        e.target.value
+                                    )
+                                }
+
+                                min="0"
+
+                                required
+
+                            />
+
+
+                            {/* CAUTION */}
+
+                            <input
+
+                                type="number"
+
+                                placeholder="Montant caution"
+
+                                value={
+                                    deposit
+                                }
+
+                                onChange={(e) =>
+                                    setDeposit(
+                                        e.target.value
+                                    )
+                                }
+
+                                min="0"
+
+                                required
+
+                            />
+
+                        </div>
+
+
+                        {/* ACTIONS */}
+
+                        <div className="apartment-form-actions">
+
+                            <Button
+
+                                color="red"
+
+                                type="button"
+
+                                onClick={() => {
+
+                                    setShowModal(
+                                        false
+                                    );
+
+                                    resetForm();
+
+                                }}
+
+                            >
+
+                                Annuler
+
+                            </Button>
+
+
+                            <Button
+
+                                color="blue"
+
+                                type="submit"
+
+                            >
+
+                                {
+                                    editingId
+                                        ? "Enregistrer"
+                                        : "Créer"
+                                }
+
+                            </Button>
+
+                        </div>
+
+                    </form>
+
+                </Modal>
+
+            </div>
+
+        </Layout>
+
+    );
+
 }

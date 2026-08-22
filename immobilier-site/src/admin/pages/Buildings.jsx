@@ -17,6 +17,9 @@ import { ApartmentsContext } from "../../context/ApartmentsContext";
 
 import BuildingsService from "../../services/buildings.service";
 
+import "./Buildings.css";
+
+
 export default function Buildings() {
 
     const {
@@ -30,6 +33,7 @@ export default function Buildings() {
     const {
         apartments
     } = useContext(ApartmentsContext);
+
 
     const [search, setSearch] = useState("");
 
@@ -46,6 +50,7 @@ export default function Buildings() {
     const [status, setStatus] = useState("");
 
     const [deliveryDate, setDeliveryDate] = useState("");
+
 
     const filteredBuildings = useMemo(() => {
 
@@ -69,15 +74,16 @@ export default function Buildings() {
 
     }, [buildings, search]);
 
+
     if (loading) {
 
         return (
 
             <Layout>
 
-                <div className="flex justify-center items-center h-96">
+                <div className="buildings-loading">
 
-                    <div className="text-xl font-semibold">
+                    <div className="buildings-loading-text">
 
                         Chargement des immeubles...
 
@@ -90,6 +96,7 @@ export default function Buildings() {
         );
 
     }
+
 
     function resetForm() {
 
@@ -106,6 +113,7 @@ export default function Buildings() {
         setDeliveryDate("");
 
     }
+
 
     async function addBuilding(e) {
 
@@ -135,17 +143,24 @@ export default function Buildings() {
 
             };
 
+
             if (editingId) {
 
-                await BuildingsService.update(editingId, payload);
+                await BuildingsService.update(
+                    editingId,
+                    payload
+                );
 
             }
 
             else {
 
-                await BuildingsService.create(payload);
+                await BuildingsService.create(
+                    payload
+                );
 
             }
+
 
             await reloadBuildings();
 
@@ -159,11 +174,14 @@ export default function Buildings() {
 
             console.error(err);
 
-            alert("Erreur lors de l'enregistrement.");
+            alert(
+                "Erreur lors de l'enregistrement."
+            );
 
         }
 
     }
+
 
     function editBuilding(building) {
 
@@ -177,33 +195,48 @@ export default function Buildings() {
 
         setStatus(building.status || "");
 
-        setDeliveryDate(building.deliveryDate || "");
+        setDeliveryDate(
+            building.deliveryDate || ""
+        );
 
         setShowModal(true);
 
     }
 
+
     async function deleteBuilding(id) {
 
-        const hasApartments = apartments.some(
+        const hasApartments =
+            apartments.some(
 
-            apartment =>
+                apartment =>
+                    (
+                        apartment.buildingId ||
+                        apartment.building_id
+                    ) == id
 
-                (apartment.buildingId || apartment.building_id) == id
+            );
 
-        );
 
         if (hasApartments) {
 
-            alert("Impossible de supprimer un immeuble contenant des appartements.");
+            alert(
+                "Impossible de supprimer un immeuble contenant des appartements."
+            );
 
             return;
 
         }
 
-        if (!window.confirm("Supprimer cet immeuble ?"))
 
+        if (
+            !window.confirm(
+                "Supprimer cet immeuble ?"
+            )
+        ) {
             return;
+        }
+
 
         try {
 
@@ -217,17 +250,25 @@ export default function Buildings() {
 
             console.error(err);
 
-            alert("Impossible de supprimer.");
+            alert(
+                "Impossible de supprimer."
+            );
 
         }
 
     }
 
+
     return (
 
         <Layout>
 
-            <div className="space-y-8">
+            <div className="buildings-page">
+
+
+                {/* =====================================================
+                    HEADER
+                ====================================================== */}
 
                 <PageHeader
 
@@ -247,9 +288,12 @@ export default function Buildings() {
 
                 />
 
-                <br></br>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* =====================================================
+                    STATISTIQUES
+                ====================================================== */}
+
+                <div className="buildings-stats">
 
                     <StatsCard
 
@@ -263,18 +307,16 @@ export default function Buildings() {
 
                     />
 
+
                     <StatsCard
 
                         title="Livrés"
 
                         value={
-
                             buildings.filter(
-
-                                b => b.status === "Livré"
-
+                                b =>
+                                    b.status === "Livré"
                             ).length
-
                         }
 
                         color="green"
@@ -283,18 +325,17 @@ export default function Buildings() {
 
                     />
 
+
                     <StatsCard
 
                         title="En construction"
 
                         value={
-
                             buildings.filter(
-
-                                b => b.status === "En construction"
-
+                                b =>
+                                    b.status ===
+                                    "En construction"
                             ).length
-
                         }
 
                         color="orange"
@@ -305,328 +346,384 @@ export default function Buildings() {
 
                 </div>
 
-                <div className="flex justify-between items-center mb-8">
-                    <br></br><br></br><br></br>
+
+                {/* =====================================================
+                    RECHERCHE
+                ====================================================== */}
+
+                <div className="buildings-search-row">
 
                     <SearchBar
 
                         value={search}
 
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) =>
+                            setSearch(e.target.value)
+                        }
 
                         placeholder="Rechercher un immeuble..."
 
                     />
 
-                    <div className="text-slate-500">
 
-                        {filteredBuildings.length} résultat(s)
+                    <div className="buildings-result-count">
+
+                        {filteredBuildings.length}
+
+                        {" "}
+
+                        résultat
+                        {filteredBuildings.length > 1
+                            ? "s"
+                            : ""
+                        }
 
                     </div>
 
                 </div>
 
 
-               {
+                {/* =====================================================
+                    LISTE DES IMMEUBLES
+                ====================================================== */}
+
+                {
                     filteredBuildings.length === 0 ? (
 
                         <Empty
+
                             title="Aucun immeuble"
+
                             subtitle="Commencez par créer votre premier immeuble."
+
                         />
 
                     ) : (
 
-                        <div className="space-y-8">
+                        <div className="buildings-list">
 
-                            {filteredBuildings.map((building) => {
+                            {
+                                filteredBuildings.map(
+                                    (building) => {
 
-                                const nbApartments = apartments.filter(
+                                        const nbApartments =
+                                            apartments.filter(
 
-                                    (a) =>
-                                        (a.buildingId || a.building_id) == building.id
+                                                (a) =>
+                                                    (
+                                                        a.buildingId ||
+                                                        a.building_id
+                                                    ) == building.id
 
-                                ).length;
+                                            ).length;
 
-                                return (
 
-                                    <div
-                                        key={building.id}
-                                        className="
-                                            bg-white
-                                            border
-                                            border-slate-200
-                                            shadow-sm
-                                            hover:shadow-lg
-                                            transition
-                                            p-8
-                                        "
-                                    >
+                                        return (
 
-                                        <div className="flex justify-between items-start">
-
-                                            <div>
-
-                                                <h2 className="text-2xl font-bold text-slate-800">
-
-                                                    🏢 {building.name}
-
-                                                </h2>
-
-                                                <p className="text-slate-500 mt-2">
-
-                                                    📍 {building.address}
-                                                    <br></br><br></br>
-
-                                                </p>
-
-                                            </div>                                           
-
-                                            <Badge
-
-                                                color={
-                                                    building.status === "Livré"
-                                                        ? "green"
-                                                        : building.status === "En construction"
-                                                        ? "orange"
-                                                        : building.status === "Rénovation"
-                                                        ? "blue"
-                                                        : "red"
-                                                }
-
+                                            <div
+                                                key={building.id}
+                                                className="building-card"
                                             >
 
-                                                {building.status}
 
-                                            </Badge>
+                                                {/* =================================
+                                                    ENTÊTE
+                                                ================================== */}
 
-                                        </div>
+                                                <div className="building-card-header">
 
-                                        <div className="mt-8 grid grid-cols-3 gap-8">
+                                                    <div className="building-heading">
 
-                                            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                                                        <h2>
 
-                                                <p className="text-xs uppercase tracking-wide text-slate-500">
-                                                    Étages
-                                                </p>
+                                                            🏢{" "}
+                                                            {building.name}
 
-                                                <p className="text-3xl font-bold mt-2">
-                                                    {building.floors || "-"}
-                                                </p>
+                                                        </h2>
 
-                                            </div>
 
-                                            
+                                                        <p>
 
-                                            <div>
+                                                            📍{" "}
+                                                            {building.address}
 
-                                                <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
-                                                    <p className="text-xs uppercase tracking-wide text-slate-500">
+                                                        </p>
 
-                                                        Appartements
+                                                    </div>
 
-                                                    </p>
 
-                                               <p className="text-3xl font-bold mt-2">
+                                                    <Badge
 
-                                                    {nbApartments}
+                                                        color={
+                                                            building.status === "Livré"
+                                                                ? "green"
+                                                                : building.status === "En construction"
+                                                                ? "orange"
+                                                                : building.status === "Rénovation"
+                                                                ? "blue"
+                                                                : "red"
+                                                        }
 
-                                                </p>
+                                                    >
+
+                                                        {building.status}
+
+                                                    </Badge>
 
                                                 </div>
 
-                                            </div>
 
-                                            <div>
+                                                {/* =================================
+                                                    INFORMATIONS
+                                                ================================== */}
 
-                                                <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6">
+                                                <div className="building-info-grid">
 
-                                                <p className="text-xs uppercase tracking-wide text-slate-500">
 
-                                                    Mise en exploitation
+                                                    <div className="building-info-card">
 
-                                                </p>
+                                                        <p>
+                                                            Étages
+                                                        </p>
 
-                                                <p className="text-3xl font-bold mt-2">
+                                                        <strong>
+                                                            {
+                                                                building.floors ||
+                                                                "-"
+                                                            }
+                                                        </strong>
 
-                                                    {
-                                                        building.delivery_date
-                                                            ? new Date(building.delivery_date).toLocaleDateString("fr-FR")
-                                                            : "-"
-                                                    }
+                                                    </div>
 
-                                                </p>
+
+                                                    <div className="building-info-card">
+
+                                                        <p>
+                                                            Appartements
+                                                        </p>
+
+                                                        <strong>
+                                                            {nbApartments}
+                                                        </strong>
+
+                                                    </div>
+
+
+                                                    <div className="building-info-card">
+
+                                                        <p>
+                                                            Mise en exploitation
+                                                        </p>
+
+                                                        <strong>
+
+                                                            {
+                                                                building.delivery_date
+                                                                    ? new Date(
+                                                                        building.delivery_date
+                                                                    ).toLocaleDateString(
+                                                                        "fr-FR"
+                                                                    )
+                                                                    : "-"
+                                                            }
+
+                                                        </strong>
+
+                                                    </div>
+
 
                                                 </div>
 
+
+                                                {/* =================================
+                                                    ACTIONS
+                                                ================================== */}
+
+                                                <div className="building-actions">
+
+                                                    <Button
+
+                                                        color="blue"
+
+                                                        onClick={() =>
+                                                            editBuilding(
+                                                                building
+                                                            )
+                                                        }
+
+                                                    >
+
+                                                        ✏️ Modifier
+
+                                                    </Button>
+
+
+                                                    <Button
+
+                                                        color="red"
+
+                                                        onClick={() =>
+                                                            deleteBuilding(
+                                                                building.id
+                                                            )
+                                                        }
+
+                                                    >
+
+                                                        🗑️ Supprimer
+
+                                                    </Button>
+
+                                                </div>
+
+
                                             </div>
 
-                                        </div>
+                                        );
 
-                                        <div className="mt-8 pt-6 border-t flex justify-end gap-4">
-
-                                            <Button
-                                                color="blue"
-                                                onClick={() => editBuilding(building)}
-                                            >
-
-                                                ✏️ Modifier
-
-                                            </Button>
-
-                                            <Button
-                                                color="red"
-                                                onClick={() => deleteBuilding(building.id)}
-                                            >
-
-                                                🗑️ Supprimer
-
-                                            </Button>
-
-                                        </div>
-
-                                    </div>
-
-                                );
-
-                            })}
+                                    }
+                                )
+                            }
 
                         </div>
 
                     )
                 }
 
+
+                {/* =====================================================
+                    MODAL
+                ====================================================== */}
+
                 <Modal
+
                     open={showModal}
+
                     title={
                         editingId
                             ? "Modifier un immeuble"
                             : "Nouvel immeuble"
                     }
+
                     onClose={() => {
+
                         setShowModal(false);
+
                         resetForm();
+
                     }}
+
                 >
 
                     <form
                         onSubmit={addBuilding}
-                        className="space-y-6"
+                        className="building-form"
                     >
 
+
                         <input
+
                             type="text"
+
                             placeholder="Nom de l'immeuble"
+
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="
-                            w-full
-                            border
-                            border-slate-300
-                            px-4
-                            py-3
-                            focus:ring-2
-                            focus:ring-blue-500
-                            outline-none
-                            "
+
+                            onChange={(e) =>
+                                setName(e.target.value)
+                            }
+
                             required
+
                         />
+
 
                         <input
+
                             type="text"
+
                             placeholder="Adresse"
+
                             value={address}
-                            onChange={(e) => setAddress(e.target.value)}
-                            className="
-                            w-full
-                            border
-                            border-slate-300
-                            px-4
-                            py-3
-                            focus:ring-2
-                            focus:ring-blue-500
-                            outline-none
-                            "
+
+                            onChange={(e) =>
+                                setAddress(e.target.value)
+                            }
+
                             required
+
                         />
-                        
 
-                    <select
-                        value={floors}
-                        onChange={(e) => setFloors(e.target.value)}
-                        className="
-                                    w-full
-                                    border
-                                    border-slate-300
-                                    px-4
-                                    py-3
-                                    focus:ring-2
-                                    focus:ring-blue-500
-                                    outline-none
-                                    "
-                    >
-                        <option value="">
-                            Nombre d'étages
-                        </option>
-
-                        <option value="Rez-de-chaussée">
-                            Rez-de-chaussée
-                        </option>
-
-                        <option value="1er étage">
-                            R + 1
-                        </option>
-
-                        <option value="2ème étage">
-                            R + 2
-                        </option>
-
-                        <option value="3ème étage">
-                            R + 3
-                        </option>
-
-                        <option value="4ème étage">
-                            R + 4
-                        </option>
-
-                        <option value="5ème étage">
-                            R + 5
-                        </option>
-
-                        <option value="6ème étage">
-                            R + 6
-                        </option>
-
-                        <option value="7ème étage">
-                            R + 7
-                        </option>
-
-                        <option value="8ème étage">
-                            R + 8
-                        </option>
-
-                        <option value="9ème étage">
-                            R + 9
-                        </option>
-
-                        <option value="10ème étage">
-                            R + 10
-                        </option>
-                    </select>
 
                         <select
+
+                            value={floors}
+
+                            onChange={(e) =>
+                                setFloors(e.target.value)
+                            }
+
+                        >
+
+                            <option value="">
+                                Nombre d'étages
+                            </option>
+
+                            <option value="Rez-de-chaussée">
+                                Rez-de-chaussée
+                            </option>
+
+                            <option value="1er étage">
+                                R + 1
+                            </option>
+
+                            <option value="2ème étage">
+                                R + 2
+                            </option>
+
+                            <option value="3ème étage">
+                                R + 3
+                            </option>
+
+                            <option value="4ème étage">
+                                R + 4
+                            </option>
+
+                            <option value="5ème étage">
+                                R + 5
+                            </option>
+
+                            <option value="6ème étage">
+                                R + 6
+                            </option>
+
+                            <option value="7ème étage">
+                                R + 7
+                            </option>
+
+                            <option value="8ème étage">
+                                R + 8
+                            </option>
+
+                            <option value="9ème étage">
+                                R + 9
+                            </option>
+
+                            <option value="10ème étage">
+                                R + 10
+                            </option>
+
+                        </select>
+
+
+                        <select
+
                             value={status}
-                            onChange={(e) => setStatus(e.target.value)}
-                            className="
-                            w-full
-                            border
-                            border-slate-300
-                            px-4
-                            py-3
-                            focus:ring-2
-                            focus:ring-blue-500
-                            outline-none
-                            "
+
+                            onChange={(e) =>
+                                setStatus(e.target.value)
+                            }
+
                         >
 
                             <option value="">
@@ -651,59 +748,76 @@ export default function Buildings() {
 
                         </select>
 
-                        <div>
 
-                            <label className="block mb-2 font-medium">
+                        <div className="building-form-field">
+
+                            <label>
                                 Date de mise en exploitation
                             </label>
 
                             <input
+
                                 type="date"
+
                                 value={deliveryDate}
-                                onChange={(e) => setDeliveryDate(e.target.value)}
-                                className="
-                                w-full
-                                border
-                                border-slate-300
-                                px-4
-                                py-3
-                                focus:ring-2
-                                focus:ring-blue-500
-                                outline-none
-                                "
+
+                                onChange={(e) =>
+                                    setDeliveryDate(
+                                        e.target.value
+                                    )
+                                }
+
                             />
 
                         </div>
 
-                        <div className="flex justify-end gap-3 pt-4">
+
+                        <div className="building-form-actions">
 
                             <Button
+
                                 color="red"
+
                                 type="button"
+
                                 onClick={() => {
+
                                     setShowModal(false);
+
                                     resetForm();
+
                                 }}
+
                             >
+
                                 Annuler
+
                             </Button>
 
+
                             <Button
+
                                 color="blue"
+
                                 type="submit"
+
                             >
+
                                 {
                                     editingId
                                         ? "Enregistrer"
                                         : "Créer"
                                 }
+
                             </Button>
 
                         </div>
 
+
                     </form>
 
                 </Modal>
+
 
             </div>
 

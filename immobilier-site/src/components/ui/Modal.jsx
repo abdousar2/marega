@@ -1,3 +1,5 @@
+import "./Modal.css";
+
 export default function Modal({
 
     open,
@@ -10,27 +12,57 @@ export default function Modal({
 
 }) {
 
-    if (!open) return null;
+    if (!open) {
+        return null;
+    }
+
 
     return (
 
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6">
+        <div
+            className="ui-modal-overlay"
+            onMouseDown={(event) => {
 
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl">
+                if (
+                    event.target === event.currentTarget &&
+                    onClose
+                ) {
 
-                <div className="flex justify-between items-center border-b p-6">
+                    onClose();
 
-                    <h2 className="text-2xl font-bold">
+                }
+
+            }}
+        >
+
+            <div
+                className="ui-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="ui-modal-title"
+            >
+
+                <div className="ui-modal-header">
+
+                    <h2
+                        id="ui-modal-title"
+                        className="ui-modal-title"
+                    >
 
                         {title}
 
                     </h2>
 
+
                     <button
+
+                        type="button"
 
                         onClick={onClose}
 
-                        className="text-2xl hover:text-red-600"
+                        className="ui-modal-close"
+
+                        aria-label="Fermer"
 
                     >
 
@@ -40,7 +72,8 @@ export default function Modal({
 
                 </div>
 
-                <div className="p-6">
+
+                <div className="ui-modal-body">
 
                     {children}
 

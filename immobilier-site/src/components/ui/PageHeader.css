@@ -1,0 +1,137 @@
+/* =========================================================
+   PAGE HEADER
+========================================================= */
+
+.ui-page-header {
+    width: 100%;
+
+    box-sizing: border-box;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    margin-bottom: 32px;
+}
+
+
+/* =========================================================
+   CONTENU
+========================================================= */
+
+.ui-page-header-content {
+    min-width: 0;
+}
+
+.ui-page-header-title {
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 36px;
+    font-weight: 700;
+
+    line-height: 1.2;
+
+    letter-spacing: -0.025em;
+}
+
+.ui-page-header-subtitle {
+    margin: 8px 0 0;
+
+    color: #64748b;
+
+    font-size: 15px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   BOUTON
+========================================================= */
+
+.ui-page-header-button {
+    flex-shrink: 0;
+
+    padding: 12px 24px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 10px rgba(37, 99, 235, 0.18);
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.ui-page-header-button:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 14px rgba(37, 99, 235, 0.22);
+}
+
+.ui-page-header-button:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 768px) {
+
+    .ui-page-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+
+        margin-bottom: 24px;
+    }
+
+    .ui-page-header-title {
+        font-size: 30px;
+    }
+
+    .ui-page-header-button {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+
+    .ui-page-header-title {
+        font-size: 27px;
+    }
+
+    .ui-page-header-subtitle {
+        font-size: 14px;
+    }
+
+}

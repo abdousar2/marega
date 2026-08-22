@@ -1,0 +1,624 @@
+/* =========================================================
+   TENANTS PAGE
+========================================================= */
+
+.tenants-page {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.tenants-loading {
+    min-height: 384px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #334155;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.tenants-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+
+/* =========================================================
+   RECHERCHE
+========================================================= */
+
+.tenants-search {
+    width: 100%;
+    margin-bottom: 28px;
+}
+
+
+/* =========================================================
+   ANCIENS LOCATAIRES
+========================================================= */
+
+.tenants-former-toggle {
+    margin-top: 28px;
+    margin-bottom: 20px;
+}
+
+
+.tenants-former-toggle label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+
+    color: #475569;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+}
+
+
+.tenants-former-toggle input {
+    width: 17px;
+    height: 17px;
+
+    accent-color: #2563eb;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   FILTRES
+========================================================= */
+
+.tenant-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+
+    gap: 10px;
+
+    margin-bottom: 32px;
+}
+
+
+.tenant-filter {
+    min-height: 42px;
+
+    padding: 0 20px;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 999px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.tenant-filter:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+
+.tenant-filter.active-all {
+    background: #0f172a;
+    border-color: #0f172a;
+    color: #ffffff;
+}
+
+
+.tenant-filter.active-active {
+    background: #16a34a;
+    border-color: #16a34a;
+    color: #ffffff;
+}
+
+
+.tenant-filter.active-former {
+    background: #dc2626;
+    border-color: #dc2626;
+    color: #ffffff;
+}
+
+
+/* =========================================================
+   GRILLE LOCATAIRES
+========================================================= */
+
+.tenants-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 24px;
+
+    align-items: stretch;
+}
+
+
+/* =========================================================
+   CARTE LOCATAIRE
+========================================================= */
+
+.tenant-card {
+    display: flex;
+    flex-direction: column;
+
+    min-width: 0;
+
+    padding: 24px;
+
+    background: #ffffff;
+
+    border:
+        1px solid #f1f5f9;
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 10px 25px rgba(
+            15,
+            23,
+            42,
+            0.08
+        );
+
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease;
+}
+
+
+.tenant-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #e2e8f0;
+
+    box-shadow:
+        0 18px 40px rgba(
+            15,
+            23,
+            42,
+            0.12
+        );
+}
+
+
+/* =========================================================
+   EN-TÊTE CARTE
+========================================================= */
+
+.tenant-card-header {
+    display: flex;
+    align-items: center;
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+
+.tenant-avatar {
+    width: 56px;
+    height: 56px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #ca8a04;
+
+    color: #ffffff;
+
+    font-size: 20px;
+    font-weight: 700;
+}
+
+
+.tenant-identity {
+    min-width: 0;
+}
+
+
+.tenant-identity h2 {
+    margin: 0;
+
+    color: #1e293b;
+
+    font-size: 20px;
+    font-weight: 700;
+
+    line-height: 1.3;
+
+    overflow-wrap: anywhere;
+}
+
+
+.tenant-identity p {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   INFORMATIONS
+========================================================= */
+
+.tenant-information {
+    display: flex;
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-bottom: 16px;
+}
+
+
+.tenant-information p {
+    margin: 0;
+
+    color: #334155;
+
+    font-size: 14px;
+
+    line-height: 1.5;
+
+    overflow-wrap: anywhere;
+}
+
+
+.tenant-information .tenant-location {
+    color: #64748b;
+
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   STATUT
+========================================================= */
+
+.tenant-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    align-self: flex-start;
+
+    min-height: 36px;
+
+    padding:
+        0 16px;
+
+    border-radius: 999px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+
+    margin-top: 4px;
+}
+
+
+.status-active {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+
+.status-former {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.tenant-actions {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+
+    margin-top: 18px;
+}
+
+
+.tenant-actions button {
+    flex: 1;
+
+    min-height: 44px;
+}
+
+
+.tenant-leave-button {
+    width: 100%;
+
+    min-height: 42px;
+
+    margin-top: 12px;
+
+    padding:
+        0 16px;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: #dc2626;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.tenant-leave-button:hover {
+    background: #b91c1c;
+}
+
+
+.tenant-leave-button:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================================================
+   FORMULAIRE MODAL
+========================================================= */
+
+.tenant-form {
+    width: 100%;
+}
+
+
+.tenant-form-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 18px;
+}
+
+
+.tenant-form input,
+.tenant-form select {
+    width: 100%;
+
+    height: 50px;
+
+    box-sizing: border-box;
+
+    padding:
+        0 16px;
+
+    border:
+        1px solid #cbd5e1;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #0f172a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.tenant-form input::placeholder {
+    color: #94a3b8;
+}
+
+
+.tenant-form input:hover,
+.tenant-form select:hover {
+    border-color: #94a3b8;
+}
+
+
+.tenant-form input:focus,
+.tenant-form select:focus {
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 3px rgba(
+            37,
+            99,
+            235,
+            0.12
+        );
+}
+
+
+.tenant-form-field {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 7px;
+}
+
+
+.tenant-form-field label {
+    color: #475569;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+.tenant-form-field input {
+    width: 100%;
+}
+
+
+/* =========================================================
+   ACTIONS FORMULAIRE
+========================================================= */
+
+.tenant-form-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-top: 28px;
+
+    padding-top: 24px;
+
+    border-top:
+        1px solid #e2e8f0;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .tenants-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .tenants-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+
+    .tenant-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .tenants-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .tenant-actions {
+        flex-direction: column;
+    }
+
+
+    .tenant-actions button {
+        width: 100%;
+    }
+
+
+    .tenant-form-actions {
+        flex-direction: column-reverse;
+
+        align-items: stretch;
+    }
+
+
+    .tenant-form-actions button {
+        width: 100%;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .tenants-stats {
+        grid-template-columns: 1fr;
+
+        gap: 16px;
+    }
+
+
+    .tenant-filters {
+        width: 100%;
+    }
+
+
+    .tenant-filter {
+        flex: 1;
+
+        min-width: 90px;
+
+        padding:
+            0 12px;
+    }
+
+}

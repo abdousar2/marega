@@ -1,3 +1,5 @@
+import "./Table.css";
+
 export default function Table({
 
     headers = [],
@@ -8,54 +10,40 @@ export default function Table({
 
     return (
 
-        <div className="bg-white rounded-2xl shadow border border-slate-200 overflow-hidden">
+        <div className="ui-table-container">
 
-            <table className="w-full">
+            <div className="ui-table-scroll">
 
-                <thead className="bg-slate-50 border-b">
+                <table className="ui-table">
 
-                    <tr>
+                    <thead>
 
-                        {
+                        <tr>
 
-                            headers.map(header => (
+                            {headers.map((header) => (
 
-                                <th
-
-                                    key={header}
-
-                                    className="
-                                        px-8
-                                        py-5
-                                        text-left
-                                        text-sm
-                                        uppercase
-                                        tracking-wide
-                                        font-bold
-                                        text-slate-500
-                                    "
-
-                                >
+                                <th key={header}>
 
                                     {header}
 
                                 </th>
 
-                            ))
+                            ))}
 
-                        }
+                        </tr>
 
-                    </tr>
+                    </thead>
 
-                </thead>
 
-                <tbody>
+                    <tbody>
 
-                    {children}
+                        {children}
 
-                </tbody>
+                    </tbody>
 
-            </table>
+                </table>
+
+            </div>
 
         </div>
 
