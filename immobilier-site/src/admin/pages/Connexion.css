@@ -1,0 +1,994 @@
+/* =========================================================
+   PAGE CONNEXION
+========================================================= */
+
+.connexion-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+
+    background:
+        radial-gradient(
+            circle at top right,
+            rgba(37, 99, 235, 0.08),
+            transparent 35%
+        ),
+        #f8fafc;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.connexion-header {
+    height: 82px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 6%;
+
+    background: rgba(255, 255, 255, 0.96);
+
+    border-bottom: 1px solid #e2e8f0;
+
+    position: relative;
+    z-index: 10;
+}
+
+
+.connexion-logo {
+    display: flex;
+    flex-direction: column;
+
+    text-decoration: none;
+
+    line-height: 1;
+}
+
+
+.connexion-logo-name {
+    color: #020617;
+
+    font-size: 25px;
+    font-weight: 900;
+
+    letter-spacing: -0.04em;
+}
+
+
+.connexion-logo-subtitle {
+    margin-top: 5px;
+
+    color: #94a3b8;
+
+    font-size: 8px;
+    font-weight: 600;
+
+    letter-spacing: 0.24em;
+}
+
+
+.connexion-back {
+    color: #475569;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition: color 0.2s ease;
+}
+
+
+.connexion-back:hover {
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.connexion-main {
+    flex: 1;
+
+    display: flex;
+    justify-content: center;
+
+    padding: 70px 24px 80px;
+}
+
+
+.connexion-content {
+    width: 100%;
+    max-width: 1050px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.connexion-intro {
+    max-width: 720px;
+
+    margin: 0 auto 52px;
+
+    text-align: center;
+}
+
+
+.connexion-eyebrow {
+    display: inline-block;
+
+    margin-bottom: 16px;
+
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 800;
+
+    letter-spacing: 0.28em;
+}
+
+
+.connexion-intro h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: clamp(38px, 5vw, 58px);
+
+    line-height: 1.05;
+
+    font-weight: 900;
+
+    letter-spacing: -0.045em;
+}
+
+
+.connexion-intro h1 span {
+    color: #2563eb;
+}
+
+
+.connexion-intro p {
+    max-width: 620px;
+
+    margin: 22px auto 0;
+
+    color: #64748b;
+
+    font-size: 17px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   SECTION AGENCES
+========================================================= */
+
+.agency-section {
+    width: 100%;
+}
+
+
+.agency-section-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+
+.agency-section-header h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+
+.agency-section-header p {
+    margin: 6px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+.agency-count {
+    flex-shrink: 0;
+
+    padding: 8px 13px;
+
+    border: 1px solid #dbeafe;
+
+    border-radius: 999px;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.agency-grid {
+    display: grid;
+
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(280px, 1fr)
+    );
+
+    gap: 18px;
+}
+
+/* =========================================================
+   RECHERCHE ET FILTRES
+========================================================= */
+
+.agency-filters {
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 1fr)
+        190px
+        220px
+        auto;
+
+    gap: 12px;
+
+    margin-bottom: 24px;
+}
+
+
+/* =========================================================
+   BARRE DE RECHERCHE
+========================================================= */
+
+.agency-search {
+    position: relative;
+
+    display: flex;
+
+    align-items: center;
+
+    min-height: 48px;
+
+    border: 1px solid #dbe3ee;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.agency-search:focus-within {
+    border-color: #60a5fa;
+
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+
+.agency-search-icon {
+    width: 48px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    font-size: 15px;
+}
+
+
+.agency-search input {
+    width: 100%;
+
+    height: 46px;
+
+    padding: 0 42px 0 0;
+
+    border: none;
+
+    outline: none;
+
+    background: transparent;
+
+    color: #0f172a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+}
+
+
+.agency-search input::placeholder {
+    color: #94a3b8;
+}
+
+
+.agency-search-clear {
+    position: absolute;
+
+    right: 10px;
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border: none;
+
+    border-radius: 50%;
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease;
+}
+
+
+.agency-search-clear:hover {
+    background: #e2e8f0;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   SELECTS
+========================================================= */
+
+.agency-filter-select {
+    width: 100%;
+
+    min-height: 48px;
+
+    padding: 0 38px 0 14px;
+
+    border: 1px solid #dbe3ee;
+
+    border-radius: 12px;
+
+    background-color: #ffffff;
+
+    color: #334155;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    outline: none;
+
+    cursor: pointer;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+
+.agency-filter-select:focus {
+    border-color: #60a5fa;
+
+    box-shadow:
+        0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+.agency-reset {
+    min-height: 48px;
+
+    padding: 0 16px;
+
+    border: 1px solid #dbe3ee;
+
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.agency-reset:hover {
+    border-color: #bfdbfe;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+}
+
+
+/* =========================================================
+   AUCUN RÉSULTAT
+========================================================= */
+
+.agency-empty {
+    padding: 55px 30px;
+
+    border: 1px dashed #cbd5e1;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    text-align: center;
+}
+
+
+.agency-empty-icon {
+    width: 58px;
+    height: 58px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 auto 18px;
+
+    border-radius: 16px;
+
+    background: #f1f5f9;
+
+    font-size: 23px;
+}
+
+
+.agency-empty h3 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 19px;
+
+    font-weight: 800;
+}
+
+
+.agency-empty p {
+    max-width: 450px;
+
+    margin: 8px auto 20px;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+.agency-empty button {
+    padding: 10px 17px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    font-family: inherit;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.agency-empty button:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+/* =========================================================
+   RESPONSIVE FILTRES
+========================================================= */
+
+@media (max-width: 950px) {
+
+    .agency-filters {
+        grid-template-columns:
+            1fr
+            1fr;
+
+    }
+
+
+    .agency-search {
+        grid-column: 1 / -1;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .agency-filters {
+        grid-template-columns: 1fr;
+
+        gap: 10px;
+    }
+
+
+    .agency-search {
+        grid-column: auto;
+    }
+
+
+    .agency-reset {
+        width: 100%;
+    }
+
+}
+
+
+/* =========================================================
+   CARTE AGENCE
+========================================================= */
+
+.agency-card {
+    width: 100%;
+
+    min-height: 280px;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 24px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 20px;
+
+    background: #ffffff;
+
+    text-align: left;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 4px 16px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+
+.agency-card:hover {
+    transform: translateY(-5px);
+
+    border-color: #93c5fd;
+
+    box-shadow:
+        0 18px 40px rgba(15, 23, 42, 0.10);
+}
+
+
+.agency-card:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, 0.25);
+
+    outline-offset: 3px;
+}
+
+
+/* =========================================================
+   HAUT CARTE
+========================================================= */
+
+.agency-card-top {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    margin-bottom: 28px;
+}
+
+
+.agency-icon {
+    width: 54px;
+    height: 54px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 16px;
+
+    background: #eff6ff;
+
+    font-size: 25px;
+}
+
+
+.agency-arrow {
+    width: 36px;
+    height: 36px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #f8fafc;
+
+    color: #64748b;
+
+    font-size: 18px;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.agency-card:hover .agency-arrow {
+    background: #2563eb;
+
+    color: #ffffff;
+
+    transform: translateX(2px);
+}
+
+
+/* =========================================================
+   CONTENU CARTE
+========================================================= */
+
+.agency-card-content {
+    flex: 1;
+}
+
+
+.agency-status {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 7px;
+
+    margin-bottom: 10px;
+
+    color: #16a34a;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.agency-status span {
+    width: 7px;
+    height: 7px;
+
+    display: inline-block;
+
+    border-radius: 50%;
+
+    background: #22c55e;
+}
+
+
+.agency-card-content h3 {
+    margin: 0 0 7px;
+
+    color: #0f172a;
+
+    font-size: 24px;
+    font-weight: 850;
+
+    letter-spacing: -0.025em;
+}
+
+
+.agency-card-content p {
+    margin: 0 0 15px;
+
+    color: #475569;
+
+    font-size: 14px;
+}
+
+
+.agency-location {
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   FOOTER CARTE
+========================================================= */
+
+.agency-card-footer {
+    display: flex;
+
+    align-items: center;
+    justify-content: space-between;
+
+    margin-top: 25px;
+
+    padding-top: 17px;
+
+    border-top: 1px solid #f1f5f9;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.agency-card-footer strong {
+    font-size: 17px;
+
+    transition: transform 0.2s ease;
+}
+
+
+.agency-card:hover .agency-card-footer strong {
+    transform: translateX(4px);
+}
+
+
+/* =========================================================
+   AIDE
+========================================================= */
+
+.agency-help {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    margin-top: 24px;
+
+    padding: 20px 22px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 16px;
+
+    background: #ffffff;
+}
+
+
+.agency-help-icon {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #eff6ff;
+
+    color: #2563eb;
+
+    font-weight: 800;
+}
+
+
+.agency-help > div:nth-child(2) {
+    flex: 1;
+}
+
+
+.agency-help strong {
+    color: #0f172a;
+
+    font-size: 14px;
+}
+
+
+.agency-help p {
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+.agency-help-link {
+    flex-shrink: 0;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    text-decoration: none;
+}
+
+
+.agency-help-link:hover {
+    text-decoration: underline;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.connexion-footer {
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    gap: 20px;
+
+    padding: 18px 6%;
+
+    border-top: 1px solid #e2e8f0;
+
+    background: #ffffff;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .connexion-header {
+        height: 72px;
+
+        padding: 0 20px;
+    }
+
+
+    .connexion-logo-name {
+        font-size: 20px;
+    }
+
+
+    .connexion-back {
+        font-size: 12px;
+    }
+
+
+    .connexion-main {
+        padding: 50px 18px 60px;
+    }
+
+
+    .connexion-intro {
+        margin-bottom: 38px;
+    }
+
+
+    .connexion-intro h1 {
+        font-size: 38px;
+    }
+
+
+    .connexion-intro p {
+        font-size: 15px;
+    }
+
+
+    .agency-section-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+    }
+
+
+    .agency-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .agency-card {
+        min-height: 260px;
+    }
+
+
+    .agency-help {
+        align-items: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+
+    .agency-help-link {
+        margin-left: 53px;
+    }
+
+
+    .connexion-footer {
+        flex-direction: column;
+
+        text-align: center;
+    }
+
+}

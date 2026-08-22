@@ -15,6 +15,7 @@ const authRoutes = require("./routes/auth.routes");
 const usersRoutes = require("./routes/users.routes");
 const financeRoutes = require("./routes/finance.routes");
 const contactRoutes = require("./routes/contact.routes");
+const agenciesRoutes = require("./routes/agencies.routes");
 
 
 const app = express();
@@ -53,6 +54,7 @@ app.use("/api/expenses", expensesRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/audit", auditRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/agencies", agenciesRoutes);
 
 app.get("/", (req, res) => {
     res.json({

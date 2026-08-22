@@ -93,6 +93,57 @@ class User {
 
     }
 
+    static async findByEmailAndAgency(email, agencyId) {
+
+        const result = await db.query(
+
+            `
+            SELECT
+
+                u.*,
+
+                au.agency_id,
+                au.role AS agency_role,
+                au.active AS agency_active,
+
+                a.name AS agency_name,
+                a.type AS agency_type,
+                a.city AS agency_city,
+                a.country AS agency_country
+
+            FROM marega.users u
+
+            INNER JOIN marega.agency_users au
+                ON au.user_id = u.id
+
+            INNER JOIN marega.agencies a
+                ON a.id = au.agency_id
+
+            WHERE
+                LOWER(u.email) = LOWER($1)
+
+                AND au.agency_id = $2
+
+                AND u.active = TRUE
+
+                AND au.active = TRUE
+
+                AND a.status = 'active'
+
+            LIMIT 1
+            `,
+
+            [
+                email,
+                agencyId
+            ]
+
+        );
+
+        return result.rows[0];
+
+    }
+
 
     // =========================================================
     // CRÉATION

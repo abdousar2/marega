@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 
 import AuthService from "../../services/auth.service";
 
@@ -7,11 +7,62 @@ export default function Login() {
 
     const navigate = useNavigate();
 
+
+    /* =========================================================
+       AGENCE SÉLECTIONNÉE
+    ========================================================= */
+
+    const [agency] = useState(() => {
+
+        try {
+
+            const storedAgency =
+                sessionStorage.getItem(
+                    "techtradisport_selected_agency"
+                );
+
+            if (!storedAgency) {
+                return null;
+            }
+
+            return JSON.parse(storedAgency);
+
+        } catch (error) {
+
+            console.error(
+                "Erreur récupération agence :",
+                error
+            );
+
+            sessionStorage.removeItem(
+                "techtradisport_selected_agency"
+            );
+
+            return null;
+
+        }
+
+    });
+
+
+    /* =========================================================
+       FORMULAIRE
+    ========================================================= */
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const [error, setError] = useState("");   
+
+    const handleChangeAgency = () => {
+
+        sessionStorage.removeItem(
+            "techtradisport_selected_agency"
+        );
+
+        navigate("/connexion");
+    };
 
 
     async function handleSubmit(e) {
@@ -23,14 +74,31 @@ export default function Login() {
 
         try {
 
+            if (!agency?.id) {
+
+                setError(
+                    "Veuillez d'abord sélectionner votre agence."
+                );
+
+                return;
+
+            }
+
             await AuthService.login({
+
                 email,
-                password
+
+                password,
+
+                agency_id: agency.id
+
             });
 
             navigate("/admin");
 
-        } catch (err) {
+        }
+
+        catch (err) {
 
             console.error(err);
 
@@ -39,11 +107,97 @@ export default function Login() {
                 "Impossible de se connecter."
             );
 
-        } finally {
+        }
+
+        finally {
 
             setLoading(false);
 
         }
+
+    }
+
+    if (!agency) {
+
+        return (
+
+            <div className="
+                min-h-screen
+                bg-slate-950
+                flex
+                items-center
+                justify-center
+                px-6
+            ">
+
+                <div className="
+                    w-full
+                    max-w-md
+                    bg-white
+                    rounded-3xl
+                    p-8
+                    text-center
+                    shadow-2xl
+                ">
+
+                    <div className="
+                        w-16
+                        h-16
+                        mx-auto
+                        mb-6
+                        rounded-2xl
+                        bg-blue-600
+                        text-white
+                        flex
+                        items-center
+                        justify-center
+                        text-2xl
+                        font-black
+                    ">
+                        M
+                    </div>
+
+                    <h1 className="
+                        text-2xl
+                        font-bold
+                        text-slate-900
+                        mb-3
+                    ">
+                        Sélectionnez votre agence
+                    </h1>
+
+                    <p className="
+                        text-slate-500
+                        mb-8
+                    ">
+                        Vous devez sélectionner votre agence
+                        avant de vous connecter.
+                    </p>
+
+                    <NavLink
+                        to="/connexion"
+                        className="
+                            inline-flex
+                            items-center
+                            justify-center
+                            w-full
+                            h-14
+                            rounded-2xl
+                            bg-blue-600
+                            hover:bg-blue-700
+                            text-white
+                            font-semibold
+                            transition
+                        "
+                    >
+                        Choisir mon agence
+                    </NavLink>
+
+                </div>
+
+            </div>
+
+        );
 
     }
 
@@ -128,7 +282,16 @@ export default function Login() {
             ">
 
                 {/* LOGO */}
-            <div className="h-28 flex items-center justify border-w border-slate-700 bg-blue p-3">
+            <div className="
+                h-28
+                flex
+                items-center
+                justify-center
+                border
+                border-slate-700
+                bg-blue-900
+                p-3
+            ">
 
                 <img
                     src="/images/logo-ibm-marega.png"
@@ -440,6 +603,92 @@ export default function Login() {
 
                     </div>
                     <br></br><br></br>
+
+                    {/* =====================================================
+                        AGENCE SÉLECTIONNÉE
+                    ===================================================== */}
+
+                    {agency && (
+
+                        <div className="
+                            mb-6
+                            flex
+                            items-center
+                            justify-between
+                            gap-4
+                            px-4
+                            py-3
+                            rounded-2xl
+                            bg-slate-50
+                            border
+                            border-slate-200
+                        ">
+
+                            <div className="
+                                flex
+                                items-center
+                                gap-3
+                            ">
+
+                                <div className="
+                                    w-10
+                                    h-10
+                                    rounded-xl
+                                    bg-blue-600
+                                    text-white
+                                    flex
+                                    items-center
+                                    justify-center
+                                    font-bold
+                                ">
+                                    {agency.name
+                                        ?.charAt(0)
+                                        ?.toUpperCase()
+                                    }
+                                </div>
+
+                                <div>
+
+                                    <p className="
+                                        text-xs
+                                        text-slate-400
+                                        font-medium
+                                    ">
+                                        Agence sélectionnée
+                                    </p>
+
+                                    <p className="
+                                        text-sm
+                                        font-bold
+                                        text-slate-900
+                                    ">
+                                        {agency.name}
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                            
+
+
+                            <button
+                                type="button"
+                                onClick={handleChangeAgency}
+                                className="
+                                    text-xs
+                                    font-semibold
+                                    text-blue-600
+                                    hover:text-blue-700
+                                    whitespace-nowrap
+                                "
+                            >
+                                Changer
+                            </button>
+
+                        </div>
+
+                    )}
 
 
                     <h1 className="

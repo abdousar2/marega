@@ -73,7 +73,7 @@ export default function Navbar() {
                 <div className="navbar-actions">
 
                     <NavLink
-                        to="/login"
+                        to="/connexion"
                         className="navbar-login"
                     >
                         Se connecter

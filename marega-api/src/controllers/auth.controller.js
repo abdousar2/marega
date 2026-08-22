@@ -20,16 +20,17 @@ class AuthController {
 
             const {
                 email,
-                password
+                password,
+                agency_id
             } = req.body;
 
 
-            if (!email || !password) {
+            if (!email || !password || !agency_id) {
 
                 return res.status(400).json({
 
                     error:
-                        "Veuillez renseigner votre email et votre mot de passe."
+                        "Veuillez renseigner votre agence, votre email et votre mot de passe."
 
                 });
 
@@ -37,7 +38,10 @@ class AuthController {
 
 
             const user =
-                await User.findByEmail(email);
+                await User.findByEmailAndAgency(
+                    email,
+                    agency_id
+                );
 
 
             if (!user) {
@@ -88,8 +92,15 @@ class AuthController {
 
                     {
                         id: user.id,
+
                         email: user.email,
-                        role: user.role
+
+                        role: user.agency_role,
+
+                        agency_id: user.agency_id,
+
+                        agency_name: user.agency_name
+
                     },
 
                     process.env.JWT_SECRET,
@@ -141,10 +152,29 @@ class AuthController {
                         user.email,
 
                     role:
-                        user.role,
+                        user.agency_role,
 
                     active:
-                        user.active
+                        user.active,
+
+                    agency: {
+
+                        id:
+                            user.agency_id,
+
+                        name:
+                            user.agency_name,
+
+                        type:
+                            user.agency_type,
+
+                        city:
+                            user.agency_city,
+
+                        country:
+                            user.agency_country
+
+                    }
 
                 }
 
