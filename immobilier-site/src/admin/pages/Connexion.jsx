@@ -12,55 +12,61 @@ export default function Connexion() {
 
     const [loading, setLoading] = useState(true);
 
-    const [error, setError] = useState("");
+    const [error, setError] = useState("");   
 
-   useEffect(() => {
 
-    console.log("CONNEXION : chargement des agences");
+    
+    useEffect(() => {
 
-    fetch("http://localhost:5000/api/agencies")
-        .then((response) => {
+        console.log("CONNEXION : chargement des agences");
 
-            if (!response.ok) {
-                throw new Error(
-                    "Erreur API agences"
+        const API_URL =
+            import.meta.env.VITE_API_URL ||
+            "http://localhost:5000/api";
+
+        fetch(`${API_URL}/agencies`)
+            .then((response) => {
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        `Erreur API agences (${response.status})`
+                    );
+
+                }
+
+                return response.json();
+
+            })
+            .then((data) => {
+
+                console.log(
+                    "CONNEXION : agences reçues",
+                    data
                 );
-            }
 
-            return response.json();
+                setAgencies(data);
 
-        })
-        .then((data) => {
+            })
+            .catch((err) => {
 
-            console.log(
-                "CONNEXION : agences reçues",
-                data
-            );
+                console.error(
+                    "CONNEXION : erreur",
+                    err
+                );
 
-            setAgencies(data);
+                setError(
+                    "Impossible de charger les agences."
+                );
 
-        })
-        .catch((err) => {
+            })
+            .finally(() => {
 
-            console.error(
-                "CONNEXION : erreur",
-                err
-            );
+                setLoading(false);
 
-            setError(
-                "Impossible de charger les agences."
-            );
+            });
 
-        })
-        .finally(() => {
-
-            setLoading(false);
-
-        });
-
-}, []);
-
-
+    }, []);
     /* =========================================================
        ÉTAT DES FILTRES
     ========================================================= */
