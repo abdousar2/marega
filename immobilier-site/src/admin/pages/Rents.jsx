@@ -20,6 +20,8 @@ import {
 
 import { RentsContext } from "../../context/RentsContext";
 
+import "./Rents.css";
+
 export default function Rents() {
 
     const { rents, loading } = useContext(RentsContext);
@@ -170,7 +172,7 @@ export default function Rents() {
                 title="Gestion des loyers"
                 subtitle="Suivi automatique des échéances générées par les contrats."
             />
-            <br></br>            
+                      
 
             {showSuccess && (
 
@@ -221,14 +223,14 @@ export default function Rents() {
 
             </div>
             <br></br>
-
+            
             <SearchBar
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Rechercher un locataire..."
             />
-            <br></br><br></br>
-
+            <br></br>
+            
             <div className="flex flex-wrap gap-3 mt-6 mb-8">
 
                 <Button
@@ -264,8 +266,7 @@ export default function Rents() {
                 </Button>
 
             </div>
-            <br></br>
-
+            
             {filteredRents.length === 0 ? (
 
                 <Empty
@@ -275,237 +276,268 @@ export default function Rents() {
 
             ) : (
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+                <div className="rents-grid">
 
-                                {filteredRents.map((rent) => (
+                    {filteredRents.map((rent) => (
+
+                        <div
+                            key={rent.id}
+                            className="rent-card"
+                        >
+
+                            {/* =================================================
+                                HEADER
+                            ================================================= */}
+
+                            <div className="rent-card-header">
+
+                                <div className="rent-identity">
 
                                     <div
-                                        key={rent.id}
-                                        className="
-                                        bg-white
-                                        rounded-3xl
-                                        border
-                                        border-slate-200
-                                        shadow-sm
-                                        hover:shadow-xl
-                                        hover:-translate-y-1
-                                        transition
-                                        duration-300
-                                        p-7
-                                        "
+                                        className={`
+                                            rent-avatar
+                                            ${
+                                                rent.status === "Payé"
+                                                    ? "rent-avatar-paid"
+                                                    : rent.status === "En attente"
+                                                    ? "rent-avatar-waiting"
+                                                    : "rent-avatar-late"
+                                            }
+                                        `}
                                     >
 
-                                        <div className="flex justify-between items-start">
-
-                                            <div className="flex items-center gap-4">
-
-                                                <div
-                                                    className={`
-
-                                                        w-14
-                                                        h-14
-                                                        rounded-full
-                                                        flex
-                                                        items-center
-                                                        justify-center
-                                                        text-xl
-                                                        font-bold
-                                                        text-white
-
-                                                        ${
-                                                            rent.status === "Payé"
-                                                                ? "bg-green-600"
-                                                                : rent.status === "En attente"
-                                                                ? "bg-yellow-500"
-                                                                : "bg-red-600"
-                                                        }
-
-                                                    `}
-                                                >
-
-                                                    {(rent.tenant_name || "?").charAt(0)}
-
-                                                </div>
-
-                                                <div>
-
-                                                    <h2 className="text-xl font-bold">
-
-                                                        {rent.tenant_name}
-
-                                                    </h2>
-
-                                                    <p className="text-slate-500">
-
-                                                        Appartement {rent.apartment_number}
-
-                                                    </p>
-
-                                                </div>
-
-                                            </div>
-
-                                            <Badge
-
-                                                color={
-                                                    rent.status === "Payé"
-                                                        ? "green"
-                                                        : rent.status === "En attente"
-                                                        ? "orange"
-                                                        : "red"
-                                                }
-
-                                            >
-
-                                                {rent.status}
-
-                                            </Badge>
-
-                                        </div>
-
-                                        <div className="mt-6 space-y-3">
-
-                                            <p>
-                                                📄 Contrat <strong>{rent.contract_number}</strong>
-                                            </p>
-
-                                            <p>
-                                                📅 Mois :
-                                                <strong>
-                                                    {" "}
-                                                    {new Date(rent.due_month).toLocaleDateString(
-                                                        "fr-FR",
-                                                        {
-                                                            month: "long",
-                                                            year: "numeric",
-                                                        }
-                                                    )}
-                                                </strong>
-                                            </p>
-
-                                            <p>
-                                                ⏰ Échéance :
-                                                <strong>
-                                                    {" "}
-                                                    {new Date(rent.due_date).toLocaleDateString(
-                                                        "fr-FR"
-                                                    )}
-                                                </strong>
-                                            </p>
-
-                                            {rent.status === "En retard" && (
-
-                                                <p className="text-red-600 font-semibold">
-
-                                                    🔥 En retard de
-                                                    {getLateDays(rent.due_date)} jours
-
-                                                </p>
-
-                                            )}
-
-                                        </div>
-
-                                        <div className="mt-6 bg-slate-50 rounded-2xl p-5">
-
-                                            <div className="text-slate-500 text-sm">
-                                                Montant
-                                            </div>
-
-                                            <div className="text-2xl font-bold text-green-700 mt-2">
-
-                                                {Number(rent.amount).toLocaleString()} FCFA
-
-                                            </div>
-
-                                            {rent.status === "Payé" && (
-
-                                                <>
-
-                                                    <div className="mt-3 text-sm text-slate-500">
-
-                                                        Mode de paiement
-
-                                                    </div>
-
-                                                    <div className="font-semibold">
-
-                                                        {rent.payment_method}
-
-                                                    </div>
-
-                                                </>
-
-                                            )}
-
-                                            {rent.status === "Payé" &&
-                                            rent.payment_date && (
-
-                                            <div className="text-sm text-slate-500 mt-2">
-
-                                            Payé le
-
-                                            {" "}
-
-                                            {new Date(
-                                                rent.payment_date
-                                            ).toLocaleDateString("fr-FR")}
-
-                                            </div>
-
-                                            )}                                            
-
-                                        </div>
-
-                                        <div className="flex gap-3 mt-6">
-
-                                            {rent.status === "Payé" ? (
-
-                                                rent.receipt_path && (
-
-                                                    <Button
-                                                        variant="primary"
-                                                        className="w-full"
-                                                   
-                                                        onClick={() =>
-                                                            window.open(
-                                                            `${API_BASE}${rent.receipt_path}`,
-                                                            "_blank"
-                                                        )
-                                                        }
-                                                    >
-                                                    
-                                                        📄 Télécharger la quittance
-                                                    </Button>
-
-                                                )
-
-                                            ) : (
-
-                                                <Link
-                                                    to={`/admin/payments?rent=${rent.id}`}
-                                                >
-
-                                                    <Button
-                                                        variant="primary"
-                                                        className="w-full"
-                                                    >
-
-                                                        💳 Encaisser
-
-                                                    </Button>
-
-                                                </Link>
-
-                                            )}
-
-                                        </div>
+                                        {(rent.tenant_name || "?").charAt(0)}
 
                                     </div>
 
-                                ))}
+
+                                    <div className="rent-tenant">
+
+                                        <h2>
+
+                                            {rent.tenant_name}
+
+                                        </h2>
+
+                                        <p>
+
+                                            Appartement {rent.apartment_number}
+
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                <Badge
+                                    color={
+                                        rent.status === "Payé"
+                                            ? "green"
+                                            : rent.status === "En attente"
+                                            ? "orange"
+                                            : "red"
+                                    }
+                                >
+
+                                    {rent.status}
+
+                                </Badge>
 
                             </div>
+
+
+                            {/* =================================================
+                                INFORMATIONS
+                            ================================================= */}
+
+                            <div className="rent-information">
+
+                                <p>
+
+                                    📄 Contrat{" "}
+
+                                    <strong>
+                                        {rent.contract_number}
+                                    </strong>
+
+                                </p>
+
+
+                                <p>
+
+                                    📅 Mois :{" "}
+
+                                    <strong>
+
+                                        {new Date(
+                                            rent.due_month
+                                        ).toLocaleDateString(
+                                            "fr-FR",
+                                            {
+                                                month: "long",
+                                                year: "numeric",
+                                            }
+                                        )}
+
+                                    </strong>
+
+                                </p>
+
+
+                                <p>
+
+                                    ⏰ Échéance :{" "}
+
+                                    <strong>
+
+                                        {new Date(
+                                            rent.due_date
+                                        ).toLocaleDateString(
+                                            "fr-FR"
+                                        )}
+
+                                    </strong>
+
+                                </p>
+
+
+                                {rent.status === "En retard" && (
+
+                                    <p className="rent-late">
+
+                                        🔥 En retard de{" "}
+                                        {getLateDays(rent.due_date)} jours
+
+                                    </p>
+
+                                )}
+
+                            </div>
+
+
+                            {/* =================================================
+                                MONTANT
+                            ================================================= */}
+
+                            <div className="rent-finance">
+
+                                <div className="rent-finance-label">
+
+                                    Montant
+
+                                </div>
+
+
+                                <div className="rent-amount">
+
+                                    {Number(
+                                        rent.amount
+                                    ).toLocaleString()} FCFA
+
+                                </div>
+
+
+                                {rent.status === "Payé" && (
+
+                                    <>
+
+                                        <div className="rent-payment-label">
+
+                                            Mode de paiement
+
+                                        </div>
+
+
+                                        <div className="rent-payment-method">
+
+                                            {rent.payment_method}
+
+                                        </div>
+
+                                    </>
+
+                                )}
+
+
+                                {rent.status === "Payé" &&
+                                rent.payment_date && (
+
+                                    <div className="rent-payment-date">
+
+                                        Payé le{" "}
+
+                                        {new Date(
+                                            rent.payment_date
+                                        ).toLocaleDateString(
+                                            "fr-FR"
+                                        )}
+
+                                    </div>
+
+                                )}
+
+                            </div>
+
+
+                            {/* =================================================
+                                ACTION
+                            ================================================= */}
+
+                            <div className="rent-actions">
+
+                                {rent.status === "Payé" ? (
+
+                                    rent.receipt_path && (
+
+                                        <Button
+
+                                            variant="primary"
+
+                                            className="w-full"
+
+                                            onClick={() =>
+                                                window.open(
+                                                    `${API_BASE}${rent.receipt_path}`,
+                                                    "_blank"
+                                                )
+                                            }
+
+                                        >
+
+                                            📄 Télécharger la quittance
+
+                                        </Button>
+
+                                    )
+
+                                ) : (
+
+                                    <Link
+                                        to={`/admin/payments?rent=${rent.id}`}
+                                        className="rent-action-link"
+                                    >
+
+                                        <Button
+                                            variant="primary"
+                                            className="w-full"
+                                        >
+
+                                            💳 Encaisser
+
+                                        </Button>
+
+                                    </Link>
+
+                                )}
+
+                            </div>
+
+                        </div>
+
+                    ))}
+
+                </div>
 
                         )}
 

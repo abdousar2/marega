@@ -19,6 +19,7 @@ import {
 import { ExpensesContext } from "../../context/ExpensesContext";
 import { BuildingsContext } from "../../context/BuildingsContext";
 import { ApartmentsContext } from "../../context/ApartmentsContext";
+import "./Expenses.css";
 
 export default function Expenses() {
 
@@ -584,13 +585,7 @@ export default function Expenses() {
                 STATISTIQUES
             ================================================= */}
 
-            <div className="
-                grid
-                grid-cols-1
-                md:grid-cols-3
-                gap-6
-                mb-8
-            ">
+            <div className="expenses-grid">
 
 
                 <StatsCard
@@ -637,7 +632,7 @@ export default function Expenses() {
 
             </div>
             <br></br>
-
+            
 
             {/* =================================================
                 RECHERCHE
@@ -717,7 +712,7 @@ export default function Expenses() {
 
             </div>
             <br></br>
-
+            
 
             {/* =================================================
                 LISTE
@@ -770,80 +765,52 @@ export default function Expenses() {
                             return (
 
                                 <div
-
-                                    key={
-                                        expense.id
-                                    }
-
-                                    className="
-                                        bg-white
-                                        rounded-3xl
-                                        border
-                                        border-slate-200
-                                        shadow-sm
-                                        hover:shadow-xl
-                                        transition
-                                        p-7
-                                    "
-
+                                    key={expense.id}
+                                    className="expense-card"
                                 >
 
+                                    {/* =================================================
+                                        HEADER
+                                    ================================================= */}
 
-                                    <div className="
-                                        flex
-                                        justify-between
-                                        items-start
-                                    ">
+                                    <div className="expense-card-header">
 
+                                        <div className="expense-heading">
 
-                                        <div>
-
-                                            <p className="
-                                                text-slate-500
-                                                text-sm
-                                            ">
+                                            <p className="expense-label-small">
                                                 Sortie
                                             </p>
 
-
-                                            <h2 className="
-                                                text-xl
-                                                font-bold
-                                                mt-1
-                                            ">
-
+                                            <h2 className="expense-title">
                                                 {expense.label}
-
                                             </h2>
 
                                         </div>
 
 
-                                        <Badge
-                                            color="red"
-                                        >
-                                            -
-                                            {formatMoney(
-                                                expense.amount
-                                            )}
-                                            {" "}FCFA
-                                        </Badge>
+                                        <div className="expense-amount-badge">
 
+                                            -
+                                            {formatMoney(expense.amount)}
+                                            {" "}FCFA
+
+                                        </div>
 
                                     </div>
 
 
-                                    <div className="
-                                        mt-6
-                                        space-y-3
-                                    ">
+                                    {/* =================================================
+                                        INFORMATIONS
+                                    ================================================= */}
 
+                                    <div className="expense-information">
 
                                         <p>
 
-                                            📅{" "}
+                                            📅 Date :
 
                                             <strong>
+                                                {" "}
                                                 {formatDate(
                                                     expense.expense_date
                                                 )}
@@ -854,11 +821,11 @@ export default function Expenses() {
 
                                         <p>
 
-                                            🏷️ Catégorie :{" "}
+                                            🏷️ Catégorie :
 
                                             <strong>
-                                                {expense.category ||
-                                                    "—"}
+                                                {" "}
+                                                {expense.category || "—"}
                                             </strong>
 
                                         </p>
@@ -866,11 +833,11 @@ export default function Expenses() {
 
                                         <p>
 
-                                            💳 Paiement :{" "}
+                                            💳 Paiement :
 
                                             <strong>
-                                                {expense.payment_method ||
-                                                    "—"}
+                                                {" "}
+                                                {expense.payment_method || "—"}
                                             </strong>
 
                                         </p>
@@ -878,11 +845,11 @@ export default function Expenses() {
 
                                         <p>
 
-                                            👤 Bénéficiaire :{" "}
+                                            👤 Bénéficiaire :
 
                                             <strong>
-                                                {expense.beneficiary ||
-                                                    "—"}
+                                                {" "}
+                                                {expense.beneficiary || "—"}
                                             </strong>
 
                                         </p>
@@ -892,9 +859,10 @@ export default function Expenses() {
 
                                             <p>
 
-                                                🧾 Référence :{" "}
+                                                🧾 Référence :
 
                                                 <strong>
+                                                    {" "}
                                                     {expense.reference}
                                                 </strong>
 
@@ -907,9 +875,10 @@ export default function Expenses() {
 
                                             <p>
 
-                                                🏢 Immeuble :{" "}
+                                                🏢 Immeuble :
 
                                                 <strong>
+                                                    {" "}
                                                     {building.name}
                                                 </strong>
 
@@ -922,26 +891,12 @@ export default function Expenses() {
 
                                             <p>
 
-                                                🏠 Appartement :{" "}
+                                                🏠 Appartement :
 
                                                 <strong>
+                                                    {" "}
                                                     {apartment.number}
                                                 </strong>
-
-                                            </p>
-
-                                        )}
-
-
-                                        {expense.description && (
-
-                                            <p className="
-                                                text-slate-500
-                                                text-sm
-                                                pt-2
-                                            ">
-
-                                                {expense.description}
 
                                             </p>
 
@@ -950,25 +905,39 @@ export default function Expenses() {
                                     </div>
 
 
-                                    <div className="
-                                        flex
-                                        gap-2
-                                        mt-6
-                                    ">
+                                    {/* =================================================
+                                        DESCRIPTION
+                                    ================================================= */}
 
+                                    {expense.description && (
+
+                                        <div className="expense-description">
+
+                                            {expense.description}
+
+                                        </div>
+
+                                    )}
+
+
+                                    {/* =================================================
+                                        ACTIONS
+                                    ================================================= */}
+
+                                    <div className="expense-actions">
 
                                         <Button
 
                                             variant="secondary"
 
                                             onClick={() =>
-                                                openEditModal(
-                                                    expense
-                                                )
+                                                openEditModal(expense)
                                             }
 
                                         >
-                                            Modifier
+
+                                            ✏️ Modifier
+
                                         </Button>
 
 
@@ -977,18 +946,16 @@ export default function Expenses() {
                                             variant="danger"
 
                                             onClick={() =>
-                                                handleDelete(
-                                                    expense
-                                                )
+                                                handleDelete(expense)
                                             }
 
                                         >
-                                            Supprimer
+
+                                            🗑️ Supprimer
+
                                         </Button>
 
-
                                     </div>
-
 
                                 </div>
 

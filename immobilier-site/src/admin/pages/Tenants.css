@@ -1,10 +1,28 @@
 /* =========================================================
-   TENANTS PAGE
+   MAREGA — LOCATAIRES
+   STYLE : DOSSIER IMMOBILIER PREMIUM
+========================================================= */
+
+
+/* =========================================================
+   PAGE
 ========================================================= */
 
 .tenants-page {
+
     width: 100%;
+
     box-sizing: border-box;
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
 }
 
 
@@ -13,14 +31,21 @@
 ========================================================= */
 
 .tenants-loading {
+
     min-height: 384px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     color: #334155;
+
     font-size: 18px;
+
     font-weight: 600;
+
 }
 
 
@@ -29,13 +54,20 @@
 ========================================================= */
 
 .tenants-stats {
+
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
 
-    gap: 24px;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
 
-    margin-top: 32px;
-    margin-bottom: 32px;
+    gap: 20px;
+
+    width: 100%;
+
+    margin-top: 24px;
+
+    margin-bottom: 28px;
+
 }
 
 
@@ -44,8 +76,13 @@
 ========================================================= */
 
 .tenants-search {
+
     width: 100%;
+
+    margin-top: 20px;
+
     margin-bottom: 28px;
+
 }
 
 
@@ -54,32 +91,43 @@
 ========================================================= */
 
 .tenants-former-toggle {
-    margin-top: 28px;
+
+    margin-top: 24px;
+
     margin-bottom: 20px;
+
 }
 
 
 .tenants-former-toggle label {
+
     display: inline-flex;
+
     align-items: center;
+
     gap: 10px;
 
     color: #475569;
 
     font-size: 14px;
+
     font-weight: 500;
 
     cursor: pointer;
+
 }
 
 
 .tenants-former-toggle input {
+
     width: 17px;
+
     height: 17px;
 
     accent-color: #2563eb;
 
     cursor: pointer;
+
 }
 
 
@@ -88,68 +136,118 @@
 ========================================================= */
 
 .tenant-filters {
+
     display: flex;
+
     flex-wrap: wrap;
+
     align-items: center;
 
     gap: 10px;
 
-    margin-bottom: 32px;
+    margin-bottom: 28px;
+
 }
 
 
 .tenant-filter {
-    min-height: 42px;
 
-    padding: 0 20px;
+    min-height: 40px;
+
+    padding: 0 18px;
 
     border:
-        1px solid #e2e8f0;
+        1px solid #d9e1e7;
 
     border-radius: 999px;
 
-    background: #ffffff;
+    background:
+        #f8fafb;
 
-    color: #475569;
+    color:
+        #475569;
 
     font-family: inherit;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size: 13px;
+
+    font-weight: 650;
 
     cursor: pointer;
 
     transition:
         background-color 0.2s ease,
         color 0.2s ease,
-        border-color 0.2s ease;
+        border-color 0.2s ease,
+        transform 0.15s ease;
+
 }
 
 
 .tenant-filter:hover {
-    background: #f8fafc;
-    border-color: #cbd5e1;
+
+    background:
+        #eef2f5;
+
+    border-color:
+        #cbd5e1;
+
 }
 
+
+.tenant-filter:active {
+
+    transform:
+        scale(0.97);
+
+}
+
+
+/* Tous */
 
 .tenant-filter.active-all {
-    background: #0f172a;
-    border-color: #0f172a;
-    color: #ffffff;
+
+    background:
+        #172033;
+
+    border-color:
+        #172033;
+
+    color:
+        #ffffff;
+
 }
 
+
+/* Actifs */
 
 .tenant-filter.active-active {
-    background: #16a34a;
-    border-color: #16a34a;
-    color: #ffffff;
+
+    background:
+        #16a34a;
+
+    border-color:
+        #16a34a;
+
+    color:
+        #ffffff;
+
 }
 
 
+/* Partis */
+
 .tenant-filter.active-former {
-    background: #dc2626;
-    border-color: #dc2626;
-    color: #ffffff;
+
+    background:
+        #dc2626;
+
+    border-color:
+        #dc2626;
+
+    color:
+        #ffffff;
+
 }
 
 
@@ -158,14 +256,18 @@
 ========================================================= */
 
 .tenants-grid {
+
     display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap: 24px;
+    gap: 18px;
+
+    width: 100%;
 
     align-items: stretch;
+
 }
 
 
@@ -174,112 +276,225 @@
 ========================================================= */
 
 .tenant-card {
-    display: flex;
-    flex-direction: column;
+
+    position: relative;
+
+    width: 100%;
 
     min-width: 0;
 
-    padding: 24px;
+    box-sizing: border-box;
 
-    background: #ffffff;
+    display: flex;
+
+    flex-direction: column;
+
+    padding:
+        18px 18px 16px 20px;
+
+    /*
+       Même fond que les contrats.
+       Gris très légèrement chaud.
+    */
+
+    background:
+        linear-gradient(
+            145deg,
+            #f8fafb 0%,
+            #f1f4f6 100%
+        );
 
     border:
-        1px solid #f1f5f9;
+        1px solid #d9e1e7;
 
-    border-radius: 24px;
+    border-radius:
+        18px;
 
     box-shadow:
-        0 10px 25px rgba(
-            15,
-            23,
-            42,
-            0.08
-        );
+        0 3px 8px rgba(15, 23, 42, 0.06),
+        0 1px 2px rgba(15, 23, 42, 0.04);
+
+    overflow: hidden;
 
     transition:
-        transform 0.25s ease,
-        box-shadow 0.25s ease,
-        border-color 0.25s ease;
-}
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
 
-
-.tenant-card:hover {
-    transform: translateY(-2px);
-
-    border-color: #e2e8f0;
-
-    box-shadow:
-        0 18px 40px rgba(
-            15,
-            23,
-            42,
-            0.12
-        );
 }
 
 
 /* =========================================================
-   EN-TÊTE CARTE
+   BARRE MAREGA
 ========================================================= */
 
-.tenant-card-header {
-    display: flex;
-    align-items: center;
+.tenant-card::before {
 
-    gap: 16px;
+    content: "";
 
-    margin-bottom: 20px;
+    position: absolute;
+
+    top: 0;
+
+    left: 0;
+
+    width: 4px;
+
+    height: 100%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #1d4ed8 0%,
+            #3b82f6 50%,
+            #93c5fd 100%
+        );
+
 }
 
 
+/* =========================================================
+   HOVER
+========================================================= */
+
+.tenant-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        #b9c8d5;
+
+    box-shadow:
+        0 14px 30px rgba(15, 23, 42, 0.11),
+        0 4px 8px rgba(15, 23, 42, 0.05);
+
+}
+
+
+/* =========================================================
+   EN-TÊTE
+========================================================= */
+
+.tenant-card-header {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 13px;
+
+    margin-bottom: 16px;
+
+    padding-left: 4px;
+
+}
+
+
+/* =========================================================
+   AVATAR
+========================================================= */
+
 .tenant-avatar {
-    width: 56px;
-    height: 56px;
+
+    width: 50px;
+
+    height: 50px;
 
     flex-shrink: 0;
 
     display: flex;
+
     align-items: center;
+
     justify-content: center;
 
     border-radius: 50%;
 
-    background: #ca8a04;
+    /*
+       Jaune/or légèrement plus doux.
+    */
 
-    color: #ffffff;
+    background:
+        linear-gradient(
+            145deg,
+            #d4a017,
+            #b77900
+        );
 
-    font-size: 20px;
-    font-weight: 700;
+    color:
+        #ffffff;
+
+    font-size:
+        18px;
+
+    font-weight:
+        800;
+
+    box-shadow:
+        0 4px 10px rgba(180, 120, 0, 0.18);
+
 }
 
 
+/* =========================================================
+   IDENTITÉ
+========================================================= */
+
 .tenant-identity {
-    min-width: 0;
+
+    min-width:
+        0;
+
 }
 
 
 .tenant-identity h2 {
-    margin: 0;
 
-    color: #1e293b;
+    margin:
+        0;
 
-    font-size: 20px;
-    font-weight: 700;
+    color:
+        #172033;
 
-    line-height: 1.3;
+    font-size:
+        17px;
 
-    overflow-wrap: anywhere;
+    font-weight:
+        800;
+
+    line-height:
+        1.3;
+
+    letter-spacing:
+        -0.01em;
+
+    overflow-wrap:
+        anywhere;
+
 }
 
 
 .tenant-identity p {
-    margin: 5px 0 0;
 
-    color: #64748b;
+    margin:
+        4px 0 0;
 
-    font-size: 14px;
+    color:
+        #64748b;
 
-    overflow-wrap: anywhere;
+    font-size:
+        12px;
+
+    font-weight:
+        500;
+
+    line-height:
+        1.4;
+
+    overflow-wrap:
+        anywhere;
+
 }
 
 
@@ -288,32 +503,73 @@
 ========================================================= */
 
 .tenant-information {
-    display: flex;
-    flex-direction: column;
 
-    gap: 8px;
+    display:
+        flex;
 
-    margin-bottom: 16px;
+    flex-direction:
+        column;
+
+    gap:
+        8px;
+
+    margin-bottom:
+        14px;
+
+    padding-top:
+        13px;
+
+    padding-left:
+        4px;
+
+    border-top:
+        1px solid #d8e0e6;
+
 }
 
 
 .tenant-information p {
-    margin: 0;
 
-    color: #334155;
+    margin:
+        0;
 
-    font-size: 14px;
+    color:
+        #475569;
 
-    line-height: 1.5;
+    font-size:
+        13px;
 
-    overflow-wrap: anywhere;
+    line-height:
+        1.45;
+
+    font-weight:
+        500;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+.tenant-information strong {
+
+    color:
+        #172033;
+
+    font-weight:
+        750;
+
 }
 
 
 .tenant-information .tenant-location {
-    color: #64748b;
 
-    margin-top: 3px;
+    color:
+        #64748b;
+
+    margin-top:
+        2px;
+
 }
 
 
@@ -322,36 +578,56 @@
 ========================================================= */
 
 .tenant-status {
-    display: inline-flex;
 
-    align-items: center;
+    display:
+        inline-flex;
 
-    align-self: flex-start;
+    align-items:
+        center;
 
-    min-height: 36px;
+    align-self:
+        flex-start;
+
+    min-height:
+        31px;
 
     padding:
-        0 16px;
+        0 13px;
 
-    border-radius: 999px;
+    border-radius:
+        999px;
 
-    font-size: 14px;
+    font-size:
+        12px;
 
-    font-weight: 600;
+    font-weight:
+        700;
 
-    margin-top: 4px;
+    margin-top:
+        2px;
+
 }
 
 
 .status-active {
-    background: #dcfce7;
-    color: #15803d;
+
+    background:
+        #dcfce7;
+
+    color:
+        #15803d;
+
 }
 
 
 .status-former {
-    background: #fee2e2;
-    color: #b91c1c;
+
+    background:
+        #fee2e2;
+
+    color:
+        #b91c1c;
+
 }
 
 
@@ -360,60 +636,135 @@
 ========================================================= */
 
 .tenant-actions {
-    display: flex;
-    align-items: center;
 
-    gap: 8px;
+    display:
+        flex;
 
-    margin-top: 18px;
+    align-items:
+        center;
+
+    gap:
+        6px;
+
+    margin-top:
+        14px;
+
+    padding-top:
+        11px;
+
+    border-top:
+        1px solid #d8e0e6;
+
 }
 
 
 .tenant-actions button {
-    flex: 1;
 
-    min-height: 44px;
+    flex:
+        1;
+
+    min-height:
+        40px;
+
+    padding:
+        6px 9px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    box-shadow:
+        none;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
 }
 
 
+.tenant-actions button:hover {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 3px 7px rgba(15, 23, 42, 0.12);
+
+}
+
+
+/* =========================================================
+   BOUTON "MARQUER COMME PARTI"
+========================================================= */
+
 .tenant-leave-button {
-    width: 100%;
 
-    min-height: 42px;
+    width:
+        100%;
 
-    margin-top: 12px;
+    min-height:
+        38px;
+
+    margin-top:
+        9px;
 
     padding:
-        0 16px;
+        0 14px;
 
-    border: 0;
+    border:
+        0;
 
-    border-radius: 12px;
+    border-radius:
+        9px;
 
-    background: #dc2626;
+    background:
+        #dc2626;
 
-    color: #ffffff;
+    color:
+        #ffffff;
 
-    font-family: inherit;
+    font-family:
+        inherit;
 
-    font-size: 14px;
-    font-weight: 600;
+    font-size:
+        12px;
 
-    cursor: pointer;
+    font-weight:
+        700;
+
+    cursor:
+        pointer;
 
     transition:
         background-color 0.2s ease,
-        transform 0.2s ease;
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
 }
 
 
 .tenant-leave-button:hover {
-    background: #b91c1c;
+
+    background:
+        #b91c1c;
+
+    box-shadow:
+        0 3px 7px rgba(185, 28, 28, 0.18);
+
 }
 
 
 .tenant-leave-button:active {
-    transform: scale(0.98);
+
+    transform:
+        scale(0.98);
+
 }
 
 
@@ -422,97 +773,151 @@
 ========================================================= */
 
 .tenant-form {
-    width: 100%;
+
+    width:
+        100%;
+
 }
 
 
 .tenant-form-grid {
-    display: grid;
+
+    display:
+        grid;
 
     grid-template-columns:
         repeat(2, minmax(0, 1fr));
 
-    gap: 18px;
+    gap:
+        18px;
+
 }
 
 
+/* =========================================================
+   CHAMPS
+========================================================= */
+
 .tenant-form input,
 .tenant-form select {
-    width: 100%;
 
-    height: 50px;
+    width:
+        100%;
 
-    box-sizing: border-box;
+    height:
+        44px;
+
+    box-sizing:
+        border-box;
 
     padding:
-        0 16px;
+        0 14px;
 
     border:
-        1px solid #cbd5e1;
+        1px solid #d5dee8;
 
-    border-radius: 10px;
+    border-radius:
+        11px;
 
-    background: #ffffff;
+    background:
+        #f8fafc;
 
-    color: #0f172a;
+    color:
+        #172033;
 
-    font-family: inherit;
+    font-family:
+        inherit;
 
-    font-size: 14px;
+    font-size:
+        13px;
 
-    outline: none;
+    font-weight:
+        500;
+
+    outline:
+        none;
 
     transition:
+        background 0.2s ease,
         border-color 0.2s ease,
         box-shadow 0.2s ease;
+
 }
 
 
 .tenant-form input::placeholder {
-    color: #94a3b8;
+
+    color:
+        #94a3b8;
+
+    font-weight:
+        400;
+
 }
 
 
 .tenant-form input:hover,
 .tenant-form select:hover {
-    border-color: #94a3b8;
+
+    border-color:
+        #b8c5d1;
+
 }
 
 
 .tenant-form input:focus,
 .tenant-form select:focus {
-    border-color: #2563eb;
+
+    background:
+        #ffffff;
+
+    border-color:
+        #2563eb;
 
     box-shadow:
-        0 0 0 3px rgba(
-            37,
-            99,
-            235,
-            0.12
-        );
+        0 0 0 3px
+        rgba(37, 99, 235, 0.10);
+
 }
 
 
+/* =========================================================
+   CHAMP FORMULAIRE
+========================================================= */
+
 .tenant-form-field {
-    display: flex;
 
-    flex-direction: column;
+    display:
+        flex;
 
-    gap: 7px;
+    flex-direction:
+        column;
+
+    gap:
+        7px;
+
 }
 
 
 .tenant-form-field label {
-    color: #475569;
 
-    font-size: 13px;
+    color:
+        #334155;
 
-    font-weight: 600;
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
 }
 
 
 .tenant-form-field input {
-    width: 100%;
+
+    width:
+        100%;
+
 }
 
 
@@ -521,104 +926,177 @@
 ========================================================= */
 
 .tenant-form-actions {
-    display: flex;
 
-    justify-content: flex-end;
+    display:
+        flex;
 
-    align-items: center;
+    justify-content:
+        flex-end;
 
-    gap: 12px;
+    align-items:
+        center;
 
-    margin-top: 28px;
+    gap:
+        10px;
 
-    padding-top: 24px;
+    margin-top:
+        24px;
+
+    padding-top:
+        18px;
 
     border-top:
         1px solid #e2e8f0;
+
+}
+
+
+.tenant-form-actions button {
+
+    min-height:
+        40px;
+
+    padding:
+        9px 18px;
+
+    border-radius:
+        10px;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
 }
 
 
 /* =========================================================
-   RESPONSIVE
+   RESPONSIVE — TABLETTE
 ========================================================= */
 
 @media (max-width: 1100px) {
 
     .tenants-grid {
+
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
+
     }
 
 }
 
+
+/* =========================================================
+   RESPONSIVE — PETIT ÉCRAN
+========================================================= */
 
 @media (max-width: 900px) {
 
     .tenants-stats {
+
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
+
     }
 
-
     .tenant-form-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
+
     }
 
 }
 
+
+/* =========================================================
+   RESPONSIVE — MOBILE
+========================================================= */
 
 @media (max-width: 700px) {
 
     .tenants-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
+
     }
 
 
     .tenant-actions {
-        flex-direction: column;
+
+        flex-direction:
+            column;
+
     }
 
 
     .tenant-actions button {
-        width: 100%;
+
+        width:
+            100%;
+
     }
 
 
     .tenant-form-actions {
-        flex-direction: column-reverse;
 
-        align-items: stretch;
+        flex-direction:
+            column-reverse;
+
+        align-items:
+            stretch;
+
     }
 
 
     .tenant-form-actions button {
-        width: 100%;
+
+        width:
+            100%;
+
     }
 
 }
 
 
+/* =========================================================
+   RESPONSIVE — PETIT MOBILE
+========================================================= */
+
 @media (max-width: 600px) {
 
     .tenants-stats {
-        grid-template-columns: 1fr;
 
-        gap: 16px;
+        grid-template-columns:
+            1fr;
+
+        gap:
+            16px;
+
     }
 
 
     .tenant-filters {
-        width: 100%;
+
+        width:
+            100%;
+
     }
 
 
     .tenant-filter {
-        flex: 1;
 
-        min-width: 90px;
+        flex:
+            1;
+
+        min-width:
+            90px;
 
         padding:
             0 12px;
+
     }
 
 }

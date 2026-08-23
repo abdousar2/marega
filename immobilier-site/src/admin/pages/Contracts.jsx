@@ -23,6 +23,8 @@ import {
     hasPermission
 } from "../../config/permissions";
 
+import "./Contracts.css";
+
 
 export default function Contracts() {
 
@@ -711,23 +713,13 @@ export default function Contracts() {
                     openCreateModal
                 }
 
-            />
-
-
-            <br />
-
+            /> 
 
             {/* =================================================
                 STATISTIQUES
             ================================================= */}
 
-            <div className="
-                grid
-                grid-cols-1
-                md:grid-cols-3
-                gap-6
-                mb-8
-            ">
+            <div className="contracts-stats">
 
                 <StatsCard
                     title="Contrats"
@@ -757,33 +749,18 @@ export default function Contracts() {
                 />
 
             </div>
-
-
-            <br />
-
-
+ 
             {/* =================================================
                 RECHERCHE
             ================================================= */}
 
-            <SearchBar
-
-                value={search}
-
-                onChange={
-                    e =>
-                        setSearch(
-                            e.target.value
-                        )
-                }
-
-                placeholder="Rechercher un locataire ou un contrat..."
-
-            />
-
-
-            <br />
-            <br />
+            <div className="contracts-search">
+                <SearchBar
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    placeholder="Rechercher un locataire ou un contrat..."
+                />
+            </div>
 
 
             {/* =================================================
@@ -815,13 +792,8 @@ export default function Contracts() {
             >
 
                 <form
-
-                    onSubmit={
-                        saveContract
-                    }
-
-                    className="space-y-5"
-
+                    onSubmit={saveContract}
+                    className="contract-form"
                 >
 
 
@@ -829,13 +801,7 @@ export default function Contracts() {
 
                     <div>
 
-                        <label className="
-                            block
-                            text-sm
-                            font-semibold
-                            text-slate-700
-                            mb-2
-                        ">
+                        <label className="contract-label">
 
                             Locataire
 
@@ -853,12 +819,7 @@ export default function Contracts() {
                                     )
                             }
 
-                            className="
-                                border
-                                p-3
-                                w-full
-                                rounded-xl
-                            "
+                            className="contract-input"
 
                         >
 
@@ -914,13 +875,7 @@ export default function Contracts() {
 
                     <div>
 
-                        <label className="
-                            block
-                            text-sm
-                            font-semibold
-                            text-slate-700
-                            mb-2
-                        ">
+                        <label className="contract-label">
 
                             Numéro de carte d'identité
 
@@ -944,12 +899,7 @@ export default function Contracts() {
 
                             placeholder="Ex : 1 790 1997 00028"
 
-                            className="
-                                border
-                                p-3
-                                w-full
-                                rounded-xl
-                            "
+                            className="contract-input"
 
                         />
 
@@ -960,13 +910,7 @@ export default function Contracts() {
 
                     <div>
 
-                        <label className="
-                            block
-                            text-sm
-                            font-semibold
-                            text-slate-700
-                            mb-2
-                        ">
+                        <label className="contract-label">
 
                             Niveau / Étage
 
@@ -984,12 +928,7 @@ export default function Contracts() {
                                     )
                             }
 
-                            className="
-                                border
-                                p-3
-                                w-full
-                                rounded-xl
-                            "
+                            className="contract-input"
 
                         >
 
@@ -1048,22 +987,11 @@ export default function Contracts() {
 
                     {/* DATES */}
 
-                    <div className="
-                        grid
-                        grid-cols-1
-                        md:grid-cols-2
-                        gap-4
-                    ">
+                    <div className="contract-form-grid-2">
 
                         <div>
 
-                            <label className="
-                                block
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                                mb-2
-                            ">
+                            <label className="contract-label">
 
                                 Date de début
 
@@ -1085,12 +1013,7 @@ export default function Contracts() {
                                         )
                                 }
 
-                                className="
-                                    border
-                                    p-3
-                                    w-full
-                                    rounded-xl
-                                "
+                                className="contract-input"
 
                             />
 
@@ -1099,13 +1022,7 @@ export default function Contracts() {
 
                         <div>
 
-                            <label className="
-                                block
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                                mb-2
-                            ">
+                            <label className="contract-label">
 
                                 Date de fin
 
@@ -1127,12 +1044,7 @@ export default function Contracts() {
                                         )
                                 }
 
-                                className="
-                                    border
-                                    p-3
-                                    w-full
-                                    rounded-xl
-                                "
+                                className="contract-input"
 
                             />
 
@@ -1143,23 +1055,12 @@ export default function Contracts() {
 
                     {/* FINANCES */}
 
-                    <div className="
-                        grid
-                        grid-cols-1
-                        md:grid-cols-3
-                        gap-4
-                    ">
+                    <div className="contract-form-grid-3">
 
 
                         <div>
 
-                            <label className="
-                                block
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                                mb-2
-                            ">
+                            <label className="contract-label">
 
                                 Loyer mensuel
 
@@ -1181,12 +1082,7 @@ export default function Contracts() {
                                         )
                                 }
 
-                                className="
-                                    border
-                                    p-3
-                                    w-full
-                                    rounded-xl
-                                "
+                                className="contract-input"
 
                             />
 
@@ -1195,13 +1091,7 @@ export default function Contracts() {
 
                         <div>
 
-                            <label className="
-                                block
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                                mb-2
-                            ">
+                            <label className="contract-label">
 
                                 Charges
 
@@ -1223,12 +1113,7 @@ export default function Contracts() {
                                         )
                                 }
 
-                                className="
-                                    border
-                                    p-3
-                                    w-full
-                                    rounded-xl
-                                "
+                                className="contract-input"
 
                             />
 
@@ -1237,13 +1122,7 @@ export default function Contracts() {
 
                         <div>
 
-                            <label className="
-                                block
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                                mb-2
-                            ">
+                            <label className="contract-label">
 
                                 Caution
 
@@ -1265,12 +1144,7 @@ export default function Contracts() {
                                         )
                                 }
 
-                                className="
-                                    border
-                                    p-3
-                                    w-full
-                                    rounded-xl
-                                "
+                                className="contract-input"
 
                             />
 
@@ -1315,12 +1189,7 @@ export default function Contracts() {
                                     )
                             }
 
-                            className="
-                                border
-                                p-3
-                                w-full
-                                rounded-xl
-                            "
+                            className="contract-input"
 
                         />
 
@@ -1357,12 +1226,7 @@ export default function Contracts() {
                                     )
                             }
 
-                            className="
-                                border
-                                p-3
-                                w-full
-                                rounded-xl
-                            "
+                            className="contract-input"
 
                         >
 
@@ -1415,12 +1279,7 @@ export default function Contracts() {
 
                             rows="3"
 
-                            className="
-                                border
-                                p-3
-                                w-full
-                                rounded-xl
-                            "
+                            className="contract-input"
 
                         />
 
@@ -1429,12 +1288,7 @@ export default function Contracts() {
 
                     {/* BOUTONS */}
 
-                    <div className="
-                        flex
-                        justify-end
-                        gap-3
-                        pt-4
-                    ">
+                    <div className="contract-form-actions">
 
 
                         <Button
@@ -1494,14 +1348,7 @@ export default function Contracts() {
                 LISTE DES CONTRATS
             ================================================= */}
 
-            <div className="
-                grid
-                grid-cols-1
-                lg:grid-cols-2
-                xl:grid-cols-3
-                gap-6
-                mt-8
-            ">
+            <div className="contracts-grid">
 
 
                 {filteredContracts.length === 0 ? (
@@ -1538,52 +1385,23 @@ export default function Contracts() {
                             return (
 
                                 <div
-
-                                    key={
-                                        contract.id
-                                    }
-
-                                    className="
-                                        bg-white
-                                        rounded-3xl
-                                        border
-                                        border-slate-200
-                                        shadow-sm
-                                        hover:shadow-xl
-                                        transition
-                                        p-7
-                                    "
-
+                                    key={contract.id}
+                                    className="contract-card"
                                 >
-
 
                                     {/* HEADER */}
 
-                                    <div className="
-                                        flex
-                                        justify-between
-                                        items-start
-                                        px-3
-                                        pt-2
-                                    ">
+                                    <div className="contract-card-header">
 
                                         <div>
 
-                                            <p className="
-                                                text-slate-500
-                                                text-sm
-                                            ">
+                                            <p className="contract-label-small">
 
                                                 Contrat
 
                                             </p>
 
-
-                                            <h2 className="
-                                                text-2xl
-                                                font-bold
-                                                mt-1
-                                            ">
+                                            <h2 className="contract-number">
 
                                                 {
                                                     contract.contract_number
@@ -1616,10 +1434,7 @@ export default function Contracts() {
 
                                     {/* INFORMATIONS */}
 
-                                    <div className="
-                                        mt-6
-                                        space-y-3
-                                    ">
+                                    <div className="contract-information">
 
                                         <p>
 
@@ -1719,36 +1534,19 @@ export default function Contracts() {
 
                                     {/* FINANCES */}
 
-                                    <div className="
-                                        mt-6
-                                        grid
-                                        grid-cols-2
-                                        gap-4
-                                    ">
+                                    <div className="contract-finances">
 
 
-                                        <div className="
-                                            bg-slate-50
-                                            rounded-2xl
-                                            p-4
-                                        ">
+                                        <div className="contract-finance-box">
 
-                                            <div className="
-                                                text-slate-500
-                                                text-sm
-                                            ">
+                                            <div className="contract-finance-label">
 
                                                 Loyer
 
                                             </div>
 
 
-                                            <div className="
-                                                text-xl
-                                                font-bold
-                                                text-green-700
-                                                mt-2
-                                            ">
+                                            <div className="contract-rent">
 
                                                 {
                                                     Number(
@@ -1763,27 +1561,16 @@ export default function Contracts() {
                                         </div>
 
 
-                                        <div className="
-                                            bg-slate-50
-                                            rounded-2xl
-                                            p-4
-                                        ">
+                                        <div className="contract-finance-box">
 
-                                            <div className="
-                                                text-slate-500
-                                                text-sm
-                                            ">
+                                            <div className="contract-finance-label">
 
                                                 Caution
 
                                             </div>
 
 
-                                            <div className="
-                                                text-xl
-                                                font-bold
-                                                mt-2
-                                            ">
+                                            <div className="contract-deposit">
 
                                                 {
                                                     Number(
@@ -1802,12 +1589,7 @@ export default function Contracts() {
 
                                     {/* ACTIONS */}
 
-                                    <div className="
-                                        flex
-                                        flex-wrap
-                                        gap-2
-                                        mt-6
-                                    ">
+                                    <div className="contract-actions">
 
 
                                         {contract.pdf_path && (

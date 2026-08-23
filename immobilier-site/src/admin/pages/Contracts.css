@@ -1,18 +1,17 @@
 /* =========================================================
-   MAREGA — IMMEUBLES
+   MAREGA — CONTRATS
    STYLE : DOSSIER IMMOBILIER PREMIUM
 ========================================================= */
 
 
 /* =========================================================
-   PAGE
+   POLICE
 ========================================================= */
 
-.buildings-page {
-
-    width: 100%;
-
-    box-sizing: border-box;
+.contracts-grid,
+.contract-card,
+.contracts-stats,
+.contracts-search {
 
     font-family:
         Inter,
@@ -27,58 +26,23 @@
 
 
 /* =========================================================
-   CHARGEMENT
-========================================================= */
-
-.buildings-loading {
-
-    min-height: 384px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: center;
-
-}
-
-
-.buildings-loading-text {
-
-    color:
-        #334155;
-
-    font-size:
-        18px;
-
-    font-weight:
-        600;
-
-}
-
-
-/* =========================================================
    STATISTIQUES
 ========================================================= */
 
-.buildings-stats {
+.contracts-stats {
 
     display: grid;
 
     grid-template-columns:
         repeat(3, minmax(0, 1fr));
 
-    gap:
-        20px;
+    gap: 20px;
 
-    width:
-        100%;
+    width: 100%;
 
-    margin-top:
-        24px;
+    margin-top: 24px;
 
-    margin-bottom:
-        28px;
+    margin-bottom: 28px;
 
 }
 
@@ -87,82 +51,63 @@
    RECHERCHE
 ========================================================= */
 
-.buildings-search-row {
+.contracts-search {
 
-    display: flex;
+    width: 100%;
 
-    align-items: center;
+    margin-top: 20px;
 
-    justify-content: space-between;
-
-    gap:
-        20px;
-
-    width:
-        100%;
-
-    margin-top:
-        20px;
-
-    margin-bottom:
-        28px;
-
-}
-
-
-.buildings-result-count {
-
-    color:
-        #64748b;
-
-    font-size:
-        13px;
-
-    font-weight:
-        600;
-
-    white-space:
-        nowrap;
+    margin-bottom: 28px;
 
 }
 
 
 /* =========================================================
-   LISTE DES IMMEUBLES
+   GRILLE
 ========================================================= */
 
-.buildings-list {
+.contracts-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+    width: 100%;
+
+    margin-top: 24px;
+
+    align-items: stretch;
+
+}
+
+
+/* =========================================================
+   CARTE CONTRAT
+========================================================= */
+
+.contract-card {
+
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
 
     display: flex;
 
     flex-direction: column;
 
-    gap:
-        20px;
+    padding: 18px 18px 16px 20px;
 
-    width:
-        100%;
-
-}
-
-
-/* =========================================================
-   CARTE IMMEUBLE
-========================================================= */
-
-.building-card {
-
-    position:
-        relative;
-
-    width:
-        100%;
-
-    box-sizing:
-        border-box;
-
-    padding:
-        20px 20px 18px 24px;
+    /*
+       Gris chaud très léger.
+       Plus reposant que le blanc pur.
+    */
 
     background:
         linear-gradient(
@@ -174,15 +119,13 @@
     border:
         1px solid #d9e1e7;
 
-    border-radius:
-        18px;
+    border-radius: 18px;
 
     box-shadow:
         0 3px 8px rgba(15, 23, 42, 0.06),
         0 1px 2px rgba(15, 23, 42, 0.04);
 
-    overflow:
-        hidden;
+    overflow: hidden;
 
     transition:
         transform 0.22s ease,
@@ -196,25 +139,19 @@
    BARRE MAREGA
 ========================================================= */
 
-.building-card::before {
+.contract-card::before {
 
-    content:
-        "";
+    content: "";
 
-    position:
-        absolute;
+    position: absolute;
 
-    top:
-        0;
+    top: 0;
 
-    left:
-        0;
+    left: 0;
 
-    width:
-        4px;
+    width: 4px;
 
-    height:
-        100%;
+    height: 100%;
 
     background:
         linear-gradient(
@@ -228,10 +165,10 @@
 
 
 /* =========================================================
-   HOVER
+   EFFET HOVER
 ========================================================= */
 
-.building-card:hover {
+.contract-card:hover {
 
     transform:
         translateY(-3px);
@@ -247,51 +184,69 @@
 
 
 /* =========================================================
-   HEADER CARTE
+   EN-TÊTE
 ========================================================= */
 
-.building-card-header {
+.contract-card-header {
 
-    display:
-        flex;
+    display: flex;
 
-    align-items:
-        flex-start;
+    align-items: flex-start;
 
-    justify-content:
-        space-between;
+    justify-content: space-between;
 
-    gap:
-        16px;
+    gap: 12px;
 
-    padding-left:
-        4px;
+    width: 100%;
+
+    padding-left: 4px;
 
 }
 
 
 /* =========================================================
-   IDENTITÉ IMMEUBLE
+   LABEL "CONTRAT"
 ========================================================= */
 
-.building-heading {
+.contract-label-small {
 
-    min-width:
-        0;
+    margin: 0;
+
+    color:
+        #64748b;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.3;
+
+    font-weight:
+        700;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.08em;
 
 }
 
 
-.building-heading h2 {
+/* =========================================================
+   NUMÉRO CONTRAT
+========================================================= */
+
+.contract-number {
 
     margin:
-        0;
+        4px 0 0;
 
     color:
         #172033;
 
     font-size:
-        21px;
+        17px;
 
     font-weight:
         800;
@@ -308,16 +263,62 @@
 }
 
 
-.building-heading p {
+/* =========================================================
+   BADGE STATUT
+========================================================= */
 
-    margin:
-        6px 0 0;
+.contract-card-header span {
 
-    color:
-        #64748b;
+    flex-shrink:
+        0;
 
     font-size:
-        13px;
+        11px;
+
+    font-weight:
+        700;
+
+}
+
+
+/* =========================================================
+   INFORMATIONS
+========================================================= */
+
+.contract-information {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 8px;
+
+    margin-top: 16px;
+
+    padding-top: 13px;
+
+    padding-left: 4px;
+
+    border-top:
+        1px solid #d8e0e6;
+
+}
+
+
+/* =========================================================
+   LIGNE INFORMATION
+========================================================= */
+
+.contract-information p {
+
+    margin:
+        0;
+
+    color:
+        #475569;
+
+    font-size:
+        16px;
 
     line-height:
         1.45;
@@ -332,46 +333,49 @@
 
 
 /* =========================================================
-   INFORMATIONS
+   VALEURS IMPORTANTES
 ========================================================= */
 
-.building-info-grid {
+.contract-information strong {
 
-    display:
-        grid;
+    color:
+        #172033;
 
-    grid-template-columns:
-        repeat(3, minmax(0, 1fr));
-
-    gap:
-        10px;
-
-    margin-top:
-        16px;
-
-    padding-top:
-        14px;
-
-    border-top:
-        1px solid #d8e0e6;
+    font-weight:
+        750;
 
 }
 
 
 /* =========================================================
-   BLOC INFORMATION
+   FINANCES
 ========================================================= */
 
-.building-info-card {
+.contract-finances {
 
-    box-sizing:
-        border-box;
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 9px;
+
+    margin-top: 16px;
+
+}
+
+
+/* =========================================================
+   BLOC FINANCIER
+========================================================= */
+
+.contract-finance-box {
 
     min-width:
         0;
 
     padding:
-        12px;
+        11px;
 
     background:
         #e9eef2;
@@ -386,13 +390,10 @@
 
 
 /* =========================================================
-   LABEL
+   LABEL FINANCE
 ========================================================= */
 
-.building-info-card p {
-
-    margin:
-        0;
+.contract-finance-label {
 
     color:
         #64748b;
@@ -400,11 +401,11 @@
     font-size:
         10px;
 
-    font-weight:
-        700;
-
     line-height:
         1.3;
+
+    font-weight:
+        700;
 
     text-transform:
         uppercase;
@@ -416,28 +417,58 @@
 
 
 /* =========================================================
-   VALEUR
+   LOYER
 ========================================================= */
 
-.building-info-card strong {
-
-    display:
-        block;
+.contract-rent {
 
     margin-top:
         5px;
 
     color:
-        #172033;
+        #15803d;
 
     font-size:
-        18px;
+        15px;
 
     font-weight:
         800;
 
     line-height:
         1.25;
+
+    letter-spacing:
+        -0.01em;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+/* =========================================================
+   CAUTION
+========================================================= */
+
+.contract-deposit {
+
+    margin-top:
+        5px;
+
+    color:
+        #1e40af;
+
+    font-size:
+        15px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.25;
+
+    letter-spacing:
+        -0.05em;
 
     overflow-wrap:
         anywhere;
@@ -449,22 +480,16 @@
    ACTIONS
 ========================================================= */
 
-.building-actions {
+.contract-actions {
 
     display:
         flex;
-
-    align-items:
-        center;
-
-    justify-content:
-        flex-end;
 
     flex-wrap:
         wrap;
 
     gap:
-        6px;
+        4px;
 
     margin-top:
         15px;
@@ -482,22 +507,22 @@
    BOUTONS
 ========================================================= */
 
-.building-actions button {
+.contract-actions button {
 
     min-height:
-        40px;
+        50px;
 
     padding:
         6px 10px;
 
-    border-radius:
-        8px;
-
     font-size:
-        11px;
+        10px;
 
     font-weight:
-        700;
+        800;
+
+    border-radius:
+        8px;
 
     box-shadow:
         none;
@@ -509,7 +534,7 @@
 }
 
 
-.building-actions button:hover {
+.contract-actions button:hover {
 
     transform:
         translateY(-1px);
@@ -521,10 +546,10 @@
 
 
 /* =========================================================
-   FORMULAIRE MODAL
+   FORMULAIRE
 ========================================================= */
 
-.building-form {
+.contract-form {
 
     display:
         flex;
@@ -533,7 +558,7 @@
         column;
 
     gap:
-        20px;
+        22px;
 
     color:
         #172033;
@@ -542,20 +567,46 @@
 
 
 /* =========================================================
+   LABELS
+========================================================= */
+
+.contract-label {
+
+    display:
+        block;
+
+    margin-bottom:
+        7px;
+
+    color:
+        #334155;
+
+    font-size:
+        13px;
+
+    font-weight:
+        700;
+
+    letter-spacing:
+        0.01em;
+
+}
+
+
+/* =========================================================
    CHAMPS
 ========================================================= */
 
-.building-form input,
-.building-form select {
+.contract-input {
 
     width:
         100%;
 
-    height:
-        44px;
-
     box-sizing:
         border-box;
+
+    height:
+        44px;
 
     padding:
         0 14px;
@@ -573,7 +624,10 @@
         #172033;
 
     font-family:
-        inherit;
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        sans-serif;
 
     font-size:
         13px;
@@ -592,11 +646,7 @@
 }
 
 
-/* =========================================================
-   PLACEHOLDER
-========================================================= */
-
-.building-form input::placeholder {
+.contract-input::placeholder {
 
     color:
         #94a3b8;
@@ -607,25 +657,7 @@
 }
 
 
-/* =========================================================
-   HOVER CHAMPS
-========================================================= */
-
-.building-form input:hover,
-.building-form select:hover {
-
-    border-color:
-        #b8c5d1;
-
-}
-
-
-/* =========================================================
-   FOCUS
-========================================================= */
-
-.building-form input:focus,
-.building-form select:focus {
+.contract-input:focus {
 
     background:
         #ffffff;
@@ -641,36 +673,57 @@
 
 
 /* =========================================================
-   CHAMP FORMULAIRE
+   GROUPES FORMULAIRE
 ========================================================= */
 
-.building-form-field {
+.contract-form-grid-2 {
 
     display:
-        flex;
+        grid;
 
-    flex-direction:
-        column;
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
 
     gap:
-        7px;
+        16px;
 
 }
 
 
-.building-form-field label {
+.contract-form-grid-3 {
 
-    color:
-        #334155;
+    display:
+        grid;
 
-    font-size:
-        13px;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
 
-    font-weight:
-        700;
+    gap:
+        14px;
 
-    letter-spacing:
-        0.01em;
+}
+
+
+/* =========================================================
+   TEXTAREA
+========================================================= */
+
+textarea.contract-input {
+
+    height:
+        auto;
+
+    min-height:
+        90px;
+
+    padding:
+        12px 14px;
+
+    resize:
+        vertical;
+
+    line-height:
+        1.5;
 
 }
 
@@ -679,16 +732,16 @@
    ACTIONS FORMULAIRE
 ========================================================= */
 
-.building-form-actions {
+.contract-form-actions {
 
     display:
         flex;
 
-    align-items:
-        center;
-
     justify-content:
         flex-end;
+
+    align-items:
+        center;
 
     gap:
         10px;
@@ -705,7 +758,7 @@
 }
 
 
-.building-form-actions button {
+.contract-form-actions button {
 
     min-height:
         40px;
@@ -726,20 +779,12 @@
 
 
 /* =========================================================
-   TABLETTE
+   RESPONSIVE
 ========================================================= */
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
 
-    .buildings-stats {
-
-        grid-template-columns:
-            repeat(2, minmax(0, 1fr));
-
-    }
-
-
-    .building-info-grid {
+    .contracts-grid {
 
         grid-template-columns:
             repeat(2, minmax(0, 1fr));
@@ -749,136 +794,64 @@
 }
 
 
-/* =========================================================
-   MOBILE
-========================================================= */
+@media (max-width: 900px) {
 
-@media (max-width: 640px) {
+    .contracts-stats {
 
-    .buildings-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+    .contract-form-grid-3 {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .contracts-grid {
 
         grid-template-columns:
             1fr;
 
-        gap:
-            16px;
-
     }
 
-
-    .buildings-search-row {
-
-        flex-direction:
-            column;
-
-        align-items:
-            stretch;
-
-        gap:
-            12px;
-
-    }
-
-
-    .buildings-result-count {
-
-        text-align:
-            right;
-
-    }
-
-
-    .buildings-list {
-
-        gap:
-            16px;
-
-    }
-
-
-    .building-card {
-
-        padding:
-            18px 18px 16px 22px;
-
-        border-radius:
-            16px;
-
-    }
-
-
-    .building-card-header {
-
-        flex-direction:
-            column;
-
-        align-items:
-            stretch;
-
-        gap:
-            12px;
-
-    }
-
-
-    .building-heading h2 {
-
-        font-size:
-            19px;
-
-    }
-
-
-    .building-info-grid {
+    .contracts-stats {
 
         grid-template-columns:
             1fr;
 
-        gap:
-            8px;
+    }
 
-        margin-top:
-            14px;
+    .contract-form-grid-2,
+    .contract-form-grid-3 {
+
+        grid-template-columns:
+            1fr;
 
     }
 
-
-    .building-info-card {
-
-        padding:
-            11px;
-
-    }
-
-
-    .building-info-card strong {
-
-        font-size:
-            17px;
-
-    }
-
-
-    .building-actions {
+    .contract-actions {
 
         flex-direction:
             column;
 
-        align-items:
-            stretch;
-
     }
 
-
-    .building-actions button {
+    .contract-actions button {
 
         width:
             100%;
 
     }
 
-
-    .building-form-actions {
+    .contract-form-actions {
 
         flex-direction:
             column-reverse;
@@ -888,8 +861,7 @@
 
     }
 
-
-    .building-form-actions button {
+    .contract-form-actions button {
 
         width:
             100%;

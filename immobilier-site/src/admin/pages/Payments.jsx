@@ -27,6 +27,7 @@ import { PaymentsContext } from "../../context/PaymentsContext";
 import { RentsContext } from "../../context/RentsContext";
 
 import PaymentsService from "../../services/payments.service";
+import "./Payments.css";
 
 export default function Payments() {
 
@@ -262,9 +263,8 @@ export default function Payments() {
                     }
             }
         />
-        <br></br>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <div className="payments-stats">
 
             <StatsCard
                 title="Paiements"
@@ -285,15 +285,13 @@ export default function Payments() {
             />
 
         </div>
-        <br></br>
-
+        
         <SearchBar
             value={search}
             onChange={(e)=>setSearch(e.target.value)}
             placeholder="Rechercher un paiement..."
         />
-        <br></br><br></br>
-
+        
         <Modal
             open={showModal}
             title={
@@ -462,7 +460,7 @@ export default function Payments() {
         </Modal>
             
 
-            <div className="grid gap-6 mt-8">
+            <div className="payments-grid">
 
                 {filteredPayments.length === 0 ? (
 
@@ -475,77 +473,139 @@ export default function Payments() {
                     filteredPayments.map(payment => (
 
                         <div
-
                             key={payment.id}
-
                             onClick={() =>
                                 navigate(`/admin/payments/${payment.id}`)
                             }
-
-                            className="
-                                bg-white
-                                rounded-xl
-                                shadow
-                                p-5
-                                cursor-pointer
-                                hover:shadow-lg
-                                hover:-translate-y-1
-                                transition-all
-                            "
-
+                            className="payment-card"
                         >
 
-                            <h2 className="font-bold text-xl">
+                            {/* =================================================
+                                HEADER
+                            ================================================= */}
 
-                                {payment.tenant_name}
+                            <div className="payment-card-header">
 
-                            </h2>
+                                <div className="payment-identity">
 
-                            <p>Mois : {payment.payment_month}</p>
+                                    <div className="payment-avatar">
 
-                            <p>Montant : {Number(payment.amount).toLocaleString()} FCFA</p>
+                                        {(payment.tenant_name || "?").charAt(0)}
 
-                            <p>Mode : {payment.payment_method}</p>
+                                    </div>
 
-                            <span
-                                className={`inline-block mt-3 px-3 py-1 rounded-full text-sm font-semibold ${
-                                    payment.status === "Payé"
-                                        ? "bg-green-100 text-green-700"
-                                        : payment.status === "En attente"
-                                        ? "bg-yellow-100 text-yellow-700"
-                                        : "bg-red-100 text-red-700"
-                                }`}
-                            >
-                                {payment.status}
-                            </span>
+
+                                    <div className="payment-tenant">
+
+                                        <h2>
+                                            {payment.tenant_name}
+                                        </h2>
+
+                                        <p>
+                                            Paiement #{payment.id}
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+
+                                <Badge
+                                    color={
+                                        payment.status === "Payé"
+                                            ? "green"
+                                            : payment.status === "En attente"
+                                            ? "orange"
+                                            : "red"
+                                    }
+                                >
+
+                                    {payment.status}
+
+                                </Badge>
+
+                            </div>
+
+
+                            {/* =================================================
+                                INFORMATIONS
+                            ================================================= */}
+
+                            <div className="payment-information">
+
+                                <p>
+
+                                    📅 Mois :
+
+                                    <strong>
+                                        {" "}
+                                        {payment.payment_month}
+                                    </strong>
+
+                                </p>
+
+
+                                <p>
+
+                                    💳 Mode :
+
+                                    <strong>
+                                        {" "}
+                                        {payment.payment_method}
+                                    </strong>
+
+                                </p>
+
+                            </div>
+
+
+                            {/* =================================================
+                                MONTANT
+                            ================================================= */}
+
+                            <div className="payment-finance">
+
+                                <div className="payment-finance-label">
+
+                                    Montant encaissé
+
+                                </div>
+
+
+                                <div className="payment-amount">
+
+                                    {Number(
+                                        payment.amount
+                                    ).toLocaleString()} FCFA
+
+                                </div>
+
+                            </div>
+
+
+                            {/* =================================================
+                                QUITTANCE
+                            ================================================= */}
 
                             {payment.receipt_path && (
 
-                                <a
+                                <div className="payment-actions">
 
-                                    href={`${API_BASE}${payment.receipt_path}`}
+                                    <a
+                                        href={`${API_BASE}${payment.receipt_path}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        onClick={(e) =>
+                                            e.stopPropagation()
+                                        }
+                                        className="payment-receipt-button"
+                                    >
 
-                                    target="_blank"
+                                        📄 Télécharger la quittance
 
-                                    rel="noreferrer"
+                                    </a>
 
-                                    onClick={(e) =>
-                                        e.stopPropagation()
-                                    }
-
-                                    className="
-                                        inline-block
-                                        mt-4
-                                        bg-green-600
-                                        text-white
-                                        px-4
-                                        py-2
-                                        rounded
-                                    "
-
-                                >
-                                    📄 Télécharger la quittance
-                                </a>
+                                </div>
 
                             )}
 

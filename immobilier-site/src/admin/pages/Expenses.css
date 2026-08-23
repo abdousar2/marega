@@ -1,0 +1,704 @@
+/* =========================================================
+   MAREGA — DÉPENSES
+   STYLE : DOSSIER FINANCIER PREMIUM
+========================================================= */
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.expenses-page {
+
+    width: 100%;
+
+    box-sizing: border-box;
+
+}
+
+
+/* =========================================================
+   POLICE
+========================================================= */
+
+.expenses-grid,
+.expense-card {
+
+    font-family:
+        Inter,
+        ui-sans-serif,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+}
+
+
+/* =========================================================
+   GRILLE
+========================================================= */
+
+.expenses-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+
+    width: 100%;
+
+    margin-top: 24px;
+
+    align-items: stretch;
+
+}
+
+
+/* =========================================================
+   CARTE DÉPENSE
+========================================================= */
+
+.expense-card {
+
+    position: relative;
+
+    width: 100%;
+
+    min-width: 0;
+
+    box-sizing: border-box;
+
+    display: flex;
+
+    flex-direction: column;
+
+    padding:
+        18px 18px 16px 20px;
+
+    background:
+        linear-gradient(
+            145deg,
+            #f8fafb 0%,
+            #f1f4f6 100%
+        );
+
+    border:
+        1px solid #d9e1e7;
+
+    border-radius:
+        18px;
+
+    box-shadow:
+        0 3px 8px rgba(
+            15,
+            23,
+            42,
+            0.06
+        ),
+        0 1px 2px rgba(
+            15,
+            23,
+            42,
+            0.04
+        );
+
+    overflow:
+        hidden;
+
+    transition:
+        transform 0.22s ease,
+        box-shadow 0.22s ease,
+        border-color 0.22s ease;
+
+}
+
+
+/* =========================================================
+   BARRE MAREGA
+========================================================= */
+
+.expense-card::before {
+
+    content:
+        "";
+
+    position:
+        absolute;
+
+    top:
+        0;
+
+    left:
+        0;
+
+    width:
+        4px;
+
+    height:
+        100%;
+
+    background:
+        linear-gradient(
+            to bottom,
+            #dc2626 0%,
+            #ef4444 50%,
+            #fca5a5 100%
+        );
+
+}
+
+
+/* =========================================================
+   HOVER
+========================================================= */
+
+.expense-card:hover {
+
+    transform:
+        translateY(-3px);
+
+    border-color:
+        #b9c8d5;
+
+    box-shadow:
+        0 14px 30px rgba(
+            15,
+            23,
+            42,
+            0.11
+        ),
+        0 4px 8px rgba(
+            15,
+            23,
+            42,
+            0.05
+        );
+
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.expense-card-header {
+
+    display:
+        flex;
+
+    align-items:
+        flex-start;
+
+    justify-content:
+        space-between;
+
+    gap:
+        12px;
+
+    width:
+        100%;
+
+    padding-left:
+        4px;
+
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.expense-heading {
+
+    min-width:
+        0;
+
+}
+
+
+.expense-label-small {
+
+    margin:
+        0;
+
+    color:
+        #64748b;
+
+    font-size:
+        11px;
+
+    line-height:
+        1.3;
+
+    font-weight:
+        700;
+
+    text-transform:
+        uppercase;
+
+    letter-spacing:
+        0.08em;
+
+}
+
+
+.expense-title {
+
+    margin:
+        4px 0 0;
+
+    color:
+        #172033;
+
+    font-size:
+        19px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.3;
+
+    letter-spacing:
+        -0.015em;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+/* =========================================================
+   MONTANT
+========================================================= */
+
+.expense-amount-badge {
+
+    flex-shrink:
+        0;
+
+    max-width:
+        48%;
+
+    padding:
+        7px 9px;
+
+    background:
+        #fee2e2;
+
+    border:
+        1px solid #fecaca;
+
+    border-radius:
+        9px;
+
+    color:
+        #b91c1c;
+
+    font-size:
+        12px;
+
+    font-weight:
+        800;
+
+    line-height:
+        1.3;
+
+    text-align:
+        right;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+/* =========================================================
+   INFORMATIONS
+========================================================= */
+
+.expense-information {
+
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        8px;
+
+    margin-top:
+        16px;
+
+    padding-top:
+        13px;
+
+    padding-left:
+        4px;
+
+    border-top:
+        1px solid #d8e0e6;
+
+}
+
+
+.expense-information p {
+
+    margin:
+        0;
+
+    color:
+        #475569;
+
+    font-size:
+        14px;
+
+    line-height:
+        1.45;
+
+    font-weight:
+        500;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+.expense-information strong {
+
+    color:
+        #172033;
+
+    font-weight:
+        750;
+
+}
+
+
+/* =========================================================
+   DESCRIPTION
+========================================================= */
+
+.expense-description {
+
+    margin-top:
+        14px;
+
+    padding:
+        11px 12px;
+
+    background:
+        #e9eef2;
+
+    border:
+        1px solid #d9e1e7;
+
+    border-radius:
+        11px;
+
+    color:
+        #64748b;
+
+    font-size:
+        12px;
+
+    line-height:
+        1.5;
+
+    font-style:
+        italic;
+
+    overflow-wrap:
+        anywhere;
+
+}
+
+
+/* =========================================================
+   ACTIONS
+========================================================= */
+
+.expense-actions {
+
+    display:
+        flex;
+
+    gap:
+        6px;
+
+    margin-top:
+        15px;
+
+    padding-top:
+        12px;
+
+    border-top:
+        1px solid #d8e0e6;
+
+}
+
+
+.expense-actions button {
+
+    flex:
+        1;
+
+    min-height:
+        40px;
+
+    padding:
+        7px 10px;
+
+    border-radius:
+        8px;
+
+    font-size:
+        11px;
+
+    font-weight:
+        700;
+
+    box-shadow:
+        none;
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+}
+
+
+.expense-actions button:hover {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 3px 7px rgba(
+            15,
+            23,
+            42,
+            0.12
+        );
+
+}
+
+
+/* =========================================================
+   FILTRE CATÉGORIE
+========================================================= */
+
+.expenses-filter {
+
+    height:
+        44px;
+
+    min-width:
+        220px;
+
+    padding:
+        0 14px;
+
+    box-sizing:
+        border-box;
+
+    border:
+        1px solid #d5dee8;
+
+    border-radius:
+        11px;
+
+    background:
+        #f8fafc;
+
+    color:
+        #172033;
+
+    font-family:
+        inherit;
+
+    font-size:
+        13px;
+
+    font-weight:
+        600;
+
+    outline:
+        none;
+
+    cursor:
+        pointer;
+
+    transition:
+        border-color 0.2s ease,
+        background-color 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.expenses-filter:hover {
+
+    border-color:
+        #94a3b8;
+
+}
+
+
+.expenses-filter:focus {
+
+    background:
+        #ffffff;
+
+    border-color:
+        #2563eb;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            37,
+            99,
+            235,
+            0.10
+        );
+
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.expenses-stats {
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap:
+        20px;
+
+    width:
+        100%;
+
+    margin-top:
+        24px;
+
+    margin-bottom:
+        28px;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1100px) {
+
+    .expenses-grid {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .expenses-stats {
+
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+
+    }
+
+}
+
+
+@media (max-width: 700px) {
+
+    .expenses-grid {
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .expense-amount-badge {
+
+        max-width:
+            42%;
+
+        font-size:
+            11px;
+
+    }
+
+
+    .expense-title {
+
+        font-size:
+            17px;
+
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .expenses-stats {
+
+        grid-template-columns:
+            1fr;
+
+        gap:
+            16px;
+
+    }
+
+
+    .expense-card {
+
+        padding:
+            16px 16px 15px 20px;
+
+    }
+
+
+    .expense-information p {
+
+        font-size:
+            13px;
+
+    }
+
+
+    .expense-actions {
+
+        flex-direction:
+            column;
+
+    }
+
+
+    .expense-actions button {
+
+        width:
+            100%;
+
+    }
+
+}
