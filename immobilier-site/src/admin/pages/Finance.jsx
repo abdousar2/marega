@@ -12,6 +12,8 @@ import {
 
 import FinanceService from "../../services/finance.service";
 
+import "./Finance.css";
+
 
 export default function Finance() {
 
@@ -301,7 +303,7 @@ export default function Finance() {
 
         );
 
-    }
+    }   
 
 
     // =========================================================
@@ -311,6 +313,7 @@ export default function Finance() {
     return (
 
         <Layout>
+            
 
             <div className="
                 space-y-6
@@ -339,39 +342,17 @@ export default function Finance() {
                 {/* FILTRES */}
                 {/* ================================================= */}
 
-                <Card>
+                <div className="finance-filter-card">
 
-                    <div className="
-                        flex
-                        flex-wrap
-                        items-end
-                        gap-8
-                        justify-between
-                    ">
+                    <div className="finance-filter-layout">
 
+                        <div className="finance-period">
 
-                        {/* PÉRIODE */}
-
-                        <div className="
-                            flex-1
-                            min-w-[500px]
-                        ">
-
-                            <p className="
-                                text-sm
-                                font-semibold
-                                text-slate-700
-                                mb-3
-                            ">
+                            <p className="finance-field-label">
                                 Période
                             </p>
 
-                            <div className="
-                                flex
-                                items-center
-                                gap-2
-                                flex-wrap
-                            ">
+                            <div className="finance-period-buttons">
 
                                 {[
                                     ["daily", "Jour"],
@@ -379,39 +360,27 @@ export default function Finance() {
                                     ["monthly", "Mois"],
                                     ["yearly", "Année"],
                                     ["custom", "Personnalisée"]
-                                ].map(
-                                    ([value, label]) => (
+                                ].map(([value, label]) => (
 
-                                        <button
-                                            key={value}
-                                            type="button"
-                                            onClick={() =>
-                                                handlePeriodChange(value)
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() =>
+                                            handlePeriodChange(value)
+                                        }
+                                        className={`
+                                            finance-period-button
+                                            ${
+                                                period === value
+                                                    ? "active"
+                                                    : ""
                                             }
-                                            className={`
-                                                h-11
-                                                px-5
-                                                rounded-xl
-                                                text-sm
-                                                font-semibold
-                                                border
-                                                transition-all
-                                                whitespace-nowrap
+                                        `}
+                                    >
+                                        {label}
+                                    </button>
 
-                                                ${
-                                                    period === value
-                                                        ? "bg-blue-600 text-white border-blue-600 shadow-md"
-                                                        : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
-                                                }
-                                            `}
-                                        >
-
-                                            {label}
-
-                                        </button>
-
-                                    )
-                                )}
+                                ))}
 
                             </div>
 
@@ -421,15 +390,9 @@ export default function Finance() {
 
                         {period !== "custom" && (
 
-                            <div>
+                            <div className="finance-field">
 
-                                <label className="
-                                    block
-                                    text-sm
-                                    font-semibold
-                                    text-slate-700
-                                    mb-3
-                                ">
+                                <label className="finance-field-label">
                                     Date de référence
                                 </label>
 
@@ -437,145 +400,70 @@ export default function Finance() {
                                     type="date"
                                     value={date}
                                     onChange={e =>
-                                        setDate(
-                                            e.target.value
-                                        )
+                                        setDate(e.target.value)
                                     }
-                                    className="
-                                        w-full
-                                        border
-                                        border-slate-200
-                                        rounded-xl
-                                        px-4
-                                        py-2.5
-                                        bg-white
-                                        outline-none
-                                        text-sm
-                                        focus:border-blue-500
-                                        focus:ring-4
-                                        focus:ring-blue-500/10
-                                    "
+                                    className="finance-date-input"
                                 />
 
                             </div>
 
                         )}
 
-
                         {/* DATE PERSONNALISÉE */}
 
                         {period === "custom" && (
 
-                            <div className="
-                                grid
-                                grid-cols-2
-                                gap-3
-                            ">
+                            <div className="finance-field">
 
-                                <div>
+                                <label className="finance-field-label">
+                                    Du — Au
+                                </label>
 
-                                    <label className="
-                                        block
-                                        text-sm
-                                        font-semibold
-                                        text-slate-700
-                                        mb-3
-                                    ">
-                                        Du
-                                    </label>
+                                <div className="flex gap-2">
 
                                     <input
                                         type="date"
                                         value={start}
                                         onChange={e =>
-                                            setStart(
-                                                e.target.value
-                                            )
+                                            setStart(e.target.value)
                                         }
-                                        className="
-                                            w-full
-                                            border
-                                            border-slate-200
-                                            rounded-xl
-                                            px-4
-                                            py-2.5
-                                            bg-white
-                                            outline-none
-                                            text-sm
-                                            focus:border-blue-500
-                                            focus:ring-4
-                                            focus:ring-blue-500/10
-                                        "
+                                        className="finance-date-input"
                                     />
-
-                                </div>
-
-
-                                <div>
-
-                                    <label className="
-                                        block
-                                        text-sm
-                                        font-semibold
-                                        text-slate-700
-                                        mb-3
-                                    ">
-                                        Au
-                                    </label>
 
                                     <input
                                         type="date"
                                         value={end}
                                         onChange={e =>
-                                            setEnd(
-                                                e.target.value
-                                            )
+                                            setEnd(e.target.value)
                                         }
-                                        className="
-                                            w-full
-                                            border
-                                            border-slate-200
-                                            rounded-xl
-                                            px-4
-                                            py-2.5
-                                            bg-white
-                                            outline-none
-                                            text-sm
-                                            focus:border-blue-500
-                                            focus:ring-4
-                                            focus:ring-blue-500/10
-                                        "
+                                        className="finance-date-input"
                                     />
 
                                 </div>
 
                             </div>
 
-                        )}                       
+                        )}                      
 
 
                         {/* ACTUALISER */}
 
-                        <Button
-
-                            onClick={
-                                loadReport
-                            }
-
+                        <button
+                            type="button"
+                            onClick={loadReport}
                             disabled={
                                 period === "custom" &&
                                 (!start || !end)
                             }
-
+                            className="finance-refresh"
                         >
-
                             ↻ Actualiser
-
-                        </Button>
+                        </button>
 
                     </div>
 
-                </Card>
+                </div>
+                <br></br>
 
 
                 {/* ================================================= */}
@@ -607,7 +495,7 @@ export default function Finance() {
                     </div>
 
                 )}
-                <br></br>
+                
 
 
                 {report && (
@@ -674,76 +562,41 @@ export default function Finance() {
 
                             {/* ENCAISSEMENTS */}
 
-                            <div className="
-                                bg-white
-                                border
-                                border-slate-200
-                                border-t-4
-                                border-t-green-500
-                                rounded-2xl
-                                p-5
-                                shadow-sm
-                            ">
+                            <div className="finance-summary-card income">
 
-                                <div className="
-                                    flex
-                                    items-center
-                                    justify-between
-                                    gap-4
-                                ">
+                                <div className="finance-summary-content">
 
                                     <div>
 
-                                        <p className="
-                                            text-sm
-                                            font-medium
-                                            text-slate-500
-                                        ">
+                                        <p className="finance-summary-label">
                                             Encaissements
                                         </p>
 
-                                        <p className="
-                                            text-3xl
-                                            font-bold
-                                            text-green-600
-                                            mt-2
-                                            leading-tight
-                                        ">
+                                        <p className="finance-summary-value income">
+
                                             {formatMoney(
                                                 report.income?.total
                                             )}
+
                                             {" "}
-                                            <span className="
-                                                text-xl
-                                            ">
+
+                                            <span className="finance-summary-unit">
                                                 FCFA
                                             </span>
+
                                         </p>
 
-                                        <p className="
-                                            text-xs
-                                            text-slate-400
-                                            mt-2
-                                        ">
+                                        <p className="finance-summary-detail">
+
                                             {report.income?.count || 0}
                                             {" "}
                                             paiement(s)
+
                                         </p>
 
                                     </div>
 
-
-                                    <div className="
-                                        w-14
-                                        h-14
-                                        rounded-full
-                                        bg-green-50
-                                        flex
-                                        items-center
-                                        justify-center
-                                        text-2xl
-                                        shrink-0
-                                    ">
+                                    <div className="finance-summary-icon income">
                                         💰
                                     </div>
 
@@ -754,76 +607,41 @@ export default function Finance() {
 
                             {/* DÉPENSES */}
 
-                            <div className="
-                                bg-white
-                                border
-                                border-slate-200
-                                border-t-4
-                                border-t-red-500
-                                rounded-2xl
-                                p-5
-                                shadow-sm
-                            ">
+                            <div className="finance-summary-card expense">
 
-                                <div className="
-                                    flex
-                                    items-center
-                                    justify-between
-                                    gap-4
-                                ">
+                                <div className="finance-summary-content">
 
                                     <div>
 
-                                        <p className="
-                                            text-sm
-                                            font-medium
-                                            text-slate-500
-                                        ">
+                                        <p className="finance-summary-label">
                                             Dépenses
                                         </p>
 
-                                        <p className="
-                                            text-3xl
-                                            font-bold
-                                            text-red-600
-                                            mt-2
-                                            leading-tight
-                                        ">
+                                        <p className="finance-summary-value expense">
+
                                             {formatMoney(
                                                 report.expenses?.total
                                             )}
+
                                             {" "}
-                                            <span className="
-                                                text-xl
-                                            ">
+
+                                            <span className="finance-summary-unit">
                                                 FCFA
                                             </span>
+
                                         </p>
 
-                                        <p className="
-                                            text-xs
-                                            text-slate-400
-                                            mt-2
-                                        ">
+                                        <p className="finance-summary-detail">
+
                                             {report.expenses?.count || 0}
                                             {" "}
                                             dépense(s)
+
                                         </p>
 
                                     </div>
 
-
-                                    <div className="
-                                        w-14
-                                        h-14
-                                        rounded-full
-                                        bg-red-50
-                                        flex
-                                        items-center
-                                        justify-center
-                                        text-2xl
-                                        shrink-0
-                                    ">
+                                    <div className="finance-summary-icon expense">
                                         💸
                                     </div>
 
@@ -834,84 +652,65 @@ export default function Finance() {
 
                             {/* SOLDE NET */}
 
-                            <div className={`
-                                bg-white
-                                border
-                                border-slate-200
-                                border-t-4
-                                ${
-                                    Number(report.net) >= 0
-                                        ? "border-t-blue-500"
-                                        : "border-t-orange-500"
-                                }
-                                rounded-2xl
-                                p-5
-                                shadow-sm
-                            `}>
+                            <div
+                                className={`
+                                    finance-summary-card
+                                    balance
+                                    ${
+                                        Number(report.net) < 0
+                                            ? "negative"
+                                            : ""
+                                    }
+                                `}
+                            >
 
-                                <div className="
-                                    flex
-                                    items-center
-                                    justify-between
-                                    gap-4
-                                ">
+                                <div className="finance-summary-content">
 
                                     <div>
 
-                                        <p className="
-                                            text-sm
-                                            font-medium
-                                            text-slate-500
-                                        ">
+                                        <p className="finance-summary-label">
                                             Solde net
                                         </p>
 
-                                        <p className={`
-                                            text-3xl
-                                            font-bold
-                                            mt-2
-                                            leading-tight
-                                            ${
-                                                Number(report.net) >= 0
-                                                    ? "text-blue-600"
-                                                    : "text-orange-600"
-                                            }
-                                        `}>
+                                        <p
+                                            className={`
+                                                finance-summary-value
+                                                ${
+                                                    Number(report.net) >= 0
+                                                        ? "balance"
+                                                        : "negative"
+                                                }
+                                            `}
+                                        >
 
                                             {formatMoney(
                                                 report.net
                                             )}
+
                                             {" "}
-                                            <span className="
-                                                text-xl
-                                            ">
+
+                                            <span className="finance-summary-unit">
                                                 FCFA
                                             </span>
 
                                         </p>
 
-                                        <p className="
-                                            text-xs
-                                            text-slate-400
-                                            mt-2
-                                        ">
+                                        <p className="finance-summary-detail">
                                             Encaissements - Dépenses
                                         </p>
 
                                     </div>
 
-
-                                    <div className="
-                                        w-14
-                                        h-14
-                                        rounded-full
-                                        bg-blue-50
-                                        flex
-                                        items-center
-                                        justify-center
-                                        text-2xl
-                                        shrink-0
-                                    ">
+                                    <div
+                                        className={`
+                                            finance-summary-icon
+                                            ${
+                                                Number(report.net) >= 0
+                                                    ? "balance"
+                                                    : "negative"
+                                            }
+                                        `}
+                                    >
                                         📊
                                     </div>
 
@@ -1861,6 +1660,7 @@ export default function Finance() {
                                 )}
 
                             </Card>
+                            <br></br>
 
                         </div>
 
