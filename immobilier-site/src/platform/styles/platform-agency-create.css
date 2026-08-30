@@ -1,0 +1,349 @@
+.platform-agency-create {
+    min-height: calc(100vh - 80px);
+    padding: 32px;
+    background: #f8fafc;
+}
+
+.platform-agency-create-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.platform-agency-create-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+}
+
+.platform-agency-create-header h1 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 800;
+}
+
+.platform-agency-create-header p:last-child {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+.platform-agency-back {
+    height: 42px;
+    padding: 0 18px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.platform-agency-back:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.platform-agency-create-card {
+    max-width: 1000px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 24px;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+.platform-agency-create-card-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 26px 30px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.platform-agency-icon {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    background: #eff6ff;
+    color: #2563eb;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+.platform-agency-create-card-header h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.platform-agency-create-card-header p {
+    margin: 5px 0 0;
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+.platform-agency-form {
+    padding: 30px;
+}
+
+.platform-agency-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.platform-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.platform-field-full {
+    grid-column: 1 / -1;
+}
+
+.platform-field label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.platform-field label span {
+    margin-left: 3px;
+    color: #ef4444;
+}
+
+.platform-field input {
+    width: 100%;
+    height: 50px;
+    box-sizing: border-box;
+    padding: 0 15px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    outline: none;
+    background: #f8fafc;
+    color: #0f172a;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.platform-field input::placeholder {
+    color: #94a3b8;
+}
+
+.platform-field input:focus {
+    border-color: #2563eb;
+    background: #ffffff;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.08);
+}
+
+.platform-agency-alert {
+    margin: 22px 30px 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.platform-agency-alert-error {
+    border: 1px solid #fecaca;
+    background: #fef2f2;
+    color: #b91c1c;
+}
+
+.platform-agency-alert-success {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+.platform-agency-form-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 30px;
+    padding-top: 24px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.platform-agency-cancel,
+.platform-agency-submit {
+    height: 46px;
+    padding: 0 22px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.platform-agency-cancel {
+    border: 1px solid #e2e8f0;
+    background: #ffffff;
+    color: #475569;
+}
+
+.platform-agency-cancel:hover {
+    background: #f8fafc;
+}
+
+.platform-agency-submit {
+    border: none;
+    background: #2563eb;
+    color: #ffffff;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+}
+
+.platform-agency-submit:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.platform-agency-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.platform-agencies-new-button {
+    height: 44px;
+    padding: 0 18px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    border: none;
+    border-radius: 12px;
+
+    background: #2563eb;
+    color: #ffffff;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.20);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.platform-agencies-new-button:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+}
+
+.platform-agencies-new-button:active {
+    background: #1e40af;
+
+    transform: translateY(0);
+}
+
+.platform-admin-section {
+    margin-top: 35px;
+    padding-top: 30px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.platform-admin-section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.platform-admin-icon {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 13px;
+
+    background: #f0fdf4;
+    color: #16a34a;
+
+    font-size: 20px;
+}
+
+.platform-admin-section-header h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.platform-admin-section-header p {
+    margin: 4px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+
+    .platform-agency-create {
+        padding: 20px 16px;
+    }
+
+    .platform-agency-create-header {
+        flex-direction: column;
+    }
+
+    .platform-agency-create-header h1 {
+        font-size: 27px;
+    }
+
+    .platform-agency-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .platform-field-full {
+        grid-column: auto;
+    }
+
+    .platform-agency-form {
+        padding: 22px;
+    }
+
+    .platform-agency-create-card-header {
+        padding: 22px;
+    }
+
+    .platform-agency-form-footer {
+        flex-direction: column-reverse;
+    }
+
+    .platform-agency-cancel,
+    .platform-agency-submit {
+        width: 100%;
+    }
+
+    
+
+}

@@ -2,7 +2,7 @@ const db = require("../config/database");
 
 class Rent {
 
-    static async getAll() {
+    static async getAll(agencyId) {
 
         const result = await db.query(`
 
@@ -26,17 +26,23 @@ class Rent {
             JOIN marega.leases l
                 ON l.id = r.lease_id
 
+            WHERE r.agency_id = $1
+
             ORDER BY
                 r.due_month DESC,
                 r.id DESC
 
-        `);
+        `, [
+
+            agencyId
+
+        ]);
 
         return result.rows;
 
     }
 
-    static async getById(id) {
+    static async getById(id, agencyId) {
 
         const result = await db.query(
 
@@ -61,10 +67,16 @@ class Rent {
             JOIN marega.leases l
                 ON l.id = r.lease_id
 
-            WHERE r.id=$1
+            WHERE
+                r.id = $1
+
+                AND r.agency_id = $2
             `,
 
-            [id]
+            [
+                id,
+                agencyId
+            ]
 
         );
 
@@ -79,6 +91,7 @@ class Rent {
             `
             INSERT INTO marega.rents
             (
+                agency_id,
                 lease_id,
                 tenant_id,
                 due_month,
@@ -89,7 +102,7 @@ class Rent {
 
             VALUES
             (
-                $1,$2,$3,$4,$5,$6
+                $1,$2,$3,$4,$5,$6,$7
             )
 
             RETURNING *
@@ -97,6 +110,7 @@ class Rent {
 
             [
 
+                data.agency_id,
                 data.lease_id,
                 data.tenant_id,
                 data.due_month,
@@ -112,66 +126,84 @@ class Rent {
 
     }
 
-    static async markAsPaid(rentId, paymentId) {
+    static async markAsPaid(
+        rentId,
+        paymentId,
+        agencyId
+    ) {
 
-        await db.query(
-
-            `
-            UPDATE marega.rents
-
-            SET
-
-                status = 'Payé',
-
-                payment_id = $1,
-
-                updated_at = CURRENT_TIMESTAMP
-
-            WHERE id = $2
-            `,
-
-            [
-
-                paymentId,
-                rentId
-
-            ]
-
-        );
-
-    }
-
-        static async markAsUnpaidByPayment(paymentId) {
-
-            const result = await db.query(
+        const result =
+            await db.query(
 
                 `
                 UPDATE marega.rents
 
                 SET
 
-                    status = 'Impayé',
+                    status = 'Payé',
 
-                    payment_id = NULL,
+                    payment_id = $1,
 
                     updated_at = CURRENT_TIMESTAMP
 
-                WHERE payment_id = $1
+                WHERE
+
+                    id = $2
+
+                    AND agency_id = $3
 
                 RETURNING *
                 `,
 
                 [
-                    paymentId
+
+                    paymentId,
+
+                    rentId,
+
+                    agencyId
+
                 ]
 
             );
 
-            return result.rows[0];
 
-        }
+        return result.rows[0];
 
-    static async getPending() {
+    }
+    
+
+    static async markAsUnpaidByPayment(paymentId) {
+
+        const result = await db.query(
+
+            `
+            UPDATE marega.rents
+
+            SET
+
+                status = 'Impayé',
+
+                payment_id = NULL,
+
+                updated_at = CURRENT_TIMESTAMP
+
+            WHERE payment_id = $1
+
+            RETURNING *
+            `,
+
+            [
+                paymentId
+            ]
+
+        );
+
+        return result.rows[0];
+
+    }
+
+    static async getPending(agencyId) {
 
         const result = await db.query(
 
@@ -180,10 +212,17 @@ class Rent {
 
             FROM marega.rents
 
-            WHERE status <> 'Payé'
+            WHERE
+                agency_id = $1
+
+                AND status <> 'Payé'
 
             ORDER BY due_date ASC
-            `
+            `,
+
+            [
+                agencyId
+            ]
 
         );
 
@@ -191,7 +230,7 @@ class Rent {
 
     }
 
-    static async getLate() {
+    static async getLate(agencyId) {
 
         const result = await db.query(
 
@@ -202,12 +241,18 @@ class Rent {
 
             WHERE
 
-                due_date < CURRENT_DATE
+                agency_id = $1
+
+                AND due_date < CURRENT_DATE
 
                 AND status <> 'Payé'
 
             ORDER BY due_date ASC
-            `
+            `,
+
+            [
+                agencyId
+            ]
 
         );
 
@@ -306,6 +351,7 @@ class Rent {
                 `
                 INSERT INTO marega.rents
                 (
+                    agency_id,
                     lease_id,
                     tenant_id,
                     due_month,
@@ -316,12 +362,13 @@ class Rent {
 
                 VALUES
                 (
-                    $1,$2,$3,$4,$5,$6
+                    $1,$2,$3,$4,$5,$6,$7
                 )
                 `,
 
                 [
 
+                    lease.agency_id,
                     lease.id,
                     lease.tenant_id,
                     dueMonth,
@@ -339,7 +386,7 @@ class Rent {
 
         }
 
-    }
+    }    
 
 }
 

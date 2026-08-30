@@ -1,16 +1,36 @@
-const Lease = require("../models/lease.model");
-const Rent = require("../models/rent.model");
-const PDFService = require("../services/pdf.service");
-const AuditService = require("../services/audit.service");
+const Lease =
+    require("../models/lease.model");
+
+const Rent =
+    require("../models/rent.model");
+
+const PDFService =
+    require("../services/pdf.service");
+
+const AuditService =
+    require("../services/audit.service");
 
 
 class LeasesController {
+
+
+    // =========================================================
+    // LISTE
+    // =========================================================
 
     static async getAll(req, res) {
 
         try {
 
-            const leases = await Lease.getAll();
+            const agencyId =
+                req.user.agency_id;
+
+
+            const leases =
+                await Lease.getAll(
+                    agencyId
+                );
+
 
             res.json(leases);
 
@@ -21,26 +41,50 @@ class LeasesController {
             console.error(err);
 
             res.status(500).json({
-                error: "Erreur lors du chargement des contrats."
+
+                error:
+                    "Erreur lors du chargement des contrats."
+
             });
 
         }
 
     }
 
+
+    // =========================================================
+    // DÉTAIL
+    // =========================================================
+
     static async getById(req, res) {
 
         try {
 
-            const lease = await Lease.getById(req.params.id);
+            const agencyId =
+                req.user.agency_id;
+
+
+            const lease =
+                await Lease.getById(
+
+                    req.params.id,
+
+                    agencyId
+
+                );
+
 
             if (!lease) {
 
                 return res.status(404).json({
-                    error: "Contrat introuvable."
+
+                    error:
+                        "Contrat introuvable."
+
                 });
 
             }
+
 
             res.json(lease);
 
@@ -51,74 +95,181 @@ class LeasesController {
             console.error(err);
 
             res.status(500).json({
-                error: "Erreur lors du chargement du contrat."
+
+                error:
+                    "Erreur lors du chargement du contrat."
+
             });
 
         }
 
     }
 
+
+    // =========================================================
+    // CRÉATION
+    // =========================================================
+
     static async create(req, res) {
 
         try {
 
-            // Création du contrat
-            const lease = await Lease.create(req.body);
+            const agencyId =
+                req.user.agency_id;
 
-            // Contrat enrichi
+
+            // -------------------------------------------------
+            // CRÉATION
+            // -------------------------------------------------
+
+            const lease =
+                await Lease.create(
+
+                    req.body,
+
+                    agencyId
+
+                );
+
+
+            // -------------------------------------------------
+            // CONTRAT COMPLET
+            // -------------------------------------------------
+
             const completeLease =
-                await Lease.getCompleteById(lease.id);
+                await Lease.getCompleteById(
 
-            console.log("LEASE COMPLET");
-            console.log(completeLease);
+                    lease.id,
 
-            // Génération du PDF
-            console.log("Avant generateLeasePDF");
-           const pdfPath =
+                    agencyId
+
+                );
+
+
+            console.log(
+                "LEASE COMPLET"
+            );
+
+            console.log(
+                completeLease
+            );
+
+
+            // -------------------------------------------------
+            // PDF
+            // -------------------------------------------------
+
+            const pdfPath =
                 await PDFService.generateLeasePDF(
                     completeLease
                 );
 
-            console.log("Après generateLeasePDF");
 
+            // -------------------------------------------------
+            // SAUVEGARDE PDF
+            // -------------------------------------------------
 
-            // Sauvegarde du chemin
             await Lease.updatePdfPath(
+
                 lease.id,
-                pdfPath
+
+                pdfPath,
+
+                agencyId
+
             );
 
+
+            // -------------------------------------------------
+            // GÉNÉRATION DES LOYERS
+            // -------------------------------------------------
+
             await Rent.generateFromLease({
+
                 ...lease,
-                monthly_rent: lease.monthly_rent
+
+                monthly_rent:
+                    lease.monthly_rent
+
             });
 
-            // Recharge le contrat avec pdf_path
+
+            // -------------------------------------------------
+            // RECHARGEMENT
+            // -------------------------------------------------
+
             const finalLease =
                 await Lease.getCompleteById(
-                    lease.id
+
+                    lease.id,
+
+                    agencyId
+
                 );
 
 
-            await AuditService.log(req, {
+            // -------------------------------------------------
+            // AUDIT
+            // -------------------------------------------------
 
-                action: "CREATE",
+            await AuditService.log(
+                req,
+                {
 
-                module: "leases",
+                    action:
+                        "CREATE",
 
-                entity_id:
-                    finalLease.id
+                    module:
+                        "leases",
 
-            });
+                    entity_id:
+                        finalLease.id,
+
+                    details: {
+
+                        contract_number:
+                            finalLease.contract_number,
+
+                        tenant_id:
+                            finalLease.tenant_id,
+
+                        apartment_id:
+                            finalLease.apartment_id
+
+                    }
+
+                }
+            );
 
 
-            res.status(201).json(finalLease);
+            res.status(201).json(
+                finalLease
+            );
 
         }
 
         catch (err) {
 
-            console.error(err);
+            console.error(
+                "Erreur création lease :",
+                err
+            );
+
+
+            if (
+                err.code ===
+                "AGENCY_MISMATCH"
+            ) {
+
+                return res.status(403).json({
+
+                    error:
+                        err.message
+
+                });
+
+            }
+
 
             res.status(500).json({
 
@@ -131,7 +282,12 @@ class LeasesController {
 
     }
 
-        static async update(req, res) {
+
+    // =========================================================
+    // MODIFICATION
+    // =========================================================
+
+    static async update(req, res) {
 
         try {
 
@@ -139,12 +295,22 @@ class LeasesController {
                 Number(req.params.id);
 
 
-            // =================================================
-            // VÉRIFIER QUE LE CONTRAT EXISTE
-            // =================================================
+            const agencyId =
+                req.user.agency_id;
+
+
+            // -------------------------------------------------
+            // EXISTENCE DANS L'AGENCE
+            // -------------------------------------------------
 
             const existingLease =
-                await Lease.getById(id);
+                await Lease.getById(
+
+                    id,
+
+                    agencyId
+
+                );
 
 
             if (!existingLease) {
@@ -159,14 +325,19 @@ class LeasesController {
             }
 
 
-            // =================================================
-            // MODIFICATION DU CONTRAT
-            // =================================================
+            // -------------------------------------------------
+            // MODIFICATION
+            // -------------------------------------------------
 
             const lease =
                 await Lease.update(
+
                     id,
-                    req.body
+
+                    req.body,
+
+                    agencyId
+
                 );
 
 
@@ -182,28 +353,32 @@ class LeasesController {
             }
 
 
-            // =================================================
-            // SYNCHRONISATION DES LOYERS NON PAYÉS
-            // =================================================
+            // -------------------------------------------------
+            // LOYERS
+            // -------------------------------------------------
 
             await Rent.syncUnpaidFromLease(
                 lease
             );
 
 
-            // =================================================
-            // RÉCUPÉRATION DU CONTRAT COMPLET
-            // =================================================
+            // -------------------------------------------------
+            // CONTRAT COMPLET
+            // -------------------------------------------------
 
             const completeLease =
                 await Lease.getCompleteById(
-                    id
+
+                    id,
+
+                    agencyId
+
                 );
 
 
-            // =================================================
-            // RÉGÉNÉRATION DU PDF
-            // =================================================
+            // -------------------------------------------------
+            // PDF
+            // -------------------------------------------------
 
             const pdfPath =
                 await PDFService.generateLeasePDF(
@@ -211,24 +386,23 @@ class LeasesController {
                 );
 
 
-            // =================================================
-            // MISE À JOUR DU CHEMIN PDF
-            // =================================================
-
             await Lease.updatePdfPath(
+
                 id,
-                pdfPath
+
+                pdfPath,
+
+                agencyId
+
             );
 
 
-            // =================================================
+            // -------------------------------------------------
             // AUDIT
-            // =================================================
+            // -------------------------------------------------
 
             await AuditService.log(
-
                 req,
-
                 {
 
                     action:
@@ -266,17 +440,20 @@ class LeasesController {
                     }
 
                 }
-
             );
 
 
-            // =================================================
-            // CONTRAT FINAL
-            // =================================================
+            // -------------------------------------------------
+            // FINAL
+            // -------------------------------------------------
 
             const finalLease =
                 await Lease.getCompleteById(
-                    id
+
+                    id,
+
+                    agencyId
+
                 );
 
 
@@ -294,6 +471,21 @@ class LeasesController {
             );
 
 
+            if (
+                err.code ===
+                "AGENCY_MISMATCH"
+            ) {
+
+                return res.status(403).json({
+
+                    error:
+                        err.message
+
+                });
+
+            }
+
+
             res.status(500).json({
 
                 error:
@@ -305,6 +497,11 @@ class LeasesController {
 
     }
 
+
+    // =========================================================
+    // SUPPRESSION
+    // =========================================================
+
     static async remove(req, res) {
 
         try {
@@ -313,12 +510,18 @@ class LeasesController {
                 Number(req.params.id);
 
 
-            // =====================================================
-            // VÉRIFIER QUE LE CONTRAT EXISTE
-            // =====================================================
+            const agencyId =
+                req.user.agency_id;
+
 
             const lease =
-                await Lease.getById(id);
+                await Lease.getById(
+
+                    id,
+
+                    agencyId
+
+                );
 
 
             if (!lease) {
@@ -333,9 +536,9 @@ class LeasesController {
             }
 
 
-            // =====================================================
-            // VÉRIFIER LES PAIEMENTS ASSOCIÉS
-            // =====================================================
+            // -------------------------------------------------
+            // PAIEMENTS
+            // -------------------------------------------------
 
             const hasPayments =
                 await Rent.hasPayments(id);
@@ -353,21 +556,25 @@ class LeasesController {
             }
 
 
-            // =====================================================
+            // -------------------------------------------------
             // SUPPRESSION
-            // =====================================================
+            // -------------------------------------------------
 
-            await Lease.delete(id);
+            await Lease.delete(
+
+                id,
+
+                agencyId
+
+            );
 
 
-            // =====================================================
+            // -------------------------------------------------
             // AUDIT
-            // =====================================================
+            // -------------------------------------------------
 
             await AuditService.log(
-
                 req,
-
                 {
 
                     action:
@@ -393,17 +600,13 @@ class LeasesController {
                     }
 
                 }
-
             );
 
 
-            // =====================================================
-            // RÉPONSE
-            // =====================================================
-
             res.json({
 
-                success: true,
+                success:
+                    true,
 
                 message:
                     "Contrat supprimé."
@@ -419,6 +622,7 @@ class LeasesController {
                 err
             );
 
+
             res.status(500).json({
 
                 error:
@@ -432,4 +636,6 @@ class LeasesController {
 
 }
 
-module.exports = LeasesController;
+
+module.exports =
+    LeasesController;

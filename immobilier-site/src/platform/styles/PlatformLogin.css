@@ -1,0 +1,585 @@
+/* =========================================================
+   PAGE
+========================================================= */
+
+.platform-login-page {
+
+    min-height: 100vh;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    padding: 50px 24px;
+
+    background:
+        radial-gradient(
+            circle at 15% 20%,
+            rgba(37, 99, 235, 0.18),
+            transparent 35%
+        ),
+        radial-gradient(
+            circle at 85% 80%,
+            rgba(59, 130, 246, 0.12),
+            transparent 35%
+        ),
+        #020617;
+
+}
+
+
+/* =========================================================
+   CONTAINER
+========================================================= */
+
+.platform-login-container {
+
+    width: 100%;
+
+    max-width: 460px;
+
+}
+
+
+/* =========================================================
+   IDENTITÉ
+========================================================= */
+
+.platform-login-brand {
+
+    text-align: center;
+
+    margin-bottom: 32px;
+
+}
+
+
+.platform-login-logo {
+
+    width: 64px;
+
+    height: 64px;
+
+    margin: 0 auto 16px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 18px;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+
+    font-size: 25px;
+
+    font-weight: 900;
+
+    box-shadow:
+        0 15px 35px
+        rgba(37, 99, 235, 0.30);
+
+}
+
+
+.platform-login-brand h1 {
+
+    margin: 0;
+
+    color: white;
+
+    font-size: 23px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+
+}
+
+
+.platform-login-brand p {
+
+    margin: 7px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 14px;
+
+}
+
+
+/* =========================================================
+   CARTE
+========================================================= */
+
+.platform-login-card {
+
+    padding: 40px;
+
+    background: white;
+
+    border-radius: 26px;
+
+    box-shadow:
+        0 30px 70px
+        rgba(0, 0, 0, 0.30);
+
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.platform-login-heading {
+
+    margin-bottom: 30px;
+
+}
+
+
+.platform-login-badge {
+
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    padding: 7px 12px;
+
+    margin-bottom: 18px;
+
+    border-radius: 999px;
+
+    border: 1px solid #dbeafe;
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+    font-size: 11px;
+
+    font-weight: 700;
+
+    letter-spacing: 0.04em;
+
+}
+
+
+.platform-login-badge-dot {
+
+    width: 7px;
+
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #2563eb;
+
+}
+
+
+.platform-login-heading h2 {
+
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 32px;
+
+    font-weight: 800;
+
+    letter-spacing: -0.03em;
+
+}
+
+
+.platform-login-heading p {
+
+    margin: 10px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+
+}
+
+
+/* =========================================================
+   ERREUR
+========================================================= */
+
+.platform-login-error {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    padding: 13px 15px;
+
+    margin-bottom: 24px;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 14px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 13px;
+
+}
+
+
+.platform-login-error-icon {
+
+    width: 24px;
+
+    height: 24px;
+
+    flex-shrink: 0;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fee2e2;
+
+    font-weight: 800;
+
+}
+
+
+/* =========================================================
+   FORMULAIRE
+========================================================= */
+
+.platform-login-form {
+
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 22px;
+
+}
+
+
+.platform-login-field {
+
+    display: flex;
+
+    flex-direction: column;
+
+}
+
+
+.platform-login-field label {
+
+    margin-bottom: 8px;
+
+    color: #334155;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+}
+
+
+/* =========================================================
+   INPUT
+========================================================= */
+
+.platform-login-input-wrapper {
+
+    position: relative;
+
+}
+
+
+.platform-login-input-icon {
+
+    position: absolute;
+
+    left: 17px;
+
+    top: 50%;
+
+    transform: translateY(-50%);
+
+    width: 20px;
+
+    height: 20px;
+
+    color: #94a3b8;
+
+    pointer-events: none;
+
+}
+
+
+.platform-login-input-icon svg {
+
+    width: 100%;
+
+    height: 100%;
+
+}
+
+
+.platform-login-input-wrapper input {
+
+    width: 100%;
+
+    height: 56px;
+
+    padding: 0 16px 0 52px;
+
+    box-sizing: border-box;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 14px;
+
+    background: #f8fafc;
+
+    color: #0f172a;
+
+    font-size: 14px;
+
+    outline: none;
+
+    transition:
+        border-color 0.2s ease,
+        background 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+.platform-login-input-wrapper input::placeholder {
+
+    color: #94a3b8;
+
+}
+
+
+.platform-login-input-wrapper input:focus {
+
+    background: white;
+
+    border-color: #2563eb;
+
+    box-shadow:
+        0 0 0 4px
+        rgba(37, 99, 235, 0.10);
+
+}
+
+
+/* =========================================================
+   BOUTON
+========================================================= */
+
+.platform-login-button {
+
+    width: 100%;
+
+    height: 56px;
+
+    margin-top: 4px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 10px;
+
+    border: none;
+
+    border-radius: 14px;
+
+    background: linear-gradient(
+        135deg,
+        #2563eb,
+        #1d4ed8
+    );
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 12px 25px
+        rgba(37, 99, 235, 0.22);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+
+}
+
+
+.platform-login-button:hover:not(:disabled) {
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 16px 30px
+        rgba(37, 99, 235, 0.28);
+
+}
+
+
+.platform-login-button:active:not(:disabled) {
+
+    transform: translateY(0);
+
+}
+
+
+.platform-login-button:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.65;
+
+}
+
+
+.platform-login-arrow {
+
+    font-size: 20px;
+
+    line-height: 1;
+
+}
+
+
+/* =========================================================
+   SPINNER
+========================================================= */
+
+.platform-login-spinner {
+
+    width: 19px;
+
+    height: 19px;
+
+    border: 2px solid rgba(255,255,255,0.35);
+
+    border-top-color: white;
+
+    border-radius: 50%;
+
+    animation:
+        platformLoginSpin
+        0.8s linear infinite;
+
+}
+
+
+@keyframes platformLoginSpin {
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.platform-login-footer {
+
+    margin-top: 24px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 9px;
+
+    color: #64748b;
+
+    font-size: 11px;
+
+}
+
+
+.platform-login-footer-separator {
+
+    color: #475569;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 520px) {
+
+    .platform-login-page {
+
+        padding: 30px 16px;
+
+    }
+
+
+    .platform-login-card {
+
+        padding: 28px 22px;
+
+        border-radius: 22px;
+
+    }
+
+
+    .platform-login-heading h2 {
+
+        font-size: 28px;
+
+    }
+
+
+    .platform-login-brand {
+
+        margin-bottom: 25px;
+
+    }
+
+}

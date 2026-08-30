@@ -16,6 +16,10 @@ const usersRoutes = require("./routes/users.routes");
 const financeRoutes = require("./routes/finance.routes");
 const contactRoutes = require("./routes/contact.routes");
 const agenciesRoutes = require("./routes/agencies.routes");
+const platformAuthRoutes = require("./routes/platformAuth.routes");
+const platformAgenciesRoutes = require("./routes/platform-agencies");
+const platformRequestsRoutes = require("./routes/platform-requests");
+const platformAgencyUsersRoutes = require("./routes/platform-agency-users");
 
 
 const app = express();
@@ -42,6 +46,7 @@ console.log("Serving receipts from:", receiptsPath);
 app.use("/receipts", express.static(receiptsPath));
 
 app.use("/api/auth", authRoutes);
+app.use("/api/platform/auth", platformAuthRoutes);
 app.use("/api/users", usersRoutes);
 
 app.use("/api/buildings", buildingsRoutes);
@@ -55,6 +60,9 @@ app.use("/api/finance", financeRoutes);
 app.use("/api/audit", auditRoutes);
 app.use("/api/contact", contactRoutes);
 app.use("/api/agencies", agenciesRoutes);
+app.use("/api/platform/agencies", platformAgenciesRoutes);
+app.use("/api/platform/requests", platformRequestsRoutes);
+app.use("/api/platform/agencies", platformAgencyUsersRoutes);
 
 app.get("/", (req, res) => {
     res.json({

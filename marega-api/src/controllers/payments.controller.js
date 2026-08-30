@@ -3,7 +3,6 @@ const Rent = require("../models/rent.model");
 const ReceiptService = require("../services/receipt.service");
 const AuditService = require("../services/audit.service");
 
-
 class PaymentsController {
 
     // =========================================================
@@ -15,7 +14,9 @@ class PaymentsController {
         try {
 
             const payments =
-                await Payment.getAll();
+            await Payment.getAll(
+                req.user.agency_id
+            );
 
             res.json(payments);
 
@@ -34,15 +35,18 @@ class PaymentsController {
 
     }
 
-
     static async getById(req, res) {
 
         try {
 
             const payment =
-                await Payment.getCompleteById(
-                    req.params.id
-                );
+            await Payment.getCompleteById(
+
+                req.params.id,
+
+                req.user.agency_id
+
+            );
 
 
             if (!payment) {
@@ -72,7 +76,6 @@ class PaymentsController {
 
     }
 
-
     // =========================================================
     // CRÉATION
     // =========================================================
@@ -80,6 +83,40 @@ class PaymentsController {
     static async create(req, res) {
 
         try {
+
+            const agencyId =
+                req.user.agency_id;
+
+
+            // -------------------------------------------------
+            // VÉRIFICATION DES RELATIONS
+            // -------------------------------------------------
+
+            const validRelations =
+                await Payment.validateAgencyRelations(
+
+                    agencyId,
+
+                    req.body.tenant_id,
+
+                    req.body.lease_id,
+
+                    req.body.rent_id || null
+
+                );
+
+
+            if (!validRelations) {
+
+                return res.status(403).json({
+
+                    error:
+                        "Les données sélectionnées n'appartiennent pas à votre agence."
+
+                });
+
+            }
+
 
             // -------------------------------------------------
             // IDENTITÉ DU COMPTABLE
@@ -89,11 +126,13 @@ class PaymentsController {
 
                 ...req.body,
 
+                agency_id:
+                    agencyId,
+
                 cashier_user_id:
                     req.user.id
 
             };
-
 
             // -------------------------------------------------
             // CRÉATION DU PAIEMENT
@@ -111,13 +150,24 @@ class PaymentsController {
 
             if (req.body.rent_id) {
 
-                await Rent.markAsPaid(
+                const updatedRent =
+                    await Rent.markAsPaid(
 
-                    req.body.rent_id,
+                        req.body.rent_id,
 
-                    payment.id
+                        payment.id,
 
-                );
+                        agencyId
+
+                    );
+
+                if (!updatedRent) {
+
+                    throw new Error(
+                        "Le loyer sélectionné n'appartient pas à votre agence."
+                    );
+
+                }
 
             }
 
@@ -128,9 +178,21 @@ class PaymentsController {
 
             const completePayment =
                 await Payment.getCompleteById(
-                    payment.id
+
+                    payment.id,
+
+                    agencyId
+
                 );
 
+
+            if (!completePayment) {
+
+                throw new Error(
+                    "Paiement créé mais impossible de récupérer ses données complètes."
+                );
+
+            }
 
             // -------------------------------------------------
             // GÉNÉRER LE REÇU
@@ -150,7 +212,9 @@ class PaymentsController {
 
                 payment.id,
 
-                receiptPath
+                receiptPath,
+
+                agencyId
 
             );
 
@@ -214,12 +278,16 @@ class PaymentsController {
 
 
             // -------------------------------------------------
-            // RÉCUPÉRER LE PAIEMENT FINAL
+            // PAIEMENT FINAL
             // -------------------------------------------------
 
             const finalPayment =
                 await Payment.getCompleteById(
-                    payment.id
+
+                    payment.id,
+
+                    agencyId
+
                 );
 
 
@@ -248,7 +316,6 @@ class PaymentsController {
 
     }
 
-
     // =========================================================
     // MODIFICATION
     // =========================================================
@@ -260,13 +327,22 @@ class PaymentsController {
             const id =
                 Number(req.params.id);
 
+            const agencyId =
+                req.user.agency_id;
+
 
             // -------------------------------------------------
             // VÉRIFIER QUE LE PAIEMENT EXISTE
             // -------------------------------------------------
 
             const existingPayment =
-                await Payment.getById(id);
+                await Payment.getById(
+
+                    id,
+
+                    req.user.agency_id
+
+                );
 
 
             if (!existingPayment) {
@@ -407,7 +483,9 @@ class PaymentsController {
 
                     id,
 
-                    paymentData
+                    paymentData,
+
+                    req.user.agency_id
 
                 );
 
@@ -430,7 +508,11 @@ class PaymentsController {
 
             const completePayment =
                 await Payment.getCompleteById(
-                    id
+
+                    id,
+
+                    req.user.agency_id
+
                 );
 
 
@@ -446,9 +528,11 @@ class PaymentsController {
 
             await Payment.updateReceiptPath(
 
-                id,
+                payment.id,
 
-                receiptPath
+                receiptPath,
+
+                agencyId
 
             );
 
@@ -543,7 +627,11 @@ class PaymentsController {
 
             const finalPayment =
                 await Payment.getCompleteById(
-                    id
+
+                    id,
+
+                    req.user.agency_id
+
                 );
 
 
@@ -590,7 +678,13 @@ class PaymentsController {
             // -------------------------------------------------
 
             const payment =
-                await Payment.getById(id);
+                await Payment.getById(
+
+                    id,
+
+                    req.user.agency_id
+
+                );
 
 
             if (!payment) {

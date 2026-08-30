@@ -1,0 +1,200 @@
+/* =========================================================
+   PLATFORM SIDEBAR
+========================================================= */
+
+.platform-sidebar {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+    bottom: 0;
+
+    z-index: 40;
+
+    width: 270px;
+
+    display: flex;
+    flex-direction: column;
+
+    background: #020617;
+
+    color: white;
+
+    border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+/* =========================================================
+   IDENTITÉ
+========================================================= */
+
+.platform-sidebar-brand {
+    min-height: 86px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 22px;
+
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.platform-sidebar-ars-logo {
+    width: 48px;
+    height: 48px;
+
+    flex-shrink: 0;
+
+    object-fit: contain;
+
+    opacity: 0.95;
+}
+
+
+.platform-sidebar-brand-separator {
+    width: 1px;
+    height: 34px;
+
+    margin: 0 14px;
+
+    background: rgba(255, 255, 255, 0.15);
+}
+
+
+.platform-sidebar-brand-info {
+    min-width: 0;
+}
+
+
+.platform-sidebar-brand-name {
+    margin: 0;
+
+    color: white;
+
+    font-size: 13px;
+    font-weight: 800;
+
+    letter-spacing: -0.01em;
+
+    white-space: nowrap;
+}
+
+
+.platform-sidebar-brand-subtitle {
+    margin: 4px 0 0;
+
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.platform-sidebar-nav {
+    flex: 1;
+
+    padding: 24px 14px;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 4px;
+}
+
+
+.platform-sidebar-link {
+    display: flex;
+    align-items: center;
+
+    min-height: 44px;
+
+    padding: 0 14px;
+
+    border-radius: 10px;
+
+    color: #94a3b8;
+
+    text-decoration: none;
+
+    font-size: 13px;
+    font-weight: 500;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.platform-sidebar-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+
+    color: white;
+}
+
+
+.platform-sidebar-link.active {
+    background: #2563eb;
+
+    color: white;
+
+    font-weight: 600;
+
+    box-shadow:
+        0 6px 18px rgba(37, 99, 235, 0.18);
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.platform-sidebar-footer {
+    padding: 18px 20px 20px;
+
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+
+.platform-sidebar-copyright {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 10px;
+
+    line-height: 1.5;
+}
+
+
+.platform-sidebar-powered {
+    margin: 5px 0 0;
+
+    color: #475569;
+
+    font-size: 10px;
+}
+
+
+.platform-sidebar-powered strong {
+    color: #94a3b8;
+
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .platform-sidebar {
+        display: none;
+    }
+
+}

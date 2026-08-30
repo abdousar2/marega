@@ -5,12 +5,52 @@ const AuditService =
     require("../services/audit.service");
 
 
+// =========================================================
+// VÉRIFICATION AGENCE
+// =========================================================
+
+function getAgencyId(req) {
+
+    const agencyId =
+        Number(req.user?.agency_id);
+
+
+    if (!Number.isInteger(agencyId)) {
+
+        const error =
+            new Error(
+                "Agence utilisateur introuvable."
+            );
+
+        error.status = 403;
+
+        throw error;
+
+    }
+
+
+    return agencyId;
+
+}
+
+
+// =========================================================
+// CONSULTATION
+// =========================================================
+
 async function getAll(req, res) {
 
     try {
 
+        const agencyId =
+            getAgencyId(req);
+
+
         const buildings =
-            await Building.getAll();
+            await Building.getAll(
+                agencyId
+            );
+
 
         res.json(buildings);
 
@@ -18,11 +58,18 @@ async function getAll(req, res) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "BUILDINGS GET ALL ERROR:",
+            error
+        );
 
-        res.status(500).json({
+
+        res.status(
+            error.status || 500
+        ).json({
 
             message:
+                error.message ||
                 "Erreur serveur"
 
         });
@@ -32,13 +79,22 @@ async function getAll(req, res) {
 }
 
 
+// =========================================================
+// CONSULTATION D'UN BÂTIMENT
+// =========================================================
+
 async function getById(req, res) {
 
     try {
 
+        const agencyId =
+            getAgencyId(req);
+
+
         const building =
             await Building.getById(
-                req.params.id
+                req.params.id,
+                agencyId
             );
 
 
@@ -47,7 +103,7 @@ async function getById(req, res) {
             return res.status(404).json({
 
                 message:
-                    "Immeuble introuvable"
+                    "Immeuble introuvable."
 
             });
 
@@ -60,11 +116,18 @@ async function getById(req, res) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "BUILDING GET BY ID ERROR:",
+            error
+        );
 
-        res.status(500).json({
+
+        res.status(
+            error.status || 500
+        ).json({
 
             message:
+                error.message ||
                 "Erreur serveur"
 
         });
@@ -74,10 +137,19 @@ async function getById(req, res) {
 }
 
 
+// =========================================================
+// CRÉATION
+// =========================================================
+
 async function create(req, res) {
 
     try {
 
+        const agencyId =
+            getAgencyId(req);
+
+
+        // Génération automatique du code
         if (!req.body.code) {
 
             req.body.code =
@@ -88,7 +160,8 @@ async function create(req, res) {
 
         const building =
             await Building.create(
-                req.body
+                req.body,
+                agencyId
             );
 
 
@@ -119,11 +192,18 @@ async function create(req, res) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "BUILDING CREATE ERROR:",
+            error
+        );
 
-        res.status(500).json({
+
+        res.status(
+            error.status || 500
+        ).json({
 
             message:
+                error.message ||
                 "Erreur lors de la création"
 
         });
@@ -133,18 +213,43 @@ async function create(req, res) {
 }
 
 
+// =========================================================
+// MODIFICATION
+// =========================================================
+
 async function update(req, res) {
 
     try {
+
+        const agencyId =
+            getAgencyId(req);
+
 
         const building =
             await Building.update(
 
                 req.params.id,
 
-                req.body
+                req.body,
+
+                agencyId
 
             );
+
+
+        // Le bâtiment n'existe pas
+        // OU appartient à une autre agence
+
+        if (!building) {
+
+            return res.status(404).json({
+
+                message:
+                    "Immeuble introuvable."
+
+            });
+
+        }
 
 
         await AuditService.log(req, {
@@ -172,11 +277,18 @@ async function update(req, res) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "BUILDING UPDATE ERROR:",
+            error
+        );
 
-        res.status(500).json({
+
+        res.status(
+            error.status || 500
+        ).json({
 
             message:
+                error.message ||
                 "Erreur lors de la modification"
 
         });
@@ -186,31 +298,42 @@ async function update(req, res) {
 }
 
 
+// =========================================================
+// SUPPRESSION
+// =========================================================
+
 async function remove(req, res) {
 
     try {
 
+        const agencyId =
+            getAgencyId(req);
+
+
         const building =
-            await Building.getById(
-                req.params.id
+            await Building.remove(
+
+                req.params.id,
+
+                agencyId
+
             );
 
+
+        // Cela signifie également :
+        // le bâtiment appartient peut-être
+        // à une autre agence.
 
         if (!building) {
 
             return res.status(404).json({
 
                 message:
-                    "Immeuble introuvable"
+                    "Immeuble introuvable."
 
             });
 
         }
-
-
-        await Building.remove(
-            req.params.id
-        );
 
 
         await AuditService.log(req, {
@@ -243,11 +366,18 @@ async function remove(req, res) {
 
     catch (error) {
 
-        console.error(error);
+        console.error(
+            "BUILDING DELETE ERROR:",
+            error
+        );
 
-        res.status(500).json({
+
+        res.status(
+            error.status || 500
+        ).json({
 
             message:
+                error.message ||
                 "Erreur lors de la suppression"
 
         });
@@ -257,16 +387,14 @@ async function remove(req, res) {
 }
 
 
+// =========================================================
+
 module.exports = {
 
     getAll,
-
     getById,
-
     create,
-
     update,
-
     remove
 
 };

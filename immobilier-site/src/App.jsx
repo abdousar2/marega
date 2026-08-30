@@ -9,6 +9,14 @@ import Reference from "./admin/pages/Reference";
 import Contact from "./admin/pages/Contact";
 
 
+// PLATFORM
+import PlatformLogin from "./platform/pages/PlatformLogin";
+import PlatformDashboard from "./platform/pages/PlatformDashboard";
+import PlatformProtectedRoute from "./platform/routes/PlatformProtectedRoute";
+import PlatformAgencyCreate from "./platform/pages/PlatformAgencyCreate";
+import PlatformRequests from "./platform/pages/PlatformRequests";
+
+
 // ADMIN
 import Dashboard from "./admin/Dashboard";
 import Buildings from "./admin/pages/Buildings";
@@ -58,6 +66,12 @@ import { ExpensesProvider }
 import { AuthProvider }
     from "./context/AuthContext";
 
+import PlatformAgencies
+    from "./platform/pages/PlatformAgencies";
+
+import PlatformAgencyDetails
+    from "./platform/pages/PlatformAgencyDetails";
+
 
 function App() {
 
@@ -68,9 +82,9 @@ function App() {
             <Routes>
 
 
-                {/* =========================================
+                {/* =====================================================
                     SITE PUBLIC
-                ========================================= */}
+                ===================================================== */}
 
                 <Route
                     path="/"
@@ -102,15 +116,10 @@ function App() {
                     element={<Connexion />}
                 />
 
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />                
 
-
-                {/* =========================================
-                    CONNEXION
-                ========================================= */}
+                {/* =====================================================
+                    CONNEXION AGENCE
+                ===================================================== */}
 
                 <Route
                     path="/login"
@@ -118,9 +127,62 @@ function App() {
                 />
 
 
-                {/* =========================================
-                    ESPACE ADMIN
-                ========================================= */}
+                {/* =====================================================
+                    ADMINISTRATION TECHTRADISPORT
+                ===================================================== */}
+
+                <Route
+                    path="/platform/login"
+                    element={<PlatformLogin />}
+                />
+
+                <Route
+                    path="/platform/agencies/:id"
+                    element={
+                        <PlatformProtectedRoute>
+                            <PlatformAgencyDetails />
+                        </PlatformProtectedRoute>
+                    }
+                />
+
+
+                <Route
+                    path="/platform"
+                    element={
+                        <PlatformProtectedRoute>
+                            <PlatformDashboard />
+                        </PlatformProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/platform/agencies"
+                    element={
+                        <PlatformProtectedRoute>
+                            <PlatformAgencies />
+                        </PlatformProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/platform/agencies/new"
+                    element={
+                        <PlatformAgencyCreate />
+                    }
+                />
+
+                <Route
+                    path="/platform/requests"
+                    element={
+                        <PlatformProtectedRoute>
+                            <PlatformRequests />
+                        </PlatformProtectedRoute>
+                    }
+                />
+
+                {/* =====================================================
+                    ESPACE ADMIN MAREGA
+                ===================================================== */}
 
                 <Route
                     element={
@@ -196,9 +258,9 @@ function App() {
                     />
 
 
-                    {/* =====================================
+                    {/* =============================================
                         ADMIN UNIQUEMENT
-                    ===================================== */}
+                    ============================================= */}
 
                     <Route
                         element={<AdminRoute />}
@@ -212,7 +274,6 @@ function App() {
                     </Route>
 
                 </Route>
-
 
             </Routes>
 

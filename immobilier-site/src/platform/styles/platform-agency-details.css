@@ -1,0 +1,1382 @@
+.platform-agency-details-page {
+    min-height: 100vh;
+    padding: 32px;
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.platform-agency-details-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.platform-back-link {
+    display: inline-flex;
+    margin-bottom: 22px;
+    color: #2563eb;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.platform-back-link:hover {
+    color: #1d4ed8;
+}
+
+
+.platform-agency-title-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+
+.platform-agency-big-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+
+.platform-agency-title-row h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+
+.platform-agency-title-row p {
+    margin: 5px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+.platform-agency-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    margin-bottom: 5px;
+
+    color: #059669;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+
+.platform-agency-status span,
+.platform-active-text span,
+.platform-user-status span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #10b981;
+}
+
+
+.platform-agency-edit-button {
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    padding: 11px 18px;
+
+    background: white;
+    color: #334155;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.platform-agency-edit-button:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================================================
+   GRID
+========================================================= */
+
+.platform-agency-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(320px, 1fr);
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.platform-agency-card {
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+
+    padding: 26px;
+
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+}
+
+
+.platform-agency-card-header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+
+    margin-bottom: 25px;
+}
+
+
+.platform-card-icon {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #eff6ff;
+
+    font-size: 18px;
+}
+
+
+.platform-agency-card-header h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 16px;
+    font-weight: 750;
+}
+
+
+.platform-agency-card-header p {
+    margin: 4px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   INFORMATIONS
+========================================================= */
+
+.platform-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+}
+
+
+.platform-info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+
+.platform-info-item span {
+    color: #94a3b8;
+
+    font-size: 11px;
+    font-weight: 500;
+}
+
+
+.platform-info-item strong {
+    color: #334155;
+
+    font-size: 13px;
+    font-weight: 650;
+
+    overflow-wrap: anywhere;
+}
+
+
+.platform-active-text {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #059669 !important;
+}
+
+
+/* =========================================================
+   ADMIN
+========================================================= */
+
+.platform-admin-box {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    padding: 17px;
+
+    border-radius: 15px;
+
+    background: #f8fafc;
+    border: 1px solid #eef2f7;
+}
+
+
+.platform-admin-avatar,
+.platform-user-avatar {
+    flex-shrink: 0;
+
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 12px;
+
+    background: #2563eb;
+    color: white;
+
+    font-weight: 750;
+}
+
+
+.platform-admin-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+
+.platform-admin-info strong {
+    color: #0f172a;
+    font-size: 14px;
+}
+
+
+.platform-admin-info span {
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+.platform-admin-info small {
+    align-self: flex-start;
+
+    margin-top: 3px;
+    padding: 3px 7px;
+
+    border-radius: 6px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+.platform-empty-state {
+    padding: 30px;
+
+    text-align: center;
+
+    color: #94a3b8;
+    font-size: 13px;
+}
+
+
+/* =========================================================
+   USERS
+========================================================= */
+
+.platform-users-card {
+    margin-bottom: 30px;
+}
+
+
+.platform-users-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+
+.platform-users-header .platform-agency-card-header {
+    margin-bottom: 0;
+}
+
+
+.platform-add-user-button {
+    border: none;
+    border-radius: 11px;
+
+    padding: 11px 16px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 12px;
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+
+.platform-add-user-button:hover {
+    background: #1d4ed8;
+}
+
+
+/* =========================================================
+   TABLE
+========================================================= */
+
+.platform-users-table-wrapper {
+    overflow-x: auto;
+}
+
+
+.platform-users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+
+.platform-users-table th {
+    padding: 14px 10px;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-align: left;
+}
+
+
+.platform-users-table td {
+    padding: 16px 10px;
+
+    border-bottom: 1px solid #f1f5f9;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+.platform-user-cell {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+
+.platform-user-avatar {
+    width: 36px;
+    height: 36px;
+
+    border-radius: 10px;
+
+    font-size: 12px;
+}
+
+
+.platform-user-cell strong {
+    color: #334155;
+    font-size: 13px;
+}
+
+
+.platform-role-badge {
+    display: inline-flex;
+
+    padding: 5px 8px;
+
+    border-radius: 7px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 10px;
+    font-weight: 700;
+}
+
+
+.platform-user-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+.platform-user-status.active {
+    color: #059669;
+}
+
+
+.platform-user-status.inactive {
+    color: #94a3b8;
+}
+
+
+.platform-user-status.inactive span {
+    background: #94a3b8;
+}
+
+
+/* =========================================================
+   EMPTY
+========================================================= */
+
+.platform-users-empty {
+    padding: 45px 20px;
+
+    text-align: center;
+}
+
+
+.platform-users-empty > div {
+    width: 50px;
+    height: 50px;
+
+    margin: 0 auto 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #f1f5f9;
+
+    font-size: 20px;
+}
+
+
+.platform-users-empty h3 {
+    margin: 0;
+
+    color: #334155;
+
+    font-size: 14px;
+}
+
+
+.platform-users-empty p {
+    margin: 6px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   LOADING
+========================================================= */
+
+.platform-agency-loading {
+    min-height: 70vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    color: #64748b;
+}
+
+
+.platform-spinner {
+    width: 34px;
+    height: 34px;
+
+    margin-bottom: 12px;
+
+    border: 3px solid #dbeafe;
+    border-top-color: #2563eb;
+
+    border-radius: 50%;
+
+    animation: platform-spin 0.8s linear infinite;
+}
+
+
+@keyframes platform-spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.platform-agency-error {
+    max-width: 500px;
+
+    margin: 100px auto;
+
+    padding: 35px;
+
+    border-radius: 20px;
+
+    background: white;
+
+    border: 1px solid #fee2e2;
+
+    text-align: center;
+}
+
+
+.platform-agency-error-icon {
+    width: 48px;
+    height: 48px;
+
+    margin: 0 auto 15px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #fef2f2;
+    color: #dc2626;
+
+    font-weight: 800;
+}
+
+
+.platform-agency-error h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 18px;
+}
+
+
+.platform-agency-error p {
+    margin: 8px 0 20px;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+
+.platform-back-button {
+    display: inline-flex;
+
+    padding: 10px 15px;
+
+    border-radius: 10px;
+
+    background: #2563eb;
+    color: white;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 650;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .platform-agency-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .platform-agency-details-page {
+        padding: 20px;
+    }
+
+
+    .platform-agency-details-header {
+        flex-direction: column;
+    }
+
+
+    .platform-agency-edit-button {
+        width: 100%;
+    }
+
+
+    .platform-info-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .platform-users-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .platform-add-user-button {
+        width: 100%;
+    }
+
+}
+
+/* =====================================================
+   MODALE AJOUT UTILISATEUR
+===================================================== */
+
+.platform-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 24px;
+
+    background: rgba(15, 23, 42, 0.65);
+
+    backdrop-filter: blur(6px);
+}
+
+
+.platform-modal {
+    width: 100%;
+    max-width: 620px;
+
+    max-height: calc(100vh - 48px);
+
+    overflow-y: auto;
+
+    background: #ffffff;
+
+    border-radius: 24px;
+
+    box-shadow:
+        0 25px 60px rgba(15, 23, 42, 0.25);
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.platform-modal-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 24px;
+
+    padding: 28px 30px 22px;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+
+.platform-modal-eyebrow {
+    margin: 0 0 6px;
+
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.08em;
+}
+
+
+.platform-modal-header h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 24px;
+    font-weight: 800;
+}
+
+
+.platform-modal-header p:last-child {
+    margin: 6px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+}
+
+
+.platform-modal-close {
+    width: 38px;
+    height: 38px;
+
+    flex-shrink: 0;
+
+    border: 0;
+
+    border-radius: 12px;
+
+    background: #f1f5f9;
+
+    color: #64748b;
+
+    font-size: 25px;
+
+    line-height: 1;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.platform-modal-close:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+
+/* =====================================================
+   ERREUR
+===================================================== */
+
+.platform-modal-error {
+    display: flex;
+    align-items: flex-start;
+
+    gap: 10px;
+
+    margin: 22px 30px 0;
+
+    padding: 13px 15px;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 14px;
+
+    background: #fef2f2;
+
+    color: #b91c1c;
+
+    font-size: 14px;
+}
+
+
+.platform-modal-error span {
+    width: 22px;
+    height: 22px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background: #fee2e2;
+
+    font-weight: 800;
+}
+
+
+.platform-modal-error p {
+    margin: 2px 0 0;
+}
+
+
+/* =====================================================
+   FORMULAIRE
+===================================================== */
+
+.platform-user-form {
+    padding: 26px 30px 30px;
+}
+
+
+.platform-form-row {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 18px;
+}
+
+
+.platform-form-group {
+    margin-bottom: 19px;
+}
+
+
+.platform-form-group label {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #334155;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.platform-form-group input,
+.platform-form-group select {
+    width: 100%;
+
+    height: 48px;
+
+    padding: 0 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 12px;
+
+    outline: none;
+
+    background: #f8fafc;
+
+    color: #0f172a;
+
+    font-family: inherit;
+
+    font-size: 14px;
+
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background 0.2s ease;
+}
+
+
+.platform-form-group input:focus,
+.platform-form-group select:focus {
+    background: #ffffff;
+
+    border-color: #3b82f6;
+
+    box-shadow:
+        0 0 0 4px rgba(59, 130, 246, 0.10);
+}
+
+
+.platform-form-group input::placeholder {
+    color: #94a3b8;
+}
+
+
+.platform-form-group small {
+    display: block;
+
+    margin-top: 7px;
+
+    color: #94a3b8;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   ACTIONS
+===================================================== */
+
+.platform-modal-actions {
+    display: flex;
+
+    justify-content: flex-end;
+
+    gap: 12px;
+
+    margin-top: 8px;
+
+    padding-top: 22px;
+
+    border-top: 1px solid #e2e8f0;
+}
+
+
+.platform-modal-cancel,
+.platform-modal-submit {
+    height: 46px;
+
+    padding: 0 20px;
+
+    border-radius: 12px;
+
+    font-family: inherit;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.platform-modal-cancel {
+    border: 1px solid #cbd5e1;
+
+    background: #ffffff;
+
+    color: #475569;
+}
+
+
+.platform-modal-cancel:hover {
+    background: #f8fafc;
+}
+
+
+.platform-modal-submit {
+    display: inline-flex;
+
+    align-items: center;
+    justify-content: center;
+
+    gap: 9px;
+
+    border: 0;
+
+    background: #2563eb;
+
+    color: #ffffff;
+
+    box-shadow:
+        0 8px 18px rgba(37, 99, 235, 0.20);
+}
+
+
+.platform-modal-submit:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+.platform-modal-submit:disabled,
+.platform-modal-cancel:disabled {
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =====================================================
+   SPINNER
+===================================================== */
+
+.platform-button-spinner {
+    width: 17px;
+    height: 17px;
+
+    border: 2px solid rgba(255, 255, 255, 0.4);
+
+    border-top-color: #ffffff;
+
+    border-radius: 50%;
+
+    animation: platform-button-spin 0.7s linear infinite;
+}
+
+
+@keyframes platform-button-spin {
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 640px) {
+
+    .platform-modal-overlay {
+        padding: 12px;
+    }
+
+
+    .platform-modal {
+        border-radius: 20px;
+    }
+
+
+    .platform-modal-header {
+        padding: 22px;
+    }
+
+
+    .platform-user-form {
+        padding: 22px;
+    }
+
+
+    .platform-form-row {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+
+    .platform-modal-actions {
+        flex-direction: column-reverse;
+    }
+
+
+    .platform-modal-cancel,
+    .platform-modal-submit {
+        width: 100%;
+    }
+
+}
+
+/* =====================================================
+   ACTIONS UTILISATEUR
+===================================================== */
+
+.platform-user-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+.platform-user-actions button {
+    height: 34px;
+    padding: 0 11px;
+
+    border-radius: 9px;
+
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.platform-user-edit-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+
+.platform-user-edit-button:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+
+.platform-user-disable-button {
+    border: 1px solid #fecaca;
+    background: #fff7f7;
+    color: #dc2626;
+}
+
+
+.platform-user-disable-button:hover {
+    background: #fee2e2;
+}
+
+
+.platform-user-enable-button {
+    border: 1px solid #bbf7d0;
+    background: #f0fdf4;
+    color: #15803d;
+}
+
+
+.platform-user-enable-button:hover {
+    background: #dcfce7;
+}
+
+
+.platform-user-actions button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   TABLEAU
+===================================================== */
+
+.platform-users-table th:last-child,
+.platform-users-table td:last-child {
+    text-align: right;
+}
+
+
+.platform-users-table td:last-child {
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 900px) {
+
+    .platform-users-table-wrapper {
+        overflow-x: auto;
+    }
+
+    .platform-users-table {
+        min-width: 850px;
+    }
+
+}
+
+.platform-user-password-button {
+    border: 1px solid #dbe4f0;
+    background: #ffffff;
+    color: #2563eb;
+    padding: 7px 10px;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.platform-user-password-button:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.platform-modal-section-title {
+    margin-top: 24px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e8edf4;
+
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+
+    color: #64748b;
+}
+
+.platform-modal-section-title:first-child {
+    margin-top: 0;
+}
+
+.platform-agency-edit-modal {
+    max-width: 720px;
+}
+
+/* =====================================================
+   ACTION AGENCE
+===================================================== */
+
+.platform-agency-disable-button,
+.platform-agency-enable-button {
+
+    height: 40px;
+
+    padding: 0 16px;
+
+    border-radius: 10px;
+
+    font-size: 12px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+
+}
+
+
+/* -----------------------------------------------------
+   DÉSACTIVER
+----------------------------------------------------- */
+
+.platform-agency-disable-button {
+
+    border: 1px solid #fecaca;
+
+    background: #ffffff;
+
+    color: #dc2626;
+}
+
+
+.platform-agency-disable-button:hover {
+
+    background: #fef2f2;
+
+    border-color: #fca5a5;
+
+}
+
+
+/* -----------------------------------------------------
+   ACTIVER
+----------------------------------------------------- */
+
+.platform-agency-enable-button {
+
+    border: 1px solid #bbf7d0;
+
+    background: #ecfdf5;
+
+    color: #047857;
+}
+
+
+.platform-agency-enable-button:hover {
+
+    background: #d1fae5;
+
+    border-color: #86efac;
+
+}
+
+
+/* -----------------------------------------------------
+   DISABLED
+----------------------------------------------------- */
+
+.platform-agency-disable-button:disabled,
+.platform-agency-enable-button:disabled {
+
+    opacity: 0.55;
+
+    cursor: not-allowed;
+
+}
+
+
+/* =====================================================
+   ERREUR STATUT AGENCE
+===================================================== */
+
+.platform-agency-status-error {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 20px;
+
+    padding: 13px 16px;
+
+    background: #fef2f2;
+
+    border: 1px solid #fecaca;
+
+    border-radius: 12px;
+
+    color: #b91c1c;
+
+}
+
+
+.platform-agency-status-error span {
+
+    width: 28px;
+    height: 28px;
+
+    display: flex;
+
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 8px;
+
+    background: #fee2e2;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+}
+
+
+.platform-agency-status-error p {
+
+    margin: 0;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+}
+

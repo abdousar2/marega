@@ -1,0 +1,193 @@
+/* =========================================================
+   PLATFORM HEADER
+========================================================= */
+
+.platform-header {
+    height: 80px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding: 0 32px;
+
+    background: #ffffff;
+
+    border-bottom: 1px solid #e2e8f0;
+
+    box-sizing: border-box;
+}
+
+
+/* =========================================================
+   TITRE
+========================================================= */
+
+.platform-header-title {
+    min-width: 0;
+}
+
+
+.platform-header-title p {
+    margin: 0 0 3px;
+
+    color: #2563eb;
+
+    font-size: 10px;
+    font-weight: 700;
+
+    text-transform: uppercase;
+
+    letter-spacing: 0.12em;
+}
+
+
+.platform-header-title h1 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 18px;
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+}
+
+
+/* =========================================================
+   UTILISATEUR
+========================================================= */
+
+.platform-header-user {
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+}
+
+
+.platform-header-user-info {
+    text-align: right;
+}
+
+
+.platform-header-user-name {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 13px;
+    font-weight: 700;
+}
+
+
+.platform-header-user-role {
+    margin: 3px 0 0;
+
+    color: #64748b;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   BOUTON DÉCONNEXION
+========================================================= */
+
+.platform-header-logout {
+    height: 38px;
+
+    padding: 0 15px;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    color: #475569;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+.platform-header-logout:hover {
+    background: #f8fafc;
+
+    border-color: #cbd5e1;
+
+    color: #0f172a;
+
+    transform: translateY(-1px);
+}
+
+
+.platform-header-logout:active {
+    transform: translateY(0);
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .platform-header {
+        padding: 0 24px;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 600px) {
+
+    .platform-header {
+        height: 70px;
+
+        padding: 0 18px;
+    }
+
+
+    .platform-header-title p {
+        display: none;
+    }
+
+
+    .platform-header-title h1 {
+        font-size: 15px;
+    }
+
+
+    .platform-header-user {
+        gap: 10px;
+    }
+
+
+    .platform-header-user-info {
+        display: none;
+    }
+
+
+    .platform-header-logout {
+        height: 36px;
+
+        padding: 0 12px;
+
+        font-size: 11px;
+    }
+
+}

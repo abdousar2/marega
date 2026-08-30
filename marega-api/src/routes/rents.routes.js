@@ -16,52 +16,92 @@ const {
 // TOUS LES RÔLES
 // =========================================================
 
+
+// Tous les loyers de l'agence
+
 router.get(
+
     "/",
+
     authenticateToken,
+
     authorizeRoles(
+
         "ADMIN",
         "RESPONSABLE",
         "COMPTABLE",
         "AGENT"
+
     ),
+
     RentsController.getAll
+
 );
 
-router.get(
-    "/:id",
-    authenticateToken,
-    authorizeRoles(
-        "ADMIN",
-        "RESPONSABLE",
-        "COMPTABLE",
-        "AGENT"
-    ),
-    RentsController.getById
-);
+
+// Loyers en attente
 
 router.get(
+
     "/pending",
+
     authenticateToken,
+
     authorizeRoles(
+
         "ADMIN",
         "RESPONSABLE",
         "COMPTABLE",
         "AGENT"
+
     ),
+
     RentsController.getPending
+
 );
 
+
+// Loyers en retard
+
 router.get(
+
     "/late",
+
     authenticateToken,
+
     authorizeRoles(
+
         "ADMIN",
         "RESPONSABLE",
         "COMPTABLE",
         "AGENT"
+
     ),
+
     RentsController.getLate
+
+);
+
+
+// Un loyer
+
+router.get(
+
+    "/:id",
+
+    authenticateToken,
+
+    authorizeRoles(
+
+        "ADMIN",
+        "RESPONSABLE",
+        "COMPTABLE",
+        "AGENT"
+
+    ),
+
+    RentsController.getById
+
 );
 
 
@@ -70,16 +110,24 @@ router.get(
 // ADMIN / RESPONSABLE / COMPTABLE
 // =========================================================
 
+// Pour le moment désactivé car les loyers
+// sont principalement générés depuis les contrats.
+
 // router.post(
-//    "/",
-//    authenticateToken,
-//    authorizeRoles(
-//        "ADMIN",
-//        "RESPONSABLE",
-//        "COMPTABLE"
-//    ),
-//    RentsController.create
-//);
+//
+//     "/",
+//
+//     authenticateToken,
+//
+//     authorizeRoles(
+//         "ADMIN",
+//         "RESPONSABLE",
+//         "COMPTABLE"
+//     ),
+//
+//     RentsController.create
+//
+// );
 
 
 module.exports = router;

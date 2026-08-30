@@ -1,0 +1,273 @@
+/* =========================================================
+   PLATFORM DASHBOARD
+========================================================= */
+
+.platform-dashboard {
+    min-height: 100vh;
+
+    background: #f8fafc;
+
+    color: #0f172a;
+}
+
+
+/* =========================================================
+   CONTENU PRINCIPAL
+========================================================= */
+
+.platform-dashboard-content {
+    min-height: 100vh;
+
+    margin-left: 270px;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.platform-dashboard-main {
+    padding: 32px;
+}
+
+
+/* =========================================================
+   INTRODUCTION
+========================================================= */
+
+.platform-dashboard-intro {
+    margin-bottom: 30px;
+}
+
+
+.platform-dashboard-eyebrow {
+    margin: 0 0 6px;
+
+    color: #2563eb;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    letter-spacing: 0.02em;
+}
+
+
+.platform-dashboard-intro h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 32px;
+    font-weight: 800;
+
+    letter-spacing: -0.025em;
+}
+
+
+.platform-dashboard-description {
+    margin: 8px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.platform-dashboard-stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   CARTE STATISTIQUE
+========================================================= */
+
+.platform-stat-card {
+    min-height: 150px;
+
+    padding: 22px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 18px;
+
+    box-shadow:
+        0 2px 8px rgba(15, 23, 42, 0.04);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+
+.platform-stat-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #dbeafe;
+
+    box-shadow:
+        0 10px 25px rgba(15, 23, 42, 0.07);
+}
+
+
+.platform-stat-label {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+    font-weight: 600;
+}
+
+
+.platform-stat-value {
+    margin: 10px 0 4px;
+
+    color: #0f172a;
+
+    font-size: 36px;
+    font-weight: 800;
+
+    line-height: 1;
+}
+
+
+.platform-stat-description {
+    margin: 10px 0 0;
+
+    color: #94a3b8;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   BLOC BIENVENUE
+========================================================= */
+
+.platform-dashboard-welcome {
+    margin-top: 28px;
+
+    padding: 30px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 22px;
+
+    box-shadow:
+        0 2px 8px rgba(15, 23, 42, 0.03);
+}
+
+
+.platform-dashboard-welcome h3 {
+    margin: 6px 0 0;
+
+    color: #0f172a;
+
+    font-size: 24px;
+    font-weight: 800;
+
+    letter-spacing: -0.02em;
+}
+
+
+.platform-dashboard-welcome > p:last-child {
+    max-width: 720px;
+
+    margin: 12px 0 0;
+
+    color: #64748b;
+
+    font-size: 14px;
+
+    line-height: 1.7;
+}
+
+
+/* =========================================================
+   TABLETTE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .platform-dashboard-stats {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .platform-dashboard-content {
+        margin-left: 0;
+    }
+
+    .platform-dashboard-main {
+        padding: 24px;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .platform-dashboard-main {
+        padding: 18px;
+    }
+
+
+    .platform-dashboard-intro h2 {
+        font-size: 26px;
+    }
+
+
+    .platform-dashboard-stats {
+        grid-template-columns: 1fr;
+
+        gap: 14px;
+    }
+
+
+    .platform-stat-card {
+        min-height: auto;
+
+        padding: 20px;
+    }
+
+
+    .platform-dashboard-welcome {
+        padding: 22px;
+
+        border-radius: 18px;
+    }
+
+
+    .platform-dashboard-welcome h3 {
+        font-size: 21px;
+    }
+
+}

@@ -1,0 +1,665 @@
+/* =========================================================
+   PAGE AGENCES
+========================================================= */
+
+.platform-agencies {
+    min-height: 100vh;
+    background: #f8fafc;
+}
+
+.platform-agencies-main {
+    min-height: 100vh;
+    margin-left: 288px;
+}
+
+.platform-agencies-content {
+    padding: 32px;
+}
+
+
+/* =========================================================
+   EN-TÊTE
+========================================================= */
+
+.platform-agencies-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+.platform-agencies-eyebrow {
+    margin: 0 0 8px;
+    color: #2563eb;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+}
+
+.platform-agencies-heading h2 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+}
+
+.platform-agencies-subtitle {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 14px;
+}
+
+
+/* =========================================================
+   BOUTON NOUVELLE AGENCE
+========================================================= */
+
+.platform-agencies-create {
+    height: 46px;
+    padding: 0 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    border: 0;
+    border-radius: 12px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.18);
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.platform-agencies-create span {
+    font-size: 20px;
+    line-height: 1;
+}
+
+.platform-agencies-create:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+    box-shadow: 0 12px 25px rgba(37, 99, 235, 0.22);
+}
+
+
+/* =========================================================
+   STATISTIQUES
+========================================================= */
+
+.platform-agencies-stats {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.platform-agencies-stat-card {
+    min-height: 110px;
+    padding: 22px;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+
+    box-shadow:
+        0 4px 12px rgba(15, 23, 42, 0.03);
+}
+
+.platform-agencies-stat-icon {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex-shrink: 0;
+
+    border-radius: 13px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.platform-agencies-stat-icon.active {
+    background: #ecfdf5;
+    color: #059669;
+}
+
+.platform-agencies-stat-icon.inactive {
+    background: #f8fafc;
+    color: #64748b;
+}
+
+.platform-agencies-stat-card p {
+    margin: 0 0 5px;
+
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.platform-agencies-stat-card strong {
+    color: #0f172a;
+
+    font-size: 28px;
+    font-weight: 800;
+}
+
+
+/* =========================================================
+   BARRE DE RECHERCHE
+========================================================= */
+
+.platform-agencies-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 20px;
+
+    margin-bottom: 24px;
+}
+
+.platform-agencies-search {
+    width: 100%;
+    max-width: 430px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 15px;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.platform-agencies-search span {
+    margin-right: 10px;
+
+    color: #94a3b8;
+
+    font-size: 15px;
+}
+
+.platform-agencies-search input {
+    width: 100%;
+
+    border: 0;
+    outline: 0;
+
+    background: transparent;
+
+    color: #0f172a;
+
+    font-size: 13px;
+}
+
+.platform-agencies-search input::placeholder {
+    color: #94a3b8;
+}
+
+
+/* =========================================================
+   FILTRES
+========================================================= */
+
+.platform-agencies-filters {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.platform-agencies-filters button {
+    height: 38px;
+
+    padding: 0 14px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+
+    background: white;
+
+    color: #64748b;
+
+    font-size: 12px;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.platform-agencies-filters button:hover {
+    border-color: #bfdbfe;
+    color: #2563eb;
+}
+
+.platform-agencies-filters button.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+
+/* =========================================================
+   GRILLE
+========================================================= */
+
+.platform-agencies-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 20px;
+}
+
+
+/* =========================================================
+   CARTE AGENCE
+========================================================= */
+
+.platform-agency-card {
+    overflow: hidden;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+
+    box-shadow:
+        0 4px 15px rgba(15, 23, 42, 0.035);
+
+    transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.platform-agency-card:hover {
+    transform: translateY(-2px);
+
+    border-color: #cbd5e1;
+
+    box-shadow:
+        0 14px 30px rgba(15, 23, 42, 0.08);
+}
+
+
+/* =========================================================
+   HEADER CARTE
+========================================================= */
+
+.platform-agency-card-header {
+    padding: 20px 20px 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.platform-agency-logo {
+    width: 48px;
+    height: 48px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 14px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.platform-agency-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.platform-agency-status span {
+    width: 7px;
+    height: 7px;
+
+    border-radius: 50%;
+
+    background: #94a3b8;
+}
+
+.platform-agency-status span.active {
+    background: #10b981;
+}
+
+.platform-agency-status span.inactive {
+    background: #94a3b8;
+}
+
+
+/* =========================================================
+   CORPS CARTE
+========================================================= */
+
+.platform-agency-card-body {
+    padding: 20px;
+}
+
+.platform-agency-card-body h3 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.platform-agency-type {
+    margin: 5px 0 18px;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+.platform-agency-info {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+}
+
+.platform-agency-info div {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    gap: 15px;
+}
+
+.platform-agency-info span {
+    color: #94a3b8;
+
+    font-size: 11px;
+}
+
+.platform-agency-info strong {
+    max-width: 65%;
+
+    color: #334155;
+
+    font-size: 11px;
+    font-weight: 600;
+
+    text-align: right;
+
+    overflow-wrap: anywhere;
+}
+
+
+/* =========================================================
+   FOOTER CARTE
+========================================================= */
+
+.platform-agency-card-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+
+    border-top: 1px solid #f1f5f9;
+}
+
+.platform-agency-card-footer button {
+    height: 46px;
+
+    border: 0;
+
+    background: white;
+
+    color: #2563eb;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: background 0.2s ease;
+}
+
+.platform-agency-card-footer button:hover {
+    background: #eff6ff;
+}
+
+.platform-agency-card-footer button.secondary {
+    border-left: 1px solid #f1f5f9;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   ÉTATS
+========================================================= */
+
+.platform-agencies-state {
+    min-height: 300px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    background: white;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+
+    text-align: center;
+}
+
+.platform-agencies-state-icon {
+    width: 52px;
+    height: 52px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    margin-bottom: 15px;
+
+    border-radius: 15px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.platform-agencies-state h3 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.platform-agencies-state p {
+    margin: 7px 0 0;
+
+    color: #64748b;
+
+    font-size: 13px;
+}
+
+.platform-agencies-state.error .platform-agencies-state-icon {
+    background: #fef2f2;
+    color: #dc2626;
+}
+
+.platform-agencies-state button {
+    margin-top: 18px;
+
+    height: 40px;
+
+    padding: 0 16px;
+
+    border: 0;
+    border-radius: 10px;
+
+    background: #2563eb;
+    color: white;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   CHARGEMENT
+========================================================= */
+
+.platform-agencies-spinner {
+    width: 32px;
+    height: 32px;
+
+    margin-bottom: 14px;
+
+    border: 3px solid #dbeafe;
+    border-top-color: #2563eb;
+
+    border-radius: 50%;
+
+    animation: platformAgenciesSpin 0.8s linear infinite;
+}
+
+.platform-agency-card-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #2563eb;
+
+    text-decoration: none;
+
+    font-size: 12px;
+    font-weight: 650;
+}
+
+.platform-agency-card-link:hover {
+    color: #1d4ed8;
+}
+
+@keyframes platformAgenciesSpin {
+
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .platform-agencies-grid {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+@media (max-width: 900px) {
+
+    .platform-agencies-main {
+        margin-left: 0;
+    }
+
+    .platform-agencies-content {
+        padding: 24px;
+    }
+
+    .platform-agencies-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .platform-agencies-stats {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+@media (max-width: 650px) {
+
+    .platform-agencies-content {
+        padding: 18px;
+    }
+
+    .platform-agencies-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .platform-agencies-search {
+        max-width: none;
+    }
+
+    .platform-agencies-filters {
+        overflow-x: auto;
+    }
+
+    .platform-agencies-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

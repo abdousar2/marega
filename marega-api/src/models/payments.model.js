@@ -2,7 +2,11 @@ const db = require("../config/database");
 
 class Payment {
 
-    static async getAll() {
+    // =========================================================
+    // TOUS LES PAIEMENTS DE L'AGENCE
+    // =========================================================
+
+    static async getAll(agencyId) {
 
         const result = await db.query(`
 
@@ -26,16 +30,28 @@ class Payment {
             LEFT JOIN marega.leases l
                 ON l.id = p.lease_id
 
-            ORDER BY payment_month DESC,
-                     id DESC
+            WHERE p.agency_id = $1
 
-        `);
+            ORDER BY
+                p.payment_month DESC,
+                p.id DESC
+
+        `, [
+
+            agencyId
+
+        ]);
 
         return result.rows;
 
     }
 
-    static async getById(id) {
+
+    // =========================================================
+    // UN PAIEMENT DE L'AGENCE
+    // =========================================================
+
+    static async getById(id, agencyId) {
 
         const result = await db.query(
 
@@ -44,16 +60,27 @@ class Payment {
 
             FROM marega.payments
 
-            WHERE id=$1
+            WHERE
+                id = $1
+
+                AND agency_id = $2
             `,
 
-            [id]
+            [
+                id,
+                agencyId
+            ]
 
         );
 
         return result.rows[0];
 
     }
+
+
+    // =========================================================
+    // CRÉATION
+    // =========================================================
 
     static async create(data) {
 
@@ -62,6 +89,7 @@ class Payment {
             `
             INSERT INTO marega.payments
             (
+                agency_id,
                 tenant_id,
                 lease_id,
                 payment_month,
@@ -76,13 +104,15 @@ class Payment {
 
             VALUES
             (
-                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10
+                $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11
             )
 
             RETURNING *
             `,
 
             [
+
+                data.agency_id,
                 data.tenant_id,
                 data.lease_id,
                 data.payment_month,
@@ -93,6 +123,7 @@ class Payment {
                 data.status,
                 data.notes,
                 data.cashier_user_id
+
             ]
 
         );
@@ -101,8 +132,12 @@ class Payment {
 
     }
 
-    
-    static async update(id, data) {
+
+    // =========================================================
+    // MODIFICATION
+    // =========================================================
+
+    static async update(id, data, agencyId) {
 
         const result = await db.query(
 
@@ -111,18 +146,21 @@ class Payment {
 
             SET
 
-                tenant_id=$1,
-                lease_id=$2,
-                payment_month=$3,
-                amount=$4,
-                payment_date=$5,
-                payment_method=$6,
-                reference=$7,
-                status=$8,
-                notes=$9,
-                updated_at=CURRENT_TIMESTAMP
+                tenant_id = $1,
+                lease_id = $2,
+                payment_month = $3,
+                amount = $4,
+                payment_date = $5,
+                payment_method = $6,
+                reference = $7,
+                status = $8,
+                notes = $9,
+                updated_at = CURRENT_TIMESTAMP
 
-            WHERE id=$10
+            WHERE
+                id = $10
+
+                AND agency_id = $11
 
             RETURNING *
 
@@ -139,7 +177,8 @@ class Payment {
                 data.reference,
                 data.status,
                 data.notes,
-                id
+                id,
+                agencyId
 
             ]
 
@@ -149,17 +188,28 @@ class Payment {
 
     }
 
-    static async delete(id) {
+
+    // =========================================================
+    // SUPPRESSION
+    // =========================================================
+
+    static async delete(id, agencyId) {
 
         await db.query(
 
             `
             DELETE FROM marega.payments
 
-            WHERE id=$1
+            WHERE
+                id = $1
+
+                AND agency_id = $2
             `,
 
-            [id]
+            [
+                id,
+                agencyId
+            ]
 
         );
 
@@ -167,7 +217,16 @@ class Payment {
 
     }
 
-    static async updateReceiptPath(id, receiptPath) {
+
+    // =========================================================
+    // CHEMIN DU REÇU
+    // =========================================================
+
+    static async updateReceiptPath(
+        id,
+        receiptPath,
+        agencyId
+    ) {
 
         await db.query(
 
@@ -177,19 +236,31 @@ class Payment {
             SET
                 receipt_path = $1
 
-            WHERE id = $2
+            WHERE
+                id = $2
+
+                AND agency_id = $3
             `,
 
             [
                 receiptPath,
-                id
+                id,
+                agencyId
             ]
 
         );
 
     }
 
-    static async getCompleteById(id) {
+
+    // =========================================================
+    // PAIEMENT COMPLET
+    // =========================================================
+
+    static async getCompleteById(
+        id,
+        agencyId
+    ) {
 
         const result = await db.query(
 
@@ -199,6 +270,7 @@ class Payment {
                 p.*,
 
                 p.payment_month,
+
                 p.payment_month AS month,
 
                 CONCAT(
@@ -210,10 +282,13 @@ class Payment {
                 l.contract_number,
 
                 a.number AS apartment_number,
+
                 a.type,
+
                 a.rent,
 
                 b.name AS building_name,
+
                 b.address,
 
                 CONCAT(
@@ -241,10 +316,17 @@ class Payment {
             LEFT JOIN marega.buildings b
                 ON b.id = a.building_id
 
-            WHERE p.id = $1
+            WHERE
+
+                p.id = $1
+
+                AND p.agency_id = $2
             `,
 
-            [id]
+            [
+                id,
+                agencyId
+            ]
 
         );
 
@@ -252,6 +334,123 @@ class Payment {
 
     }
 
+    static async validateAgencyRelations(
+        agencyId,
+        tenantId,
+        leaseId,
+        rentId = null
+    ) {
+
+        const result = await db.query(
+
+            `
+            SELECT
+
+                t.id AS tenant_id,
+
+                l.id AS lease_id,
+
+                a.id AS apartment_id,
+
+                b.id AS building_id,
+
+                t.agency_id AS tenant_agency_id,
+
+                l.agency_id AS lease_agency_id,
+
+                a.agency_id AS apartment_agency_id,
+
+                b.agency_id AS building_agency_id
+
+            FROM marega.tenants t
+
+            LEFT JOIN marega.leases l
+                ON l.id = $2
+
+            LEFT JOIN marega.apartments a
+                ON a.id = l.apartment_id
+
+            LEFT JOIN marega.buildings b
+                ON b.id = a.building_id
+
+            WHERE
+
+                t.id = $1
+
+                AND t.agency_id = $3
+
+                AND l.agency_id = $3
+
+                AND a.agency_id = $3
+
+                AND b.agency_id = $3
+            `,
+
+            [
+                tenantId,
+                leaseId,
+                agencyId
+            ]
+
+        );
+
+        if (result.rows.length === 0) {
+
+            return false;
+
+        }
+
+        // ---------------------------------------------------------
+        // Vérification supplémentaire du loyer
+        // ---------------------------------------------------------
+
+        if (rentId) {
+
+            const rentResult = await db.query(
+
+                `
+                SELECT id
+
+                FROM marega.rents
+
+                WHERE
+
+                    id = $1
+
+                    AND agency_id = $2
+
+                    AND lease_id = $3
+
+                    AND tenant_id = $4
+                `,
+
+                [
+                    rentId,
+                    agencyId,
+                    leaseId,
+                    tenantId
+                ]
+
+            );
+
+            if (rentResult.rows.length === 0) {
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
+    }
+
 }
+
+// =========================================================
+// VÉRIFIER QUE LES ÉLÉMENTS APPARTIENNENT À L'AGENCE
+// =========================================================
+
+
 
 module.exports = Payment;
