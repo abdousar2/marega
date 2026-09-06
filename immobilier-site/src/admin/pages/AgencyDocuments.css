@@ -1,0 +1,266 @@
+/* =========================================================
+   PAGE
+========================================================= */
+
+.agency-documents-page {
+    width: 100%;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.agency-documents-header {
+    margin-bottom: 30px;
+}
+
+
+.agency-documents-eyebrow {
+    display: inline-block;
+
+    font-size: 12px;
+    font-weight: 700;
+
+    letter-spacing: 0.18em;
+
+    color: #2563eb;
+
+    margin-bottom: 8px;
+}
+
+
+.agency-documents-header h1 {
+    margin: 0;
+
+    font-size: 32px;
+    font-weight: 800;
+
+    color: #0f172a;
+}
+
+
+.agency-documents-header p {
+    margin-top: 8px;
+
+    font-size: 15px;
+
+    color: #64748b;
+
+    max-width: 700px;
+}
+
+
+/* =========================================================
+   CARD
+========================================================= */
+
+.agency-documents-card {
+    width: 100%;
+
+    max-width: 900px;
+
+    background: #ffffff;
+
+    border: 1px solid #e2e8f0;
+
+    border-radius: 20px;
+
+    padding: 32px;
+
+    box-shadow:
+        0 10px 30px rgba(15, 23, 42, 0.06);
+}
+
+
+/* =========================================================
+   CHAMPS
+========================================================= */
+
+.document-field {
+    padding: 24px 0;
+
+    border-bottom: 1px solid #e2e8f0;
+}
+
+
+.document-field:first-child {
+    padding-top: 0;
+}
+
+
+.document-field label {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 16px;
+    font-weight: 700;
+
+    color: #0f172a;
+}
+
+
+.document-field p {
+    margin: 0 0 14px;
+
+    font-size: 13px;
+
+    color: #64748b;
+}
+
+
+/* =========================================================
+   INPUT FILE
+========================================================= */
+
+.document-field input[type="file"] {
+    width: 100%;
+
+    padding: 14px;
+
+    border: 1px solid #cbd5e1;
+
+    border-radius: 12px;
+
+    background: #f8fafc;
+
+    font-size: 14px;
+
+    color: #475569;
+
+    cursor: pointer;
+
+    transition: 0.2s ease;
+}
+
+
+.document-field input[type="file"]:hover {
+    border-color: #93c5fd;
+
+    background: #eff6ff;
+}
+
+
+/* =========================================================
+   FICHIER SÉLECTIONNÉ
+========================================================= */
+
+.selected-file {
+    margin-top: 10px;
+
+    padding: 10px 14px;
+
+    border-radius: 10px;
+
+    background: #eff6ff;
+
+    color: #1d4ed8;
+
+    font-size: 13px;
+
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   MESSAGES
+========================================================= */
+
+.document-message {
+    margin-top: 22px;
+
+    padding: 14px 16px;
+
+    border-radius: 12px;
+
+    font-size: 14px;
+
+    font-weight: 600;
+}
+
+
+.document-message.error {
+    background: #fef2f2;
+
+    border: 1px solid #fecaca;
+
+    color: #dc2626;
+}
+
+
+.document-message.success {
+    background: #f0fdf4;
+
+    border: 1px solid #bbf7d0;
+
+    color: #16a34a;
+}
+
+
+/* =========================================================
+   BOUTON
+========================================================= */
+
+.document-submit {
+    margin-top: 28px;
+
+    padding: 14px 24px;
+
+    border: none;
+
+    border-radius: 12px;
+
+    background: #2563eb;
+
+    color: white;
+
+    font-size: 14px;
+
+    font-weight: 700;
+
+    cursor: pointer;
+
+    transition: all 0.2s ease;
+}
+
+
+.document-submit:hover {
+    background: #1d4ed8;
+
+    transform: translateY(-1px);
+}
+
+
+.document-submit:disabled {
+    opacity: 0.6;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 640px) {
+
+    .agency-documents-header h1 {
+        font-size: 26px;
+    }
+
+
+    .agency-documents-card {
+        padding: 22px;
+
+        border-radius: 16px;
+    }
+
+
+    .document-submit {
+        width: 100%;
+    }
+
+}

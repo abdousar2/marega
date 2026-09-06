@@ -82,9 +82,9 @@ class Payment {
     // CRÉATION
     // =========================================================
 
-    static async create(data) {
+    static async create(data, client = db) {
 
-        const result = await db.query(
+        const result = await client.query(
 
             `
             INSERT INTO marega.payments
@@ -257,6 +257,10 @@ class Payment {
     // PAIEMENT COMPLET
     // =========================================================
 
+    // =========================================================
+    // PAIEMENT COMPLET + INFORMATIONS DE L'AGENCE
+    // =========================================================
+
     static async getCompleteById(
         id,
         agencyId
@@ -273,13 +277,29 @@ class Payment {
 
                 p.payment_month AS month,
 
+                -- =============================================
+                -- LOCATAIRE
+                -- =============================================
+
                 CONCAT(
                     t.first_name,
                     ' ',
                     t.last_name
                 ) AS tenant_name,
 
+                t.phone AS tenant_phone,
+
+                t.email AS tenant_email,
+
+                -- =============================================
+                -- CONTRAT
+                -- =============================================
+
                 l.contract_number,
+
+                -- =============================================
+                -- APPARTEMENT
+                -- =============================================
 
                 a.number AS apartment_number,
 
@@ -287,9 +307,17 @@ class Payment {
 
                 a.rent,
 
+                -- =============================================
+                -- IMMEUBLE
+                -- =============================================
+
                 b.name AS building_name,
 
-                b.address,
+                b.address AS building_address,
+
+                -- =============================================
+                -- COMPTABLE
+                -- =============================================
 
                 CONCAT(
                     cashier.first_name,
@@ -297,30 +325,90 @@ class Payment {
                     cashier.last_name
                 ) AS cashier_name,
 
-                cashier.role AS cashier_role
+                cashier.role AS cashier_role,
+
+                -- =============================================
+                -- AGENCE
+                -- =============================================
+
+                ag.id AS agency_id,
+
+                ag.name AS agency_name,
+
+                ag.type AS agency_type,
+
+                ag.city AS agency_city,
+
+                ag.country AS agency_country,
+
+                ag.address AS agency_address,
+
+                ag.phone AS agency_phone,
+
+                ag.email AS agency_email,
+
+                ag.ninea AS agency_ninea,
+
+                ag.rccm AS agency_rccm,
+
+                ag.logo_path AS agency_logo_path,
+
+                ag.contract_template_path
+                    AS agency_contract_template_path,
+
+                ag.receipt_template_path
+                    AS agency_receipt_template_path
 
             FROM marega.payments p
+
+            -- =============================================
+            -- LOCATAIRE
+            -- =============================================
 
             JOIN marega.tenants t
                 ON t.id = p.tenant_id
 
+            -- =============================================
+            -- COMPTABLE
+            -- =============================================
+
             LEFT JOIN marega.users cashier
                 ON cashier.id = p.cashier_user_id
+
+            -- =============================================
+            -- CONTRAT
+            -- =============================================
 
             LEFT JOIN marega.leases l
                 ON l.id = p.lease_id
 
+            -- =============================================
+            -- APPARTEMENT
+            -- =============================================
+
             LEFT JOIN marega.apartments a
                 ON a.id = l.apartment_id
 
+            -- =============================================
+            -- IMMEUBLE
+            -- =============================================
+
             LEFT JOIN marega.buildings b
                 ON b.id = a.building_id
+
+            -- =============================================
+            -- AGENCE
+            -- =============================================
+
+            JOIN marega.agencies ag
+                ON ag.id = p.agency_id
 
             WHERE
 
                 p.id = $1
 
                 AND p.agency_id = $2
+
             `,
 
             [

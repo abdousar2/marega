@@ -120,6 +120,13 @@ export default function Sidebar({
                 },
 
                 {
+                    icon: "📁",
+                    label: "Documents de l'agence",
+                    url: "/admin/agency-documents",
+                    module: "agency_documents"
+                },
+
+                {
                     icon: "🛡️",
                     label: "Journal d'audit",
                     url: "/admin/audit",
@@ -127,7 +134,6 @@ export default function Sidebar({
                 }
 
             ]
-
         }
 
     ];

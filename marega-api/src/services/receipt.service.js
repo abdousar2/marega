@@ -1,15 +1,81 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
-const { toUSVString } = require("util");
 
-
-const logo = path.join(
-    __dirname,
-    "../assets/logo-ibm-marega.png"
-);
 
 class ReceiptService {
+
+    static getAgencyLogo(payment) {
+
+        // =========================================================
+        // LOGO PERSONNALISÉ DE L'AGENCE
+        // =========================================================
+
+        if (payment.agency_logo_path) {
+
+            // Supprimer le "/" initial pour obtenir
+            // un chemin relatif au projet
+            const relativePath =
+                payment.agency_logo_path
+                    .replace(/^[/\\]+/, "");
+
+            const agencyLogo =
+                path.resolve(
+                    process.cwd(),
+                    relativePath
+                );
+
+            console.log(
+                "Logo agence demandé :",
+                payment.agency_logo_path
+            );
+
+            console.log(
+                "Chemin physique recherché :",
+                agencyLogo
+            );
+
+            if (fs.existsSync(agencyLogo)) {
+
+                console.log(
+                    "✅ Logo personnalisé trouvé."
+                );
+
+                return agencyLogo;
+
+            }
+
+            console.log(
+                "⚠️ Logo personnalisé introuvable."
+            );
+
+        }
+
+
+        // =========================================================
+        // LOGO PAR DÉFAUT
+        // =========================================================
+
+        const defaultLogo =
+            path.join(
+                __dirname,
+                "../assets/logo-ibm-marega.png"
+            );
+
+        if (fs.existsSync(defaultLogo)) {
+
+            console.log(
+                "ℹ️ Utilisation du logo par défaut."
+            );
+
+            return defaultLogo;
+
+        }
+
+
+        return null;
+
+    }
 
     static async generateReceipt(payment) {
 
@@ -34,15 +100,25 @@ class ReceiptService {
         const primary = "#1E3A8A";
         const gray = "#6B7280";
 
+        const agencyLogo =
+             this.getAgencyLogo(payment);
 
         //=====================
         // LOGO
         //=====================
 
-        doc.image(logo, 55, 35, {
-            width: 80
-        });
+        if (agencyLogo) {
 
+            doc.image(
+                agencyLogo,
+                55,
+                35,
+                {
+                    width: 80
+                }
+            );
+
+        }
 
         //=====================
         // EN-TETE
@@ -52,7 +128,11 @@ class ReceiptService {
             .fillColor(primary)
             .font("Helvetica-Bold")
             .fontSize(18)
-            .text("IBM MAREGA", 150, 38);
+            .text(
+                payment.agency_name || "Agence immobilière",
+                150,
+                38
+            );
 
         doc
             .fontSize(8)
@@ -63,12 +143,41 @@ class ReceiptService {
                 65
             );
 
+        const agencyInfo = [
+
+            payment.agency_rccm
+                ? `RCCM : ${payment.agency_rccm}`
+                : null,
+
+            payment.agency_ninea
+                ? `NINEA : ${payment.agency_ninea}`
+                : null,
+
+            payment.agency_address
+                ? payment.agency_address
+                : null,
+
+            payment.agency_phone
+                ? `Tél. : ${payment.agency_phone}`
+                : null,
+
+            payment.agency_email
+                ? payment.agency_email
+                : null
+
+        ]
+        .filter(Boolean)
+        .join(" • ");
+
         doc
             .fontSize(8)
             .text(
-                "RC : SN DKR. 1009. B. 6013 - NINEA : 004032570 - 80 Avenue Lamine Guèye   Tél.: 33 822 88 39 ",
+                agencyInfo,
                 150,
-                77
+                77,
+                {
+                    width: 390
+                }
             );
 
         doc.moveTo(50,89)
@@ -482,7 +591,7 @@ class ReceiptService {
             .fontSize(9)
             .fillColor("gray")
             .text(
-                "IBM MAREGA • Gestion Immobilière • Dakar - Sénégal",
+                `${payment.agency_name || "Agence immobilière"} • Gestion Immobilière • ${payment.agency_city || "Dakar"} - ${payment.agency_country || "Sénégal"}`,
                 50,
                 385,
                 {

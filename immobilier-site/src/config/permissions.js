@@ -81,6 +81,13 @@ export const PERMISSIONS = {
             delete: true
         },
 
+        agency_documents: {
+            view: true,
+            create: true,
+            update: true,
+            delete: false
+        },
+
         audit: {
             view: true
         }

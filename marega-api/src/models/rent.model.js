@@ -129,6 +129,47 @@ class Rent {
     static async markAsPaid(
         rentId,
         paymentId,
+        agencyId,
+        client = db
+    ) {
+
+        const result =
+            await client.query(
+
+                `
+                UPDATE marega.rents
+
+                SET
+                    status = 'Payé',
+                    payment_id = $1,
+                    updated_at = CURRENT_TIMESTAMP
+
+                WHERE
+                    id = $2
+
+                    AND agency_id = $3
+
+                    AND status <> 'Payé'
+
+                    AND payment_id IS NULL
+
+                RETURNING *
+                `,
+
+                [
+                    paymentId,
+                    rentId,
+                    agencyId
+                ]
+
+            );
+
+        return result.rows[0];
+
+    }
+
+    static async getByIdForPayment(
+        rentId,
         agencyId
     ) {
 
@@ -136,37 +177,22 @@ class Rent {
             await db.query(
 
                 `
-                UPDATE marega.rents
-
-                SET
-
-                    status = 'Payé',
-
-                    payment_id = $1,
-
-                    updated_at = CURRENT_TIMESTAMP
+                SELECT
+                    *
+                FROM marega.rents
 
                 WHERE
+                    id = $1
 
-                    id = $2
-
-                    AND agency_id = $3
-
-                RETURNING *
+                    AND agency_id = $2
                 `,
 
                 [
-
-                    paymentId,
-
                     rentId,
-
                     agencyId
-
                 ]
 
             );
-
 
         return result.rows[0];
 

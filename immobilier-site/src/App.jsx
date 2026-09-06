@@ -36,6 +36,7 @@ import ProtectedRoute from "./admin/ProtectedRoute";
 import Users from "./admin/pages/Users";
 import AdminRoute from "./admin/AdminRoute";
 import Connexion from "./admin/pages/Connexion";
+import AgencyDocuments from "./admin/pages/AgencyDocuments";
 
 
 // Providers
@@ -257,6 +258,10 @@ function App() {
                         element={<Finance />}
                     />
 
+                    <Route
+                        path="/admin/agency-documents"
+                        element={<AgencyDocuments />}
+                    />
 
                     {/* =============================================
                         ADMIN UNIQUEMENT

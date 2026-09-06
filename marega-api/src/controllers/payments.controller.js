@@ -1,3 +1,5 @@
+const db = require("../config/database");
+
 const Payment = require("../models/payments.model");
 const Rent = require("../models/rent.model");
 const ReceiptService = require("../services/receipt.service");
@@ -82,6 +84,8 @@ class PaymentsController {
 
     static async create(req, res) {
 
+        let client;
+
         try {
 
             const agencyId =
@@ -119,6 +123,52 @@ class PaymentsController {
 
 
             // -------------------------------------------------
+            // SI UN LOYER EST SÉLECTIONNÉ
+            // VÉRIFIER SON ÉTAT AVANT LA TRANSACTION
+            // -------------------------------------------------
+
+            if (req.body.rent_id) {
+
+                const rent =
+                    await Rent.getByIdForPayment(
+
+                        req.body.rent_id,
+
+                        agencyId
+
+                    );
+
+
+                if (!rent) {
+
+                    return res.status(404).json({
+
+                        error:
+                            "Loyer introuvable dans votre agence."
+
+                    });
+
+                }
+
+
+                if (
+                    rent.status === "Payé" ||
+                    rent.payment_id !== null
+                ) {
+
+                    return res.status(409).json({
+
+                        error:
+                            "Ce loyer a déjà été encaissé. Il ne peut pas être payé une seconde fois."
+
+                    });
+
+                }
+
+            }
+
+
+            // -------------------------------------------------
             // IDENTITÉ DU COMPTABLE
             // -------------------------------------------------
 
@@ -134,13 +184,29 @@ class PaymentsController {
 
             };
 
+
             // -------------------------------------------------
-            // CRÉATION DU PAIEMENT
+            // OUVRIR UNE TRANSACTION
+            // -------------------------------------------------
+
+            client =
+                await db.connect();
+
+
+            await client.query("BEGIN");
+
+
+            // -------------------------------------------------
+            // CRÉER LE PAIEMENT
             // -------------------------------------------------
 
             const payment =
                 await Payment.create(
-                    paymentData
+
+                    paymentData,
+
+                    client
+
                 );
 
 
@@ -157,19 +223,40 @@ class PaymentsController {
 
                         payment.id,
 
-                        agencyId
+                        agencyId,
+
+                        client
 
                     );
+
 
                 if (!updatedRent) {
 
                     throw new Error(
-                        "Le loyer sélectionné n'appartient pas à votre agence."
+
+                        "Le loyer sélectionné a déjà été encaissé ou n'est plus disponible."
+
                     );
 
                 }
 
             }
+
+
+            // -------------------------------------------------
+            // VALIDER LA TRANSACTION
+            // -------------------------------------------------
+
+            await client.query("COMMIT");
+
+
+            // -------------------------------------------------
+            // LIBÉRER LE CLIENT
+            // -------------------------------------------------
+
+            client.release();
+
+            client = null;
 
 
             // -------------------------------------------------
@@ -189,10 +276,13 @@ class PaymentsController {
             if (!completePayment) {
 
                 throw new Error(
+
                     "Paiement créé mais impossible de récupérer ses données complètes."
+
                 );
 
             }
+
 
             // -------------------------------------------------
             // GÉNÉRER LE REÇU
@@ -200,7 +290,9 @@ class PaymentsController {
 
             const receiptPath =
                 await ReceiptService.generateReceipt(
+
                     completePayment
+
                 );
 
 
@@ -292,16 +384,47 @@ class PaymentsController {
 
 
             res.status(201).json(
+
                 finalPayment
+
             );
 
         }
 
         catch (err) {
 
+            // -------------------------------------------------
+            // ROLLBACK SI TRANSACTION ACTIVE
+            // -------------------------------------------------
+
+            if (client) {
+
+                try {
+
+                    await client.query("ROLLBACK");
+
+                }
+
+                catch (rollbackError) {
+
+                    console.error(
+                        "Erreur ROLLBACK :",
+                        rollbackError
+                    );
+
+                }
+
+                client.release();
+
+            }
+
+
             console.error(
+
                 "Erreur création paiement :",
+
                 err
+
             );
 
 

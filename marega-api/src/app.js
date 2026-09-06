@@ -33,17 +33,59 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 app.use(express.json());
-const contractsPath = path.resolve(process.cwd(), "contracts");
+const contractsPath =
+    path.resolve(
+        process.cwd(),
+        "contracts"
+    );
 
-console.log("Serving contracts from:", contractsPath);
+console.log(
+    "Serving contracts from:",
+    contractsPath
+);
 
-app.use("/contracts", express.static(contractsPath));
+app.use(
+    "/contracts",
+    express.static(contractsPath)
+);
 
-const receiptsPath = path.resolve(process.cwd(), "receipts");
 
-console.log("Serving receipts from:", receiptsPath);
+const receiptsPath =
+    path.resolve(
+        process.cwd(),
+        "receipts"
+    );
 
-app.use("/receipts", express.static(receiptsPath));
+console.log(
+    "Serving receipts from:",
+    receiptsPath
+);
+
+app.use(
+    "/receipts",
+    express.static(receiptsPath)
+);
+
+
+// =========================================================
+// DOCUMENTS DES AGENCES
+// =========================================================
+
+const uploadsPath =
+    path.resolve(
+        process.cwd(),
+        "uploads"
+    );
+
+console.log(
+    "Serving uploads from:",
+    uploadsPath
+);
+
+app.use(
+    "/uploads",
+    express.static(uploadsPath)
+);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/platform/auth", platformAuthRoutes);

@@ -60,6 +60,10 @@ class Lease {
 
                 l.*,
 
+                -- =================================================
+                -- LOCATAIRE
+                -- =================================================
+
                 t.first_name,
                 t.last_name,
 
@@ -73,32 +77,88 @@ class Lease {
                 t.email,
                 t.profession,
 
+                -- =================================================
+                -- APPARTEMENT
+                -- =================================================
+
                 a.number AS apartment_number,
                 a.type AS apartment_type,
                 a.surface,
                 a.rent AS apartment_rent,
                 a.deposit,
 
+                -- =================================================
+                -- IMMEUBLE
+                -- =================================================
+
                 b.name AS building_name,
-                b.address AS building_address
+                b.address AS building_address,
+
+                -- =================================================
+                -- AGENCE
+                -- =================================================
+
+                ag.id AS agency_id,
+                ag.name AS agency_name,
+                ag.type AS agency_type,
+                ag.city AS agency_city,
+                ag.country AS agency_country,
+                ag.address AS agency_address,
+                ag.phone AS agency_phone,
+                ag.email AS agency_email,
+                ag.ninea AS agency_ninea,
+                ag.rccm AS agency_rccm,
+
+                -- =================================================
+                -- DOCUMENTS DE L'AGENCE
+                -- =================================================
+
+                ag.logo_path AS agency_logo_path,
+                ag.contract_template_path
+                    AS agency_contract_template_path,
+                ag.receipt_template_path
+                    AS agency_receipt_template_path
 
             FROM marega.leases l
+
+            -- =====================================================
+            -- LOCATAIRE
+            -- =====================================================
 
             JOIN marega.tenants t
                 ON t.id = l.tenant_id
 
+            -- =====================================================
+            -- APPARTEMENT
+            -- =====================================================
+
             JOIN marega.apartments a
                 ON a.id = l.apartment_id
+
+            -- =====================================================
+            -- IMMEUBLE
+            -- =====================================================
 
             JOIN marega.buildings b
                 ON b.id = a.building_id
 
-            WHERE l.id = $1
-              AND l.agency_id = $2
+            -- =====================================================
+            -- AGENCE
+            -- =====================================================
 
-              AND t.agency_id = l.agency_id
-              AND a.agency_id = l.agency_id
-              AND b.agency_id = l.agency_id
+            JOIN marega.agencies ag
+                ON ag.id = l.agency_id
+
+            WHERE
+
+                l.id = $1
+
+                AND l.agency_id = $2
+
+                AND t.agency_id = l.agency_id
+                AND a.agency_id = l.agency_id
+                AND b.agency_id = l.agency_id
+                AND ag.id = l.agency_id
             `,
 
             [
@@ -111,7 +171,6 @@ class Lease {
         return result.rows[0];
 
     }
-
 
     // =========================================================
     // NUMÉRO DE CONTRAT
