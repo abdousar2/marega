@@ -46,7 +46,6 @@ class Lease {
 
     }
 
-
     // =========================================================
     // CONTRAT COMPLET
     // =========================================================
@@ -93,6 +92,21 @@ class Lease {
 
                 b.name AS building_name,
                 b.address AS building_address,
+                b.city AS building_city,
+                b.country AS building_country,
+
+                -- =================================================
+                -- BAILLEUR
+                -- =================================================
+
+                lnd.id AS landlord_id,
+                lnd.first_name AS landlord_first_name,
+                lnd.last_name AS landlord_last_name,
+                lnd.company_name AS landlord_company_name,
+                lnd.phone AS landlord_phone,
+                lnd.email AS landlord_email,
+                lnd.address AS landlord_address,
+                lnd.identity_number AS landlord_identity_number,
 
                 -- =================================================
                 -- AGENCE
@@ -114,8 +128,10 @@ class Lease {
                 -- =================================================
 
                 ag.logo_path AS agency_logo_path,
+
                 ag.contract_template_path
                     AS agency_contract_template_path,
+
                 ag.receipt_template_path
                     AS agency_receipt_template_path
 
@@ -141,6 +157,14 @@ class Lease {
 
             JOIN marega.buildings b
                 ON b.id = a.building_id
+
+            -- =====================================================
+            -- BAILLEUR
+            -- =====================================================
+
+            LEFT JOIN marega.landlords lnd
+                ON lnd.id = b.landlord_id
+            AND lnd.agency_id = l.agency_id
 
             -- =====================================================
             -- AGENCE
@@ -171,7 +195,6 @@ class Lease {
         return result.rows[0];
 
     }
-
     // =========================================================
     // NUMÉRO DE CONTRAT
     // =========================================================

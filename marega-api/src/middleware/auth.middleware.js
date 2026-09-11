@@ -80,11 +80,9 @@ function authenticateToken(req, res, next) {
 
 }
 
-
 function authorizeRoles(...roles) {
 
     return (req, res, next) => {
-
 
         if (!req.user) {
 
@@ -97,17 +95,70 @@ function authorizeRoles(...roles) {
 
         }
 
+        const userRole =
+            String(req.user.role || "")
+                .trim()
+                .toUpperCase();
 
-        if (
-            !roles.includes(
-                req.user.role
-            )
-        ) {
+        const allowedRoles =
+            roles.map(role =>
+                String(role)
+                    .trim()
+                    .toUpperCase()
+            );
+
+        console.log(
+            "----------------------------------------"
+        );
+
+        console.log(
+            "AUTORISATION"
+        );
+
+        console.log(
+            "User ID :",
+            req.user.id
+        );
+
+        console.log(
+            "Role reçu :",
+            JSON.stringify(req.user.role)
+        );
+
+        console.log(
+            "Role normalisé :",
+            JSON.stringify(userRole)
+        );
+
+        console.log(
+            "Roles attendus :",
+            allowedRoles
+        );
+
+        console.log(
+            "Autorisé :",
+            allowedRoles.includes(userRole)
+        );
+
+        console.log(
+            "----------------------------------------"
+        );
+
+
+        if (!allowedRoles.includes(userRole)) {
 
             return res.status(403).json({
 
+                success: false,
+
                 error:
-                    "Vous n'avez pas les droits nécessaires."
+                    "Vous n'avez pas les droits nécessaires.",
+
+                role_received:
+                    req.user.role,
+
+                roles_required:
+                    roles
 
             });
 
@@ -119,7 +170,6 @@ function authorizeRoles(...roles) {
     };
 
 }
-
 
 module.exports = {
 

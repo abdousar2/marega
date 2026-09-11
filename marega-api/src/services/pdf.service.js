@@ -2,10 +2,6 @@ const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
 
-const logo = path.join(
-    __dirname,
-    "../assets/logo-ibm-marega.png"
-);
 
 class PDFService {
 
@@ -49,15 +45,117 @@ class PDFService {
     }
 
     // =========================================================
+    // IDENTITÉ DE L'AGENCE
+    // =========================================================
+
+    static getAgency(lease) {
+
+        return {
+
+            name:
+                this.text(lease.agency_name)
+                || "Agence immobilière",
+
+            type:
+                this.text(lease.agency_type)
+                || "Agence immobilière",
+
+            address:
+                this.text(lease.agency_address),
+
+            city:
+                this.text(lease.agency_city),
+
+            country:
+                this.text(lease.agency_country),
+
+            phone:
+                this.text(lease.agency_phone),
+
+            email:
+                this.text(lease.agency_email),
+
+            ninea:
+                this.text(lease.agency_ninea),
+
+            rccm:
+                this.text(lease.agency_rccm),
+
+            logoPath:
+                this.text(lease.agency_logo_path)
+
+        };
+
+    }
+
+
+    static getAgencyLogoPath(agencyLogoPath) {
+
+        if (!agencyLogoPath) {
+            return null;
+        }
+
+        /*
+         * Exemple BDD :
+         * /uploads/agencies/5/logo.jpg
+         *
+         * On retire le "/" initial pour que
+         * path.resolve() reste bien dans le projet.
+         */
+
+        const relativePath =
+            String(agencyLogoPath)
+                .replace(/^[/\\]+/, "");
+
+        const absolutePath =
+            path.resolve(
+                process.cwd(),
+                relativePath
+            );
+
+        if (!fs.existsSync(absolutePath)) {
+
+            console.warn(
+                "Logo agence introuvable :",
+                absolutePath
+            );
+
+            return null;
+
+        }
+
+        return absolutePath;
+
+    }
+
+    // =========================================================
     // GENERATION DU CONTRAT
     // =========================================================
 
     static async generateLeasePDF(lease) {
 
-        const folder = path.resolve(
-            process.cwd(),
-            "contracts"
-        );
+        const agency =
+            this.getAgency(lease);
+
+        const agencyAddress =
+            [
+                agency.address,
+                agency.city,
+                agency.country
+            ]
+                .filter(Boolean)
+                .join(", ");
+
+        const agencyLogo =
+            this.getAgencyLogoPath(
+                agency.logoPath
+            );
+
+        const folder =
+            path.resolve(
+                process.cwd(),
+                "contracts"
+            );
 
         if (!fs.existsSync(folder)) {
 
@@ -95,6 +193,18 @@ class PDFService {
         const tenantName =
             this.text(lease.tenant_name)
             || "____________________________";
+
+        const landlordName =
+            lease.landlord_company_name
+            ||
+            [
+                lease.landlord_first_name,
+                lease.landlord_last_name
+            ]
+                .filter(Boolean)
+                .join(" ")
+            ||
+            "____________________________";
 
         const identityNumber =
             this.text(lease.identity_number)
@@ -218,10 +328,10 @@ class PDFService {
         // EN-TETE
         // -----------------------------------------------------
 
-        if (fs.existsSync(logo)) {
+        if (agencyLogo) {
 
             doc.image(
-                logo,
+                agencyLogo,
                 45,
                 30,
                 {
@@ -236,7 +346,7 @@ class PDFService {
             .fontSize(15)
             .fillColor(blue)
             .text(
-                "AGENCE IMMOBILIÈRE",
+                agency.type.toUpperCase(),  
                 150,
                 32,
                 {
@@ -250,7 +360,7 @@ class PDFService {
             .fontSize(18)
             .fillColor(dark)
             .text(
-                "IBM MAREGA",
+                agency.name.toUpperCase(),
                 150,
                 51,
                 {
@@ -259,12 +369,25 @@ class PDFService {
                 }
             );
 
+        const agencyContact = [
+            agency.address,
+            [agency.city, agency.country]
+                .filter(Boolean)
+                .join(", "),
+            agency.phone
+                ? `Tél. : ${agency.phone}`
+                : null,
+            agency.email
+        ]
+            .filter(Boolean)
+            .join(" • ");
+
         doc
             .font("Helvetica")
             .fontSize(7)
             .fillColor(gray)
             .text(
-                "Gérance. Achat. Vente. Promotion Immobilière.",
+                agencyContact,
                 150,
                 73,
                 {
@@ -273,32 +396,23 @@ class PDFService {
                 }
             );
 
-        doc
-            .font("Helvetica")
-            .fontSize(7)
-            .text(
-                "Bâtiment-Travaux Publics. Toutes Transactions Immobilières",
-                150,
-                84,
-                {
-                    width: 280,
-                    align: "center"
-                }
-            );
+        // =====================================================
+        // BLOC IDENTIFICATION AGENCE
+        // =====================================================
 
-        // Bloc NINEA
         doc
             .rect(445, 35, 115, 50)
             .lineWidth(1)
             .strokeColor(blue)
             .stroke();
 
+
         doc
             .font("Helvetica-Bold")
-            .fontSize(8)
+            .fontSize(7)
             .fillColor(blue)
             .text(
-                "AGENCE IMMOBILIÈRE",
+                agency.type.toUpperCase(),
                 450,
                 42,
                 {
@@ -307,10 +421,13 @@ class PDFService {
                 }
             );
 
+
         doc
-            .fontSize(10)
+            .font("Helvetica-Bold")
+            .fontSize(9)
+            .fillColor(dark)
             .text(
-                "IBM MAREGA",
+                agency.name.toUpperCase(),
                 450,
                 53,
                 {
@@ -319,18 +436,34 @@ class PDFService {
                 }
             );
 
-        doc
-            .fontSize(7)
-            .text(
-                "NINEA 004032570",
-                450,
-                68,
-                {
-                    width: 105,
-                    align: "center"
-                }
-            );
 
+        let agencyLegalInfo = [];
+
+        if (agency.ninea) {
+            agencyLegalInfo.push(`NINEA ${agency.ninea}`);
+        }
+
+        if (agency.rccm) {
+            agencyLegalInfo.push(`RCCM ${agency.rccm}`);
+        }
+
+        if (agencyLegalInfo.length > 0) {
+
+            doc
+                .font("Helvetica")
+                .fontSize(6.2)
+                .fillColor(dark)
+                .text(
+                    agencyLegalInfo.join(" • "),
+                    450,
+                    68,
+                    {
+                        width: 105,
+                        align: "center"
+                    }
+                );
+
+        }
         // -----------------------------------------------------
         // TITRE
         // -----------------------------------------------------
@@ -365,7 +498,7 @@ class PDFService {
             .font("Helvetica")
             .fontSize(8.5)
             .text(
-                "MAMADOU MAREGA, représenté par",
+                `${landlordName.toUpperCase()}, représenté par`,
                 60,
                 162,
                 {
@@ -377,11 +510,10 @@ class PDFService {
             .font("Helvetica-Bold")
             .fontSize(8.5)
             .text(
-                " L'AGENCE IMMOBILIERE IBM MAREGA SARL ",
+                ` ${agency.name.toUpperCase()} `,
                 60,
-                162,
-                
-            );     
+                162
+            );   
             
         doc
             .font("Helvetica")
@@ -711,7 +843,7 @@ class PDFService {
             .text(
                 `A titre de provision, et pour la bonne garantie d'exécution des clauses du présent contrat, ` +
                 `le preneur sera tenu de verser au bailleur une caution, contre récépissé au moment de la signature, ` +
-                `la somme de : ${this.money(deposit)} FCFA représentant la caution entre les mains DE L'AGENCE. ` +
+                `la somme de : ${this.money(deposit)} FCFA représentant la caution entre les mains DE ${agency.name.toUpperCase()}. ` +
                 `Cette somme sera restituée lors de la remise des clés des locaux, déduction faite de toutes sommes ` +
                 `qui pourraient être dues par le preneur, tant pour réparations que pour toute autre cause. ` +
                 `Il est clairement entendu que la caution ne pourra servir au règlement des loyers durant la période ` +
@@ -829,9 +961,11 @@ class PDFService {
             .font("Helvetica")
             .fontSize(8.3)
             .text(
-                "Pour l'exécution des présentes et de leurs suites, les parties font élection de domicile à Dakar, " +
-                "les bailleurs représentés par l'AGENCE IMMOBILIERE IBM MAREGA SARL au 80 rue Alfred Goux x " +
-                "Avenue Lamine Gueye. Le preneur dans les lieux loués.",
+                "Pour l'exécution des présentes et de leurs suites, les parties font " +
+                `élection de domicile à ${agency.city || "la ville de l'agence"}, ` +
+                `les bailleurs représentés par ${agency.name.toUpperCase()} ` +
+                `${agencyAddress ? `à ${agencyAddress}. ` : ". "}` +
+                "Le preneur dans les lieux loués.",
                 60,
                 185,
                 {
@@ -939,6 +1073,7 @@ class PDFService {
         return `/contracts/${filename}`;
 
     }
+    
 
     // =========================================================
     // NOMBRE EN LETTRES

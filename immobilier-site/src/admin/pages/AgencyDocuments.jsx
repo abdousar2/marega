@@ -174,7 +174,7 @@ export default function AgencyDocuments() {
 
                         <p>
                             Personnalisez les documents générés
-                            par MAREGA avec l'identité de votre agence.
+                            par TECHTRADISPORT avec l'identité de votre agence.
                         </p>
 
                     </div>
