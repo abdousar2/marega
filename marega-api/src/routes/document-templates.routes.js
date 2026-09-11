@@ -14,6 +14,9 @@ const upload =
 const DocumentTemplateController =
     require("../controllers/document-template.controller");
 
+const TemplateRendererController =
+    require("../controllers/template-renderer.controller");
+
 
 // =========================================================
 // ANALYSE
@@ -49,6 +52,13 @@ router.post(
     authorizeRoles("PLATFORM_ADMIN"),
     upload.single("document"),
     DocumentTemplateController.process
+);
+
+router.post(
+    "/render-lease",
+    authenticateToken,
+    authorizeRoles("PLATFORM_ADMIN"),
+    TemplateRendererController.renderLease
 );
 
 

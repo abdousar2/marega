@@ -216,157 +216,128 @@ class DocumentAIService {
 
         const fields = [];
 
+        // =====================================================
+        // HELPER
+        // =====================================================
+
+        const addField = ({
+            code,
+            label,
+            data_type,
+            source,
+            required = false,
+            value,
+            confidence = 0.90
+        }) => {
+
+            if (
+                value === null ||
+                value === undefined ||
+                value === ""
+            ) {
+                return;
+            }
+
+            fields.push({
+
+                code,
+
+                label,
+
+                data_type,
+
+                source,
+
+                required,
+
+                value,
+
+                confidence
+
+            });
+
+        };
+
 
         // =====================================================
-        // NUMÉRO DE CNI
+        // IDENTITÉ LOCATAIRE
         // =====================================================
 
-        const identityMatch = text.match(
-            /(?:CNI|carte\s+d['’]?identité|pi[eè]ce\s+d['’]?identité)\s*(?:n[°o]\.?\s*)?([0-9][0-9\s]{5,25})/i
-        );
+        const tenantName =
+            this.extractLabeledValue(
+                text,
+                [
+                    "LOCATAIRE",
+                    "LE LOCATAIRE",
+                    "PRENEUR"
+                ]
+            );
+
+        addField({
+
+            code: "tenant_name",
+
+            label: "Nom du locataire",
+
+            data_type: "string",
+
+            source: "tenant.name",
+
+            required: true,
+
+            value: tenantName,
+
+            confidence: 0.96
+
+        });
+
+
+        // =====================================================
+        // CNI LOCATAIRE
+        // =====================================================
+
+        const identityRegex =
+            /(?:CNI|carte\s+d['’]identité|pi[eè]ce\s+d['’]identité|num[eé]ro\s+de\s+(?:la\s+)?pi[eè]ce)[^0-9]{0,50}([0-9][0-9\s]{5,30})/i;
+
+        const identityMatch =
+            text.match(identityRegex);
 
         if (identityMatch) {
 
-            const identityNumber = identityMatch[1]
-                .replace(/\s+/g, "")
-                .trim();
+            addField({
 
-            fields.push({
                 code: "tenant_identity_number",
+
                 label: "Numéro de pièce d'identité",
+
                 data_type: "string",
+
                 source: "tenant.identity_number",
-                required: false,
-                value: identityNumber,
+
+                value:
+                    identityMatch[1]
+                        .replace(/\s/g, ""),
+
                 confidence: 0.97
+
             });
+
         }
 
 
         // =====================================================
-        // NOM DU BAILLEUR
+        // DATE DE NAISSANCE
         // =====================================================
 
-        const landlordMatch = text.match(
-            /BAILLEUR\s+([^\n]+)/i
-        );
+        const birthRegex =
+            /(?:né|née|ne|date\s+de\s+naissance)[^0-9]{0,40}([0-9]{1,2}(?:er)?\s+[A-Za-zÀ-ÿ]+\s+[0-9]{4})/i;
 
-        if (landlordMatch) {
-
-            fields.push({
-                code: "landlord_name",
-                label: "Nom du bailleur",
-                data_type: "string",
-                source: "landlord.name",
-                required: true,
-                value: this.cleanValue(landlordMatch[1]),
-                confidence: 0.97
-            });
-        }
-
-
-        // =====================================================
-        // ADRESSE DU BAILLEUR
-        // =====================================================
-
-        const landlordAddressMatch = text.match(
-            /BAILLEUR[^\n]*\nAdresse\s*:\s*([^\n]+)/i
-        );
-
-        if (landlordAddressMatch) {
-
-            fields.push({
-                code: "landlord_address",
-                label: "Adresse du bailleur",
-                data_type: "string",
-                source: "landlord.address",
-                required: false,
-                value: this.cleanValue(landlordAddressMatch[1]),
-                confidence: 0.94
-            });
-        }
-
-
-        // =====================================================
-        // TÉLÉPHONE DU BAILLEUR
-        // =====================================================
-
-        const landlordPhoneMatch = text.match(
-            /BAILLEUR[\s\S]{0,300}?Téléphone\s*:\s*([+\d][\d\s-]{7,20})/i
-        );
-
-        if (landlordPhoneMatch) {
-
-            fields.push({
-                code: "landlord_phone",
-                label: "Téléphone du bailleur",
-                data_type: "string",
-                source: "landlord.phone",
-                required: false,
-                value: this.cleanValue(landlordPhoneMatch[1]),
-                confidence: 0.94
-            });
-        }
-
-
-        // =====================================================
-        // EMAIL DU BAILLEUR
-        // =====================================================
-
-        const landlordEmailMatch = text.match(
-            /BAILLEUR[\s\S]{0,300}?[Ee]-mail\s*:\s*([^\s]+)/i
-        );
-
-        if (landlordEmailMatch) {
-
-            fields.push({
-                code: "landlord_email",
-                label: "Email du bailleur",
-                data_type: "string",
-                source: "landlord.email",
-                required: false,
-                value: this.cleanValue(landlordEmailMatch[1]),
-                confidence: 0.96
-            });
-        }
-
-
-        // =====================================================
-        // NOM DU LOCATAIRE
-        // =====================================================
-
-        const tenantMatch = text.match(
-            /LOCATAIRE\s+([^\n]+)/i
-        );
-
-        if (tenantMatch) {
-
-            fields.push({
-                code: "tenant_name",
-                label: "Nom du locataire",
-                data_type: "string",
-                source: "tenant.name",
-                required: true,
-                value: this.cleanValue(tenantMatch[1]),
-                confidence: 0.97
-            });
-        }
-
-        // =====================================================
-        // DATE ET LIEU DE NAISSANCE
-        // =====================================================
-
-        const birthMatch = text.match(
-            /N[ée]e?\s+le\s+([0-9]{1,2}(?:er|ère|ème|e)?\s+\w+\s+[0-9]{4})(?:\s+à\s+([^\n]+?))?(?=\s+CNI|\s+Téléphone|\s+E-mail|$)/i
-        );
+        const birthMatch =
+            text.match(birthRegex);
 
         if (birthMatch) {
 
-            // -------------------------
-            // DATE DE NAISSANCE
-            // -------------------------
-
-            fields.push({
+            addField({
 
                 code: "tenant_birth_date",
 
@@ -376,211 +347,563 @@ class DocumentAIService {
 
                 source: "tenant.birth_date",
 
-                required: false,
+                value:
+                    this.cleanValue(
+                        birthMatch[1]
+                    ),
 
-                value: this.cleanValue(birthMatch[1]),
-
-                confidence: 0.95
+                confidence: 0.93
 
             });
-
-
-            // -------------------------
-            // LIEU DE NAISSANCE
-            // -------------------------
-
-            if (birthMatch[2]) {
-
-                fields.push({
-
-                    code: "tenant_birth_place",
-
-                    label: "Lieu de naissance",
-
-                    data_type: "string",
-
-                    source: "tenant.birth_place",
-
-                    required: false,
-
-                    value: this.cleanValue(birthMatch[2]),
-
-                    confidence: 0.93
-
-                });
-
-            }
 
         }
 
         // =====================================================
-        // TÉLÉPHONE DU LOCATAIRE
+        // LIEU DE NAISSANCE
         // =====================================================
 
-        const tenantPhoneMatch = text.match(
-            /LOCATAIRE[\s\S]{0,300}?Téléphone\s*:\s*([+\d][\d\s-]{7,20})/i
-        );
+        let birthPlace = null;
+
+        const birthPlacePatterns = [
+
+            // "Née le 15 mars 1995 à Dakar"
+            /(?:né|née|ne)\s+le\s+[0-9]{1,2}(?:er)?\s+[A-Za-zÀ-ÿ]+\s+[0-9]{4}\s+à\s+([^,\n]+?)(?=\s+CNI|\s+carte|\s+téléphone|\s+email|$)/i,
+
+            // "Née le 15 mars 1995 à Dakar"
+            /date\s+de\s+naissance\s*[:\-]?\s*[0-9]{1,2}(?:er)?\s+[A-Za-zÀ-ÿ]+\s+[0-9]{4}\s+à\s+([^,\n]+)/i
+        ];
+
+        for (const regex of birthPlacePatterns) {
+
+            const match = text.match(regex);
+
+            if (match) {
+
+                birthPlace =
+                    this.cleanValue(match[1]);
+
+                break;
+            }
+        }
+
+        addField({
+
+            code: "tenant_birth_place",
+
+            label: "Lieu de naissance",
+
+            data_type: "string",
+
+            source: "tenant.birth_place",
+
+            value: birthPlace,
+
+            confidence: birthPlace
+                ? 0.95
+                : 0
+
+        });
+
+        // =====================================================
+        // PROFESSION
+        // =====================================================
+
+        let profession = null;
+
+
+        // -----------------------------------------------------
+        // CAS 1 : Profession : commerçante
+        // -----------------------------------------------------
+
+        const professionRegex =
+            /(?:profession\s+du\s+locataire|profession|activité\s+professionnelle)\s*[:\-]\s*([^\n]+)/i;
+
+        const professionMatch =
+            text.match(professionRegex);
+
+        if (professionMatch) {
+
+            profession =
+                this.cleanValue(
+                    professionMatch[1]
+                );
+
+        }
+
+
+        // -----------------------------------------------------
+        // CAS 2 : "Le locataire exerce la profession de..."
+        // -----------------------------------------------------
+
+        if (!profession) {
+
+            const professionSentenceRegex =
+                /(?:le|la)\s+locataire\s+exerce\s+(?:la\s+profession\s+de\s+)?([^,.\n]+)/i;
+
+            const professionSentenceMatch =
+                text.match(
+                    professionSentenceRegex
+                );
+
+            if (professionSentenceMatch) {
+
+                profession =
+                    this.cleanValue(
+                        professionSentenceMatch[1]
+                    );
+            }
+        }
+
+
+        addField({
+
+            code: "tenant_profession",
+
+            label: "Profession",
+
+            data_type: "string",
+
+            source: "tenant.profession",
+
+            value: profession,
+
+            confidence: profession
+                ? 0.95
+                : 0
+        });
+
+
+        // =====================================================
+        // TÉLÉPHONE LOCATAIRE
+        // =====================================================
+
+        const tenantPhoneRegex =
+            /(?:locataire|preneur)[\s\S]{0,300}?(?:t[eé]l[eé]phone|t[eé]l\.?)[^0-9+]{0,20}(\+?[0-9][0-9\s-]{7,20})/i;
+
+        const tenantPhoneMatch =
+            text.match(tenantPhoneRegex);
 
         if (tenantPhoneMatch) {
 
-            fields.push({
+            addField({
+
                 code: "tenant_phone",
+
                 label: "Téléphone du locataire",
+
                 data_type: "string",
+
                 source: "tenant.phone",
-                required: false,
-                value: this.cleanValue(tenantPhoneMatch[1]),
-                confidence: 0.95
+
+                value:
+                    this.cleanValue(
+                        tenantPhoneMatch[1]
+                    ),
+
+                confidence: 0.94
+
             });
+
         }
 
 
         // =====================================================
-        // EMAIL DU LOCATAIRE
+        // EMAIL LOCATAIRE
         // =====================================================
 
-        const tenantEmailMatch = text.match(
-            /LOCATAIRE[\s\S]{0,300}?[Ee]-mail\s*:\s*([^\s]+)/i
-        );
+        const tenantEmailRegex =
+            /(?:locataire|preneur)[\s\S]{0,300}?(?:e-mail|email)[^A-Za-z0-9._%+-]*([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/i;
+
+        const tenantEmailMatch =
+            text.match(tenantEmailRegex);
 
         if (tenantEmailMatch) {
 
-            fields.push({
+            addField({
+
                 code: "tenant_email",
+
                 label: "Email du locataire",
+
                 data_type: "string",
+
                 source: "tenant.email",
-                required: false,
-                value: this.cleanValue(tenantEmailMatch[1]),
+
+                value:
+                    tenantEmailMatch[1],
+
                 confidence: 0.96
+
             });
+
         }
 
+
+        // =====================================================
+        // BAILLEUR
+        // =====================================================
+
+        const landlordName =
+            this.extractLabeledValue(
+                text,
+                [
+                    "BAILLEUR",
+                    "LE BAILLEUR",
+                    "PROPRIÉTAIRE",
+                    "PROPRIETAIRE"
+                ]
+            );
+
+        addField({
+
+            code: "landlord_name",
+
+            label: "Nom du bailleur",
+
+            data_type: "string",
+
+            source: "landlord.name",
+
+            required: true,
+
+            value: landlordName,
+
+            confidence: 0.96
+
+        });
+
+
+        // =====================================================
+        // ADRESSE BAILLEUR
+        // =====================================================
+
+        let landlordAddress = null;
+
+        // Cas explicite :
+        // Adresse du bailleur : ...
+        // Adresse du propriétaire : ...
+        landlordAddress =
+            this.extractLabeledValue(
+                text,
+                [
+                    "Adresse du bailleur",
+                    "Adresse du propriétaire"
+                ]
+            );
+
+        // Cas fréquent :
+        // BAILLEUR ...
+        // Adresse : ...
+        if (!landlordAddress) {
+
+            const landlordAddressMatch = text.match(
+                /BAILLEUR[\s\S]{0,250}?\bAdresse\s*:\s*([^\n]+?)(?=\s+(?:Téléphone|Tél\.?|E-mail|Email)\s*:)/i
+            );
+
+            if (landlordAddressMatch) {
+
+                landlordAddress =
+                    this.cleanValue(
+                        landlordAddressMatch[1]
+                    );
+            }
+        }
+
+        addField({
+
+            code: "landlord_address",
+
+            label: "Adresse du bailleur",
+
+            data_type: "string",
+
+            source: "landlord.address",
+
+            value: landlordAddress,
+
+            confidence: landlordAddress
+                ? 0.96
+                : 0
+
+        });
+
+
+        // =====================================================
+        // TÉLÉPHONE BAILLEUR
+        // =====================================================
+
+        const landlordPhoneRegex =
+            /(?:bailleur|propri[eé]taire)[\s\S]{0,300}?(?:t[eé]l[eé]phone|t[eé]l\.?)[^0-9+]{0,20}(\+?[0-9][0-9\s-]{7,20})/i;
+
+        const landlordPhoneMatch =
+            text.match(landlordPhoneRegex);
+
+        if (landlordPhoneMatch) {
+
+            addField({
+
+                code: "landlord_phone",
+
+                label: "Téléphone du bailleur",
+
+                data_type: "string",
+
+                source: "landlord.phone",
+
+                value:
+                    landlordPhoneMatch[1],
+
+                confidence: 0.94
+
+            });
+
+        }
+
+
+        // =====================================================
+        // EMAIL BAILLEUR
+        // =====================================================
+
+        const landlordEmailRegex =
+            /(?:bailleur|propri[eé]taire)[\s\S]{0,300}?(?:e-mail|email)[^A-Za-z0-9._%+-]*([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})/i;
+
+        const landlordEmailMatch =
+            text.match(landlordEmailRegex);
+
+        if (landlordEmailMatch) {
+
+            addField({
+
+                code: "landlord_email",
+
+                label: "Email du bailleur",
+
+                data_type: "string",
+
+                source: "landlord.email",
+
+                value:
+                    landlordEmailMatch[1],
+
+                confidence: 0.96
+
+            });
+
+        }
 
         // =====================================================
         // APPARTEMENT
         // =====================================================
 
-        const apartmentMatch = text.match(
-            /(?:appartement|logement)\s+([A-Z0-9-]+)\s*,?\s*situé/i
-        );
+        const apartmentPatterns = [
 
-        if (apartmentMatch) {
+            /l['’]appartement\s+(?:n[°o]\s*)?([A-Z0-9]+(?:-[A-Z0-9]+)*)/i,
 
-            fields.push({
-                code: "apartment_number",
-                label: "Numéro de l'appartement",
-                data_type: "string",
-                source: "apartment.number",
-                required: true,
-                value: this.cleanValue(apartmentMatch[1]),
-                confidence: 0.94
-            });
+            /appartement\s+n[°ºo]?\s*([A-Z0-9]+(?:-[A-Z0-9]+)*)/i,
+
+            /logement\s+(?:n[°ºo]?\s*)?([A-Z0-9]+(?:-[A-Z0-9]+)*)/i,
+
+            /porte\s+n[°ºo]?\s*([A-Z0-9]+(?:-[A-Z0-9]+)*)/i
+
+        ];
+
+        let apartmentNumber = null;
+
+        for (const regex of apartmentPatterns) {
+
+            const match =
+                text.match(regex);
+
+            if (match) {
+
+                apartmentNumber =
+                    this.cleanValue(match[1]);
+
+                break;
+            }
         }
 
+        addField({
+
+            code: "apartment_number",
+
+            label: "Numéro du logement",
+
+            data_type: "string",
+
+            source: "apartment.number",
+
+            required: true,
+
+            value: apartmentNumber,
+
+            confidence: apartmentNumber
+                ? 0.97
+                : 0
+        });
+
         // =====================================================
-        // NOM DE L'IMMEUBLE
+        // IMMEUBLE
         // =====================================================
 
-        const buildingNameMatch = text.match(
-            /(?:immeuble|résidence|residence)\s+([^,\n]+?)(?:,|\s+sis\s+à)/i
-        );
+        const buildingRegex =
+            /(?:immeuble|r[eé]sidence)\s+([^\n,]+)/i;
 
-        if (buildingNameMatch) {
+        const buildingMatch =
+            text.match(buildingRegex);
 
-            fields.push({
+        if (buildingMatch) {
+
+            addField({
+
                 code: "building_name",
+
                 label: "Nom de l'immeuble",
+
                 data_type: "string",
+
                 source: "building.name",
+
                 required: true,
-                value: this.cleanValue(buildingNameMatch[1]),
-                confidence: 0.96
-            });
-        }
 
-        // =====================================================
-        // ADRESSE DE L'IMMEUBLE
-        // =====================================================
+                value:
+                    this.cleanValue(
+                        buildingMatch[1]
+                    ),
 
-        const buildingAddressMatch = text.match(
-            /(?:immeuble|résidence|residence)\s+[^,\n]+,\s*sis\s+à\s+(.+?),\s*(?:Dakar|[A-ZÀ-Ÿ][a-zà-ÿ]+),\s*(?:Sénégal|Senegal)/i
-        );
-
-        if (buildingAddressMatch) {
-
-            fields.push({
-                code: "building_address",
-                label: "Adresse de l'immeuble",
-                data_type: "string",
-                source: "building.address",
-                required: false,
-                value: this.cleanValue(buildingAddressMatch[1]),
                 confidence: 0.94
+
             });
+
         }
 
+
         // =====================================================
-        // VILLE DE L'IMMEUBLE
+        // ADRESSE / VILLE / PAYS IMMEUBLE
         // =====================================================
 
-        const buildingCityMatch = text.match(
-            /sis\s+à\s+.+?,\s*([A-ZÀ-Ÿ][A-Za-zÀ-ÿ' -]+),\s*(?:Sénégal|Senegal)/i
-        );
+        const buildingLocationRegex =
+            /(?:sis|situé|situe)\s+[àa]\s+([^.\n]+?)(?:,\s*([^,\n]+))?(?:,\s*(Sénégal|Senegal))?(?:\.|$)/i;
 
-        if (buildingCityMatch) {
+        const buildingLocationMatch =
+            text.match(
+                buildingLocationRegex
+            );
 
-            fields.push({
-                code: "building_city",
-                label: "Ville de l'immeuble",
-                data_type: "string",
-                source: "building.city",
-                required: false,
-                value: this.cleanValue(buildingCityMatch[1]),
-                confidence: 0.94
-            });
+
+        let buildingAddress = null;
+        let buildingCity = null;
+        let buildingCountry = null;
+
+
+        if (buildingLocationMatch) {
+
+            buildingAddress =
+                this.cleanValue(
+                    buildingLocationMatch[1]
+                );
+
+            buildingCity =
+                buildingLocationMatch[2]
+                    ? this.cleanValue(
+                        buildingLocationMatch[2]
+                    )
+                    : null;
+
+            buildingCountry =
+                buildingLocationMatch[3]
+                    ? this.cleanValue(
+                        buildingLocationMatch[3]
+                    )
+                    : null;
         }
 
-        // =====================================================
-        // PAYS DE L'IMMEUBLE
-        // =====================================================
 
-        const buildingCountryMatch = text.match(
-            /sis\s+à\s+.+?,\s*.+?,\s*(Sénégal|Senegal)/i
-        );
+        addField({
 
-        if (buildingCountryMatch) {
+            code: "building_address",
 
-            fields.push({
-                code: "building_country",
-                label: "Pays de l'immeuble",
-                data_type: "string",
-                source: "building.country",
-                required: false,
-                value: this.cleanValue(buildingCountryMatch[1]),
-                confidence: 0.99
-            });
-        }
+            label: "Adresse de l'immeuble",
+
+            data_type: "string",
+
+            source: "building.address",
+
+            value: buildingAddress,
+
+            confidence: buildingAddress
+                ? 0.94
+                : 0
+        });
+
+
+        addField({
+
+            code: "building_city",
+
+            label: "Ville de l'immeuble",
+
+            data_type: "string",
+
+            source: "building.city",
+
+            value: buildingCity,
+
+            confidence: buildingCity
+                ? 0.94
+                : 0
+        });
+
+
+        addField({
+
+            code: "building_country",
+
+            label: "Pays de l'immeuble",
+
+            data_type: "string",
+
+            source: "building.country",
+
+            value: buildingCountry,
+
+            confidence: buildingCountry
+                ? 0.98
+                : 0
+        });
 
         // =====================================================
         // SURFACE
         // =====================================================
 
-        const surfaceMatch = text.match(
-            /Surface\s+(?:approximative\s*)?:\s*([0-9]+(?:[.,][0-9]+)?)\s*m²/i
-        );
+        const surfaceRegex =
+            /(?:surface|superficie)[^0-9]{0,30}([0-9]+(?:[.,][0-9]+)?)\s*m[²2]/i;
+
+        const surfaceMatch =
+            text.match(surfaceRegex);
 
         if (surfaceMatch) {
 
-            fields.push({
+            addField({
+
                 code: "apartment_surface",
+
                 label: "Surface du logement",
+
                 data_type: "number",
+
                 source: "apartment.surface",
-                required: false,
-                value: Number(surfaceMatch[1].replace(",", ".")),
-                confidence: 0.97
+
+                value:
+                    Number(
+                        surfaceMatch[1]
+                            .replace(",", ".")
+                    ),
+
+                confidence: 0.96
+
             });
+
         }
 
 
@@ -588,21 +911,33 @@ class DocumentAIService {
         // ÉTAGE
         // =====================================================
 
-        const levelMatch = text.match(
-            /(?:au|situé\s+au|situe\s+au)\s+([0-9]{1,2}(?:er|ère|ème|e)?\s+étage|rez[- ]de[- ]chaussée)/i
-        );
+        const levelRegex =
+            /(?:au|situ[eé]\s+au|[aà]\s+l['’]?)\s*([0-9]{1,2}(?:er|ère|e|ème)?\s+étage|rez[- ]de[- ]chauss[eé]e)/i;
+
+        const levelMatch =
+            text.match(levelRegex);
 
         if (levelMatch) {
 
-            fields.push({
+            addField({
+
                 code: "apartment_level",
+
                 label: "Étage",
+
                 data_type: "string",
+
                 source: "lease.level",
-                required: false,
-                value: this.cleanValue(levelMatch[1]),
-                confidence: 0.95
+
+                value:
+                    this.cleanValue(
+                        levelMatch[1]
+                    ),
+
+                confidence: 0.94
+
             });
+
         }
 
 
@@ -610,57 +945,86 @@ class DocumentAIService {
         // LOYER
         // =====================================================
 
-        const rentMatch = text.match(
-            /Loyer\s+mensuel\s+([0-9][0-9\s.,]*)\s*FCFA/i
-        );
+        const rentRegex =
+            /(?:loyer\s+mensuel|loyer)[^0-9]{0,40}([0-9][0-9\s.,]*)\s*(?:FCFA|CFA|F\s*CFA)/i;
+
+        const rentMatch =
+            text.match(rentRegex);
 
         if (rentMatch) {
 
-            fields.push({
+            addField({
+
                 code: "monthly_rent",
+
                 label: "Loyer mensuel",
+
                 data_type: "number",
+
                 source: "lease.monthly_rent",
+
                 required: true,
-                value: this.parseMoney(rentMatch[1]),
-                confidence: 0.99
+
+                value:
+                    this.parseMoney(
+                        rentMatch[1]
+                    ),
+
+                confidence: 0.98
+
             });
+
         }
 
 
         // =====================================================
-        // CHARGES COMMUNES
+        // CHARGES
         // =====================================================
 
-        const chargesMatch = text.match(
-            /Charges\s+communes\s+([0-9][0-9\s.,]*)\s*FCFA/i
-        );
+        const chargesRegex =
+            /charges(?:\s+communes)?[^0-9]{0,50}([0-9][0-9\s.,]*)\s*(?:FCFA|CFA|F\s*CFA)/i;
+
+        const chargesMatch =
+            text.match(chargesRegex);
 
         if (chargesMatch) {
 
-            fields.push({
-                code: "common_charges",
-                label: "Charges communes",
-                data_type: "number",
-                source: "lease.common_charges",
-                required: false,
-                value: this.parseMoney(chargesMatch[1]),
-                confidence: 0.99
-            });
-        }
+            addField({
 
+                code: "common_charges",
+
+                label: "Charges communes",
+
+                data_type: "number",
+
+                source: "lease.common_charges",
+
+                value:
+                    this.parseMoney(
+                        chargesMatch[1]
+                    ),
+
+                confidence: 0.96
+
+            });
+
+        }
 
         // =====================================================
         // TOTAL MENSUEL
         // =====================================================
 
-        const totalMatch = text.match(
-            /Total\s+mensuel\s+([0-9][0-9\s.,]*)\s*FCFA/i
-        );
+        const monthlyTotalRegex =
+            /total\s+mensuel[^0-9]{0,30}([0-9][0-9\s.,]*)\s*(?:FCFA|CFA|F\s*CFA)/i;
 
-        if (totalMatch) {
+        const monthlyTotalMatch =
+            text.match(
+                monthlyTotalRegex
+            );
 
-            fields.push({
+        if (monthlyTotalMatch) {
+
+            addField({
 
                 code: "monthly_total",
 
@@ -670,85 +1034,131 @@ class DocumentAIService {
 
                 source: "lease.monthly_total",
 
-                required: false,
-
                 value:
-                    this.parseMoney(totalMatch[1]),
+                    this.parseMoney(
+                        monthlyTotalMatch[1]
+                    ),
 
-                confidence: 0.99
-            });
-        }
-
-        // =====================================================
-        // DÉPÔT DE GARANTIE
-        // =====================================================
-
-        const depositMatch = text.match(
-            /Dépôt\s+de\s+garantie\s+([0-9][0-9\s.,]*)\s*FCFA/i
-        );
-
-        if (depositMatch) {
-
-            fields.push({
-                code: "deposit",
-                label: "Dépôt de garantie",
-                data_type: "number",
-                source: "lease.deposit",
-                required: false,
-                value: this.parseMoney(depositMatch[1]),
-                confidence: 0.99
-            });
-        }
-
-
-        // =====================================================
-        // DURÉE
-        // =====================================================
-
-        const durationMatch = text.match(
-            /durée\s+de\s+([0-9]+)\s*(mois|ans?|années?)/i
-        );
-
-        if (durationMatch) {
-
-            let months = Number(durationMatch[1]);
-
-            if (
-                durationMatch[2].toLowerCase().includes("an")
-            ) {
-                months *= 12;
-            }
-
-            fields.push({
-                code: "lease_duration_months",
-                label: "Durée du bail",
-                data_type: "number",
-                source: "lease.duration",
-                required: true,
-                value: months,
                 confidence: 0.98
             });
         }
+
+
+        // =====================================================
+        // DÉPÔT
+        // =====================================================
+
+        const depositRegex =
+            /(?:d[eé]p[oô]t|caution|d[eé]p[oô]t\s+de\s+garantie)[^0-9]{0,50}([0-9][0-9\s.,]*)\s*(?:FCFA|CFA|F\s*CFA)/i;
+
+        const depositMatch =
+            text.match(depositRegex);
+
+        if (depositMatch) {
+
+            addField({
+
+                code: "deposit",
+
+                label: "Dépôt de garantie",
+
+                data_type: "number",
+
+                source: "lease.deposit",
+
+                value:
+                    this.parseMoney(
+                        depositMatch[1]
+                    ),
+
+                confidence: 0.97
+
+            });
+
+        }
+
+
+        // =====================================================
+        // DURÉE DU BAIL
+        // =====================================================
+
+        const durationRegex =
+            /dur[eé]e(?:\s+du\s+bail)?[^0-9]{0,40}([0-9]+)\s*(mois|ans?|ann[eé]es?)/i;
+
+        const durationMatch =
+            text.match(durationRegex);
+
+        if (durationMatch) {
+
+            let months =
+                Number(
+                    durationMatch[1]
+                );
+
+            if (
+                /an|année/i.test(
+                    durationMatch[2]
+                )
+            ) {
+
+                months *= 12;
+
+            }
+
+            addField({
+
+                code: "lease_duration_months",
+
+                label: "Durée du bail",
+
+                data_type: "number",
+
+                source: "lease.duration",
+
+                required: true,
+
+                value: months,
+
+                confidence: 0.96
+
+            });
+
+        }
+
 
         // =====================================================
         // DATE DE DÉBUT
         // =====================================================
 
-        const startMatch = text.match(
-            /prenant\s+effet\s+le\s+([0-9]{1,2}(?:er|ère|e|ème)?\s+\w+\s+[0-9]{4})/i
-        );
+        const startRegex =
+            /(?:prenant\s+effet|d[eé]but|commence|[àa]\s+compter\s+du)[^0-9]{0,50}([0-9]{1,2}(?:er)?\s+[A-Za-zÀ-ÿ]+\s+[0-9]{4})/i;
+
+        const startMatch =
+            text.match(startRegex);
 
         if (startMatch) {
 
-            fields.push({
+            addField({
+
                 code: "lease_start_date",
+
                 label: "Date de début du bail",
+
                 data_type: "date",
+
                 source: "lease.start_date",
+
                 required: true,
-                value: this.cleanValue(startMatch[1]),
-                confidence: 0.99
+
+                value:
+                    this.cleanValue(
+                        startMatch[1]
+                    ),
+
+                confidence: 0.96
+
             });
+
         }
 
 
@@ -756,21 +1166,35 @@ class DocumentAIService {
         // DATE DE FIN
         // =====================================================
 
-        const endMatch = text.match(
-            /arrivant\s+à\s+échéance\s+le\s+([0-9]{1,2}\s+\w+\s+[0-9]{4})/i
-        );
+        const endRegex =
+            /(?:[eé]ch[eé]ance|arrivant\s+[àa]\s+[eé]ch[eé]ance|fin|se\s+terminant)[^0-9]{0,60}([0-9]{1,2}(?:er)?\s+[A-Za-zÀ-ÿ]+\s+[0-9]{4})/i;
+
+        const endMatch =
+            text.match(endRegex);
 
         if (endMatch) {
 
-            fields.push({
+            addField({
+
                 code: "lease_end_date",
+
                 label: "Date de fin du bail",
+
                 data_type: "date",
+
                 source: "lease.end_date",
+
                 required: true,
-                value: this.cleanValue(endMatch[1]),
-                confidence: 0.98
+
+                value:
+                    this.cleanValue(
+                        endMatch[1]
+                    ),
+
+                confidence: 0.96
+
             });
+
         }
 
 
@@ -778,65 +1202,128 @@ class DocumentAIService {
         // JOUR DE PAIEMENT
         // =====================================================
 
-        const paymentDayMatch = text.match(
-            /Date\s+de\s+paiement\s+Au\s+plus\s+tard\s+le\s+([0-9]{1,2})/i
-        );
+        const paymentDayPatterns = [
 
-        if (paymentDayMatch) {
+            // "Au plus tard le 5 de chaque mois"
+            /au\s+plus\s+tard\s+le\s+([0-9]{1,2})\s+de\s+chaque\s+mois/i,
 
-            fields.push({
-                code: "payment_day",
-                label: "Jour de paiement",
-                data_type: "number",
-                source: "lease.payment_day",
-                required: false,
-                value: Number(paymentDayMatch[1]),
-                confidence: 0.99
-            });
+            // "le 5 de chaque mois"
+            /\ble\s+([0-9]{1,2})\s+de\s+chaque\s+mois/i,
+
+            // "paiement le 5"
+            /(?:date|jour)\s+de\s+paiement[^0-9]{0,30}([0-9]{1,2})/i,
+
+            // "paiement : 5"
+            /paiement\s*[:\-]\s*([0-9]{1,2})/i
+        ];
+
+
+        let paymentDay = null;
+
+
+        for (const regex of paymentDayPatterns) {
+
+            const match =
+                text.match(regex);
+
+            if (!match) {
+                continue;
+            }
+
+            const day =
+                Number(match[1]);
+
+            if (
+                Number.isInteger(day) &&
+                day >= 1 &&
+                day <= 31
+            ) {
+
+                paymentDay = day;
+
+                break;
+            }
         }
+
+
+        addField({
+
+            code: "payment_day",
+
+            label: "Jour de paiement",
+
+            data_type: "number",
+
+            source: "lease.payment_day",
+
+            value: paymentDay,
+
+            confidence: paymentDay
+                ? 0.98
+                : 0
+        });
 
 
         // =====================================================
         // MODE DE PAIEMENT
         // =====================================================
 
-        const paymentModeMatch = text.match(
-            /Mode\s+de\s+paiement\s+([^\n]+)/i
-        );
+        const paymentMethod =
+            this.extractLabeledValue(
+                text,
+                [
+                    "Mode de paiement",
+                    "Modalité de paiement",
+                    "Modalités de paiement"
+                ]
+            );
 
-        if (paymentModeMatch) {
+        addField({
 
-            fields.push({
-                code: "payment_method",
-                label: "Mode de paiement",
-                data_type: "string",
-                source: "agency_terms.payment_method",
-                required: false,
-                value: this.cleanValue(paymentModeMatch[1]),
-                confidence: 0.95
-            });
-        }
+            code: "payment_method",
+
+            label: "Mode de paiement",
+
+            data_type: "string",
+
+            source: "agency_terms.payment_method",
+
+            value: paymentMethod,
+
+            confidence: 0.92
+
+        });
 
 
         // =====================================================
         // COMPTEUR ÉLECTRIQUE
         // =====================================================
 
-        const electricityMatch = text.match(
-            /compteur\s+individuel\s+n[°o]?\s*([A-Z0-9-]+)/i
-        );
+        const electricityRegex =
+            /compteur\s+(?:[eé]lectrique|d['’]électricité)[^A-Z0-9]{0,20}(?:n[°o]\s*)?([A-Z0-9-]+)/i;
+
+        const electricityMatch =
+            text.match(electricityRegex);
 
         if (electricityMatch) {
 
-            fields.push({
+            addField({
+
                 code: "electricity_meter_number",
+
                 label: "Numéro du compteur électrique",
+
                 data_type: "string",
+
                 source: "lease_terms.electricity_meter_number",
-                required: false,
-                value: this.cleanValue(electricityMatch[1]),
-                confidence: 0.97
+
+                value:
+                    electricityMatch[1],
+
+                confidence: 0.94
+
             });
+
         }
 
 
@@ -844,28 +1331,31 @@ class DocumentAIService {
         // COMPTEUR EAU
         // =====================================================
 
-        const waterMatch = text.match(
-            /compteur\s+n[°o]?\s*([A-Z0-9-]+)\s*\.?\s*Les charges|compteur\s+n[°o]?\s*([A-Z0-9-]+)/i
-        );
+        const waterRegex =
+            /compteur\s+(?:d['’]eau|eau)[^A-Z0-9]{0,20}(?:n[°o]\s*)?([A-Z0-9-]+)/i;
+
+        const waterMatch =
+            text.match(waterRegex);
 
         if (waterMatch) {
 
-            const value =
-                waterMatch[1] ||
-                waterMatch[2];
+            addField({
 
-            if (value) {
+                code: "water_meter_number",
 
-                fields.push({
-                    code: "water_meter_number",
-                    label: "Numéro du compteur d'eau",
-                    data_type: "string",
-                    source: "lease_terms.water_meter_number",
-                    required: false,
-                    value: this.cleanValue(value),
-                    confidence: 0.90
-                });
-            }
+                label: "Numéro du compteur d'eau",
+
+                data_type: "string",
+
+                source: "lease_terms.water_meter_number",
+
+                value:
+                    waterMatch[1],
+
+                confidence: 0.92
+
+            });
+
         }
 
 
@@ -878,20 +1368,109 @@ class DocumentAIService {
 
     static parseMoney(value) {
 
-        if (!value) {
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
             return null;
         }
 
-        const cleaned = String(value)
-            .replace(/\s/g, "")
-            .replace(/\./g, "")
-            .replace(/,/g, "");
+        let cleaned =
+            String(value)
+                .replace(/\u00A0/g, " ")
+                .replace(/FCFA/gi, "")
+                .replace(/F\s*CFA/gi, "")
+                .replace(/CFA/gi, "")
+                .trim();
 
-        const number = Number(cleaned);
+        // Retirer les espaces
+        cleaned =
+            cleaned.replace(/\s/g, "");
+
+        // Exemple :
+        // 500 000
+        // 500.000
+        // 500,000
+        // 500000 FCFA
+
+        cleaned =
+            cleaned.replace(/[.,](?=\d{3}(?:[.,]|$))/g, "");
+
+        // Si décimales éventuelles
+        cleaned =
+            cleaned.replace(/,/g, ".");
+
+        const number =
+            Number(cleaned);
 
         return Number.isFinite(number)
             ? number
             : null;
+    }
+
+    // =========================================================
+    // REMPLACEMENT D'UNE VALEUR MONÉTAIRE
+    // =========================================================
+
+    static replaceMoneyValue(
+        text,
+        value,
+        placeholder
+    ) {
+
+        if (
+            value === null ||
+            value === undefined
+        ) {
+            return text;
+        }
+
+        const number =
+            Number(value);
+
+        if (!Number.isFinite(number)) {
+            return text;
+        }
+
+
+        const variants = [
+
+            String(number),
+
+            number.toLocaleString("fr-FR")
+                .replace(/\u00A0/g, " "),
+
+            number.toLocaleString("fr-FR")
+                .replace(/\u00A0/g, ""),
+
+            number.toLocaleString("en-US")
+
+        ];
+
+
+        let result = text;
+
+
+        for (const variant of variants) {
+
+            const escaped =
+                this.escapeRegExp(
+                    variant
+                );
+
+            result =
+                result.replace(
+                    new RegExp(
+                        `(?<![0-9])${escaped}(?![0-9])`,
+                        "g"
+                    ),
+                    placeholder
+                );
+        }
+
+
+        return result;
     }
 
     // =========================================================
@@ -1312,6 +1891,46 @@ class DocumentAIService {
     }
 
     // =========================================================
+    // REMPLACER UNE VALEUR EXACTE PAR UN PLACEHOLDER
+    // =========================================================
+
+    static replaceExactValue(
+        text,
+        value,
+        placeholder
+    ) {
+
+        if (
+            !text ||
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return text;
+        }
+
+        const stringValue =
+            String(value).trim();
+
+        if (!stringValue) {
+            return text;
+        }
+
+        const escaped =
+            this.escapeRegExp(
+                stringValue
+            );
+
+        return text.replace(
+            new RegExp(
+                `(?<![A-Za-zÀ-ÿ0-9])${escaped}(?![A-Za-zÀ-ÿ0-9])`,
+                "g"
+            ),
+            placeholder
+        );
+    }
+
+    // =========================================================
     // PARAMÉTRISATION INTELLIGENTE DU DOCUMENT
     // =========================================================
 
@@ -1453,23 +2072,27 @@ class DocumentAIService {
                 continue;
             }
 
-
-            // =================================================
+            // =====================================================
             // LIEU DE NAISSANCE
-            // =================================================
+            // =====================================================
 
             if (field.code === "tenant_birth_place") {
 
+                const escaped =
+                    this.escapeRegExp(value);
+
                 result =
                     result.replace(
-                        /(N[ée]e?\s+le\s+[^\n]+?\s+à\s+)([^,\n]+?)(?=\s+CNI)/i,
+                        new RegExp(
+                            `(N[ée]e?\\s+le\\s+[0-9]{1,2}(?:er)?\\s+\\w+\\s+[0-9]{4}\\s+à\\s+)${escaped}`,
+                            "i"
+                        ),
                         `$1${placeholder}`
                     );
 
                 continue;
-            }
-
-
+            }            
+            
             // =================================================
             // TÉLÉPHONE LOCATAIRE
             // =================================================
@@ -1689,17 +2312,44 @@ class DocumentAIService {
                 continue;
             }
 
+            // =====================================================
+            // DÉPÔT DE GARANTIE — TEXTE
+            // =====================================================
 
-            // =================================================
-            // DURÉE
-            // =================================================
+            if (field.code === "deposit") {
+
+                result =
+                    result.replace(
+                        /(dépôt\s+de\s+garantie\s+(?:de\s+)?)([0-9][0-9\s.,]*)\s*FCFA/gi,
+                        `$1${placeholder} FCFA`
+                    );
+
+                continue;
+            }
+
+
+            // =====================================================
+            // DURÉE DU BAIL
+            // =====================================================
 
             if (field.code === "lease_duration_months") {
 
                 result =
                     result.replace(
-                        /(durée\s+de\s+)([0-9]+)\s*(mois|ans?|années?)/i,
-                        `$1${placeholder} mois`
+                        /(durée\s+(?:du\s+bail)?\s*(?:est\s+)?(?:fixée\s+)?(?:à\s+|de\s+|pour\s+une\s+durée\s+de\s+))([0-9]+)\s*(mois|ans?|années?)/i,
+                        (match, prefix, number, unit) => {
+
+                            const normalizedUnit =
+                                this.normalizeSearchText(unit);
+
+                            if (
+                                normalizedUnit.includes("an")
+                            ) {
+                                return `${prefix}{{lease_duration_months}} mois`;
+                            }
+
+                            return `${prefix}{{lease_duration_months}} mois`;
+                        }
                     );
 
                 continue;
@@ -1801,6 +2451,92 @@ class DocumentAIService {
                 continue;
             }
 
+            // =====================================================
+            // PRÉAVIS
+            // =====================================================
+
+            const noticeMatch =
+                text.match(
+                    /pr[eé]avis[^0-9]{0,80}([0-9]+)\s*(mois|semaines?|jours?)/i
+                );
+
+            if (noticeMatch) {
+
+                let value =
+                    Number(
+                        noticeMatch[1]
+                    );
+
+                let unit =
+                    this.normalizeSearchText(
+                        noticeMatch[2]
+                    );
+
+                terms.push({
+
+                    code: "notice_period",
+
+                    label: "Durée du préavis",
+
+                    value_type: "duration",
+
+                    default_value: {
+                        value,
+                        unit
+                    },
+
+                    description:
+                        "Durée du préavis prévue par le contrat.",
+
+                    confidence: 0.91
+                });
+            }
+
+            // =====================================================
+            // RENOUVELLEMENT
+            // =====================================================
+
+            const renewalMatch =
+                text.match(
+                    /renouvel(?:lement|é)[^0-9]{0,100}([0-9]+)\s*(mois|ans?|ann[eé]es?)/i
+                );
+
+            if (renewalMatch) {
+
+                let value =
+                    Number(
+                        renewalMatch[1]
+                    );
+
+                const unit =
+                    this.normalizeSearchText(
+                        renewalMatch[2]
+                    );
+
+                if (
+                    unit.includes("an") ||
+                    unit.includes("annee")
+                ) {
+                    value *= 12;
+                }
+
+                terms.push({
+
+                    code: "renewal_duration_months",
+
+                    label: "Durée du renouvellement",
+
+                    value_type: "number",
+
+                    default_value: value,
+
+                    description:
+                        "Durée du renouvellement du bail en mois.",
+
+                    confidence: 0.90
+                });
+            }
+
         }
 
 
@@ -1837,7 +2573,7 @@ class DocumentAIService {
             }
 
         }
-
+        
 
         return result;
     }
@@ -2006,6 +2742,183 @@ class DocumentAIService {
 
             .trim();
     }
+
+    // =========================================================
+    // NORMALISATION AVANCÉE
+    // =========================================================
+
+    static normalizeForSearch(text = "") {
+
+        return String(text)
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .replace(/\u00A0/g, " ")
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "")
+            .toLowerCase()
+            .replace(/[ \t]+/g, " ")
+            .replace(/\n[ \t]+/g, "\n")
+            .replace(/[ \t]+\n/g, "\n")
+            .trim();
+
+    }
+
+
+    // =========================================================
+    // TEXTE EN LIGNES
+    // =========================================================
+
+    static getLines(text = "") {
+
+        return String(text)
+            .replace(/\r\n/g, "\n")
+            .replace(/\r/g, "\n")
+            .split("\n")
+            .map(line =>
+                line
+                    .replace(/\u00A0/g, " ")
+                    .replace(/[ \t]+/g, " ")
+                    .trim()
+            )
+            .filter(Boolean);
+
+    }
+
+    // =========================================================
+    // EXTRACTION FLEXIBLE APRÈS UN LABEL
+    // =========================================================
+
+    static extractLabeledValue(
+        text,
+        labels = [],
+        options = {}
+    ) {
+
+        const {
+            maxLength = 300,
+            multiline = false
+        } = options;
+
+        if (!text || !labels.length) {
+            return null;
+        }
+
+        const lines = this.getLines(text);
+
+        const normalizedLabels =
+            labels.map(label => ({
+                original: label,
+                normalized: this.normalizeForSearch(label)
+            }));
+
+
+        // =====================================================
+        // RECHERCHE LIGNE PAR LIGNE
+        // =====================================================
+
+        for (let i = 0; i < lines.length; i++) {
+
+            const line = lines[i];
+
+            const normalizedLine =
+                this.normalizeForSearch(line);
+
+            for (const label of normalizedLabels) {
+
+                if (
+                    !normalizedLine.startsWith(
+                        label.normalized
+                    )
+                ) {
+                    continue;
+                }
+
+
+                // =================================================
+                // CALCUL DE LA VALEUR DANS LA LIGNE ORIGINALE
+                // =================================================
+
+                const labelRegex =
+                    new RegExp(
+                        `^${this.escapeRegExp(label.original)}\\s*[:\\-–—]?\\s*`,
+                        "i"
+                    );
+
+                const match =
+                    line.match(labelRegex);
+
+
+                if (match) {
+
+                    const value =
+                        line
+                            .substring(match[0].length)
+                            .trim();
+
+                    if (value) {
+
+                        return this.cleanValue(
+                            value
+                        ).substring(0, maxLength);
+
+                    }
+                }
+
+
+                // =================================================
+                // CAS : VALEUR SUR LA LIGNE SUIVANTE
+                // =================================================
+
+                if (
+                    multiline &&
+                    lines[i + 1]
+                ) {
+
+                    return this.cleanValue(
+                        lines[i + 1]
+                    ).substring(0, maxLength);
+
+                }
+            }
+        }
+
+
+        // =====================================================
+        // FALLBACK REGEX
+        // =====================================================
+
+        const escapedLabels =
+            labels
+                .map(label =>
+                    this.escapeRegExp(label)
+                )
+                .join("|");
+
+        if (!escapedLabels) {
+            return null;
+        }
+
+
+        const regex =
+            new RegExp(
+                `(?:${escapedLabels})\\s*[:\\-–—]?\\s*([^\\n]{1,${maxLength}})`,
+                "i"
+            );
+
+
+        const match =
+            text.match(regex);
+
+        if (!match) {
+            return null;
+        }
+
+
+        return this.cleanValue(
+            match[1]
+        );
+    }
+   
 }
 
 

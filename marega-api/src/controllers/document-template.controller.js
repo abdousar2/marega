@@ -302,7 +302,7 @@ class DocumentTemplateController {
             }
 
             const agency =
-                await Agency.findById(agencyId);
+                await Agency.getById(agencyId);
 
             if (!agency) {
 
