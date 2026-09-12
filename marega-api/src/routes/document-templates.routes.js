@@ -61,5 +61,14 @@ router.post(
     TemplateRendererController.renderLease
 );
 
+router.post(
+
+    "/render-lease-pdf",
+    authenticateToken,
+    authorizeRoles("PLATFORM_ADMIN"),
+    DocumentTemplateController.renderLeasePDF
+
+);
+
 
 module.exports = router;

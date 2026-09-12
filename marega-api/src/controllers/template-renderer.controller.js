@@ -1,22 +1,27 @@
 const TemplateRendererService =
     require("../services/template-renderer.service");
 
+
 class TemplateRendererController {
 
-    static async renderLease(
-        req,
-        res
-    ) {
+    // =========================================================
+    // RENDRE UN TEMPLATE POUR UN BAIL
+    // =========================================================
+
+    static async renderLease(req, res) {
 
         try {
 
             const {
                 templateId,
-                leaseId
+                leaseId,
+                agency_id
             } = req.body;
 
-            const agencyId =
-                req.user.agency_id;
+
+            // =====================================================
+            // 1. VALIDATION TEMPLATE
+            // =====================================================
 
             if (!templateId) {
 
@@ -30,6 +35,11 @@ class TemplateRendererController {
                 });
 
             }
+
+
+            // =====================================================
+            // 2. VALIDATION BAIL
+            // =====================================================
 
             if (!leaseId) {
 
@@ -45,6 +55,66 @@ class TemplateRendererController {
             }
 
 
+            // =====================================================
+            // 3. DÉTERMINER L'AGENCE
+            // =====================================================
+
+            let agencyId;
+
+
+            // -----------------------------------------------------
+            // PLATFORM_ADMIN
+            // -----------------------------------------------------
+
+            if (
+                req.user.role === "PLATFORM_ADMIN"
+            ) {
+
+                agencyId =
+                    Number(agency_id);
+
+            }
+
+
+            // -----------------------------------------------------
+            // UTILISATEUR D'UNE AGENCE
+            // -----------------------------------------------------
+
+            else {
+
+                agencyId =
+                    Number(
+                        req.user.agency_id
+                    );
+
+            }
+
+
+            // =====================================================
+            // 4. VÉRIFIER L'AGENCE
+            // =====================================================
+
+            if (
+                !agencyId ||
+                !Number.isInteger(agencyId)
+            ) {
+
+                return res.status(400).json({
+
+                    success: false,
+
+                    message:
+                        "agency_id est obligatoire et doit être un entier."
+
+                });
+
+            }
+
+
+            // =====================================================
+            // 5. RENDU
+            // =====================================================
+
             const result =
                 await TemplateRendererService.renderByLease({
 
@@ -54,11 +124,14 @@ class TemplateRendererController {
                     leaseId:
                         Number(leaseId),
 
-                    agencyId:
-                        Number(agencyId)
+                    agencyId
 
                 });
 
+
+            // =====================================================
+            // 6. RÉPONSE
+            // =====================================================
 
             return res.status(200).json({
 
@@ -96,6 +169,7 @@ class TemplateRendererController {
     }
 
 }
+
 
 module.exports =
     TemplateRendererController;

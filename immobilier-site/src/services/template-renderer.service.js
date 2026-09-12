@@ -38,7 +38,6 @@ class TemplateRendererService {
             throw new Error(
                 `Template introuvable : ${templateId}`
             );
-
         }
 
         return result.rows[0];
@@ -46,7 +45,38 @@ class TemplateRendererService {
 
 
     // =========================================================
-    // RÉCUPÉRER LES CLAUSES DU TEMPLATE
+    // RÉCUPÉRER LES CHAMPS DU TEMPLATE
+    // =========================================================
+
+    static async getFields(templateId) {
+
+        const result = await pool.query(
+            `
+            SELECT
+                id,
+                template_id,
+                code,
+                label,
+                data_type,
+                source,
+                required,
+                default_value,
+                confidence
+            FROM marega.template_fields
+            WHERE template_id = $1
+            ORDER BY id ASC
+            `,
+            [
+                templateId
+            ]
+        );
+
+        return result.rows;
+    }
+
+
+    // =========================================================
+    // RÉCUPÉRER LES CLAUSES
     // =========================================================
 
     static async getClauses(templateId) {
@@ -105,9 +135,45 @@ class TemplateRendererService {
         return result.rows;
     }
 
+    // =========================================================
+    // RÉCUPÉRER LES TERMES SPÉCIFIQUES DU BAIL
+    // =========================================================
+
+    static async getLeaseTerms(
+        leaseId,
+        agencyId
+    ) {
+
+        const result = await pool.query(
+            `
+            SELECT
+                lt.id,
+                lt.lease_id,
+                lt.agency_term_id,
+                lt.value,
+                at.code,
+                at.label,
+                at.value_type,
+                at.default_value
+            FROM marega.lease_terms lt
+            INNER JOIN marega.agency_terms at
+                ON at.id = lt.agency_term_id
+            AND at.agency_id = $2
+            WHERE lt.lease_id = $1
+            ORDER BY lt.id ASC
+            `,
+            [
+                leaseId,
+                agencyId
+            ]
+        );
+
+        return result.rows;
+    }
+
 
     // =========================================================
-    // CONVERTIR UNE VALEUR JSONB
+    // NORMALISER UNE VALEUR
     // =========================================================
 
     static normalizeValue(value) {
@@ -119,21 +185,12 @@ class TemplateRendererService {
             return "";
         }
 
-        // PostgreSQL JSONB peut retourner directement
-        // un objet / tableau JavaScript.
+        if (Array.isArray(value)) {
+            return value.join(", ");
+        }
 
-        if (
-            typeof value === "object"
-        ) {
-
-            if (Array.isArray(value)) {
-
-                return value.join(", ");
-
-            }
-
+        if (typeof value === "object") {
             return JSON.stringify(value);
-
         }
 
         return String(value);
@@ -141,44 +198,215 @@ class TemplateRendererService {
 
 
     // =========================================================
-    // FORMATER UNE VALEUR
+    // FORMATER UNE DATE
     // =========================================================
 
-    static formatValue(value, dataType = "string") {
+    static formatDate(value) {
 
         if (
             value === null ||
-            value === undefined
+            value === undefined ||
+            value === ""
         ) {
             return "";
         }
 
-        switch (dataType) {
+        const date =
+            new Date(value);
 
-            case "number":
-
-                return Number(value)
-                    .toLocaleString("fr-FR")
-                    .replace(/\u00A0/g, " ");
-
-
-            case "boolean":
-
-                return value
-                    ? "Oui"
-                    : "Non";
-
-
-            case "date":
-
-                return String(value);
-
-
-            default:
-
-                return String(value);
-
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+            return String(value);
         }
+
+        return new Intl.DateTimeFormat(
+            "fr-FR",
+            {
+                day: "numeric",
+                month: "long",
+                year: "numeric"
+            }
+        ).format(date);
+    }
+
+
+    // =========================================================
+    // FORMATER UN MONTANT
+    // =========================================================
+
+    static formatMoney(value) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "";
+        }
+
+        const number =
+            Number(value);
+
+        if (
+            !Number.isFinite(number)
+        ) {
+            return String(value);
+        }
+
+        return new Intl.NumberFormat(
+            "fr-FR",
+            {
+                maximumFractionDigits: 0
+            }
+        )
+            .format(number)
+            .replace(/\u00A0/g, " ");
+    }
+
+
+    // =========================================================
+    // FORMATER UNE VALEUR SELON LA VARIABLE
+    // =========================================================
+
+    static formatVariableValue(
+        variable,
+        value
+    ) {
+
+        if (
+            value === null ||
+            value === undefined ||
+            value === ""
+        ) {
+            return "";
+        }
+
+
+        // -----------------------------------------------------
+        // DATES
+        // -----------------------------------------------------
+
+        const dateVariables = [
+
+            "tenant_birth_date",
+
+            "lease_start_date",
+
+            "lease_end_date",
+
+            "date",
+
+            "birth_date",
+
+            "start_date",
+
+            "end_date"
+
+        ];
+
+        if (
+            dateVariables.includes(variable)
+        ) {
+
+            return this.formatDate(value);
+        }
+
+
+        // -----------------------------------------------------
+        // MONTANTS
+        // -----------------------------------------------------
+
+        const moneyVariables = [
+
+            "monthly_rent",
+
+            "common_charges",
+
+            "monthly_total",
+
+            "deposit",
+
+            "common_charges_amount"
+
+        ];
+
+        if (
+            moneyVariables.includes(variable)
+        ) {
+
+            return this.formatMoney(value);
+        }
+
+
+        // -----------------------------------------------------
+        // BOOLÉENS
+        // -----------------------------------------------------
+
+        if (
+            variable === "individual_meters" ||
+            variable === "electricity_paid_by_tenant" ||
+            variable === "water_billed_by_meter"
+        ) {
+
+            return value
+                ? "Oui"
+                : "Non";
+        }
+
+
+        // -----------------------------------------------------
+        // AUTRES
+        // -----------------------------------------------------
+
+        return this.normalizeValue(
+            value
+        );
+    }
+
+
+    // =========================================================
+    // RÉCUPÉRER UNE VALEUR DANS LE CONTEXTE
+    // =========================================================
+
+    static getContextValue(
+        context,
+        variable
+    ) {
+
+        if (
+            !context ||
+            !variable
+        ) {
+            return undefined;
+        }
+
+        const parts =
+            String(variable)
+                .split(".");
+
+        let current =
+            context;
+
+        for (
+            const part
+            of parts
+        ) {
+
+            if (
+                current === null ||
+                current === undefined
+            ) {
+                return undefined;
+            }
+
+            current =
+                current[part];
+        }
+
+        return current;
     }
 
 
@@ -215,16 +443,17 @@ class TemplateRendererService {
 
                 if (
                     value === undefined ||
-                    value === null
+                    value === null ||
+                    value === ""
                 ) {
 
                     return keepUnknown
                         ? fullMatch
                         : "";
-
                 }
 
-                return this.normalizeValue(
+                return this.formatVariableValue(
+                    variable,
                     value
                 );
             }
@@ -233,66 +462,14 @@ class TemplateRendererService {
 
 
     // =========================================================
-    // RÉCUPÉRER UNE VALEUR DANS LE CONTEXTE
-    // =========================================================
-
-    static getContextValue(
-        context,
-        path
-    ) {
-
-        if (
-            !context ||
-            !path
-        ) {
-            return undefined;
-        }
-
-        // Exemple :
-        //
-        // tenant.name
-        //
-        // devient :
-        //
-        // context.tenant.name
-
-        const parts =
-            String(path)
-                .split(".");
-
-        let current =
-            context;
-
-        for (
-            const part
-            of parts
-        ) {
-
-            if (
-                current === null ||
-                current === undefined
-            ) {
-
-                return undefined;
-
-            }
-
-            current =
-                current[part];
-
-        }
-
-        return current;
-    }
-
-
-    // =========================================================
-    // CONSTRUIRE LE CONTEXTE À PARTIR DU BAIL
+    // CONSTRUIRE LE CONTEXTE DU BAIL
     // =========================================================
 
     static async buildLeaseContext(
         lease,
-        agencyTerms = []
+        agencyTerms = [],
+        templateFields = [],
+        leaseTerms = []
     ) {
 
         if (!lease) {
@@ -300,14 +477,278 @@ class TemplateRendererService {
             throw new Error(
                 "Données du bail manquantes."
             );
-
         }
+
+
+        // =====================================================
+        // TERMES AGENCE
+        // =====================================================
+
+        const agencyTermMap = {};
+
+        for (const term of agencyTerms) {
+
+            if (!term || !term.code) {
+                continue;
+            }
+
+            let value =
+                term.default_value;
+
+            if (
+                value &&
+                typeof value === "object" &&
+                !Array.isArray(value) &&
+                Object.prototype.hasOwnProperty.call(
+                    value,
+                    "value"
+                )
+            ) {
+
+                value =
+                    value.value;
+            }
+
+            agencyTermMap[term.code] =
+                value;
+        }
+
+
+        // =====================================================
+        // TERMES DU BAIL
+        // =====================================================
+
+        const leaseTermMap = {};
+
+        for (const term of leaseTerms) {
+
+            if (!term || !term.code) {
+                continue;
+            }
+
+            let value =
+                term.value;
+
+            if (
+                value &&
+                typeof value === "object" &&
+                !Array.isArray(value) &&
+                Object.prototype.hasOwnProperty.call(
+                    value,
+                    "value"
+                )
+            ) {
+
+                value =
+                    value.value;
+            }
+
+            leaseTermMap[term.code] =
+                value;
+        }
+
+
+        // =====================================================
+        // VALEURS PAR DÉFAUT DU TEMPLATE
+        // =====================================================
+
+        const templateDefaultMap = {};
+
+        for (const field of templateFields) {
+
+            if (!field || !field.code) {
+                continue;
+            }
+
+            if (
+                field.default_value !== null &&
+                field.default_value !== undefined
+            ) {
+
+                let value =
+                    field.default_value;
+
+                if (
+                    value &&
+                    typeof value === "object" &&
+                    !Array.isArray(value) &&
+                    Object.prototype.hasOwnProperty.call(
+                        value,
+                        "value"
+                    )
+                ) {
+
+                    value =
+                        value.value;
+                }
+
+                templateDefaultMap[field.code] =
+                    value;
+            }
+        }
+
+
+        // =====================================================
+        // LOYER
+        // =====================================================
+
+        const monthlyRent =
+            Number(
+                lease.monthly_rent || 0
+            );
+
+
+        // =====================================================
+        // CHARGES COMMUNES
+        //
+        // Priorité :
+        // 1. charge réelle du bail si > 0
+        // 2. terme du bail
+        // 3. terme agence
+        // =====================================================
+
+        let commonCharges =
+            Number(
+                lease.common_charges
+            );
+
+        if (
+            !Number.isFinite(commonCharges) ||
+            commonCharges <= 0
+        ) {
+
+            if (
+                leaseTermMap.common_charges_amount !==
+                undefined
+            ) {
+
+                commonCharges =
+                    Number(
+                        leaseTermMap.common_charges_amount
+                    );
+
+            } else if (
+                agencyTermMap.common_charges_amount !==
+                undefined
+            ) {
+
+                commonCharges =
+                    Number(
+                        agencyTermMap.common_charges_amount
+                    );
+
+            } else {
+
+                commonCharges = 0;
+            }
+        }
+
+
+        if (!Number.isFinite(commonCharges)) {
+            commonCharges = 0;
+        }
+
+
+        // =====================================================
+        // TOTAL MENSUEL
+        // =====================================================
+
+        const monthlyTotal =
+            monthlyRent +
+            commonCharges;
+
+
+        // =====================================================
+        // LOCATAIRE
+        // =====================================================
+
+        const tenantName =
+            String(
+                lease.tenant_name ||
+                [
+                    lease.tenant_first_name,
+                    lease.tenant_last_name
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+            ).trim();
+
+
+        // =====================================================
+        // BAILLEUR
+        // =====================================================
+
+        const landlordName =
+            String(
+                lease.landlord_name ||
+                [
+                    lease.landlord_first_name,
+                    lease.landlord_last_name
+                ]
+                    .filter(Boolean)
+                    .join(" ")
+            ).trim();
+
+
+        // =====================================================
+        // VILLE / PAYS
+        //
+        // Si l'immeuble n'en possède pas :
+        // on prend ceux de l'agence.
+        // =====================================================
+
+        const buildingCity =
+            lease.building_city ||
+            lease.agency_city ||
+            "";
+
+        const buildingCountry =
+            lease.building_country ||
+            lease.agency_country ||
+            "";
+
+
+        // =====================================================
+        // MODE DE PAIEMENT
+        // =====================================================
+
+        const paymentMethod =
+            lease.payment_method ||
+            leaseTermMap.payment_method ||
+            agencyTermMap.payment_method ||
+            templateDefaultMap.payment_method ||
+            null;
+
+
+        // =====================================================
+        // COMPTEURS
+        //
+        // On utilise uniquement une vraie valeur du bail.
+        // Jamais les valeurs du contrat de simulation.
+        // =====================================================
+
+        const electricityMeter =
+            lease.electricity_meter_number ||
+            lease.electricity_meter ||
+            leaseTermMap.electricity_meter_number ||
+            null;
+
+        const waterMeter =
+            lease.water_meter_number ||
+            lease.water_meter ||
+            leaseTermMap.water_meter_number ||
+            null;
+
+
+        // =====================================================
+        // CONTEXTE
+        // =====================================================
 
         const context = {
 
-            // =================================================
+            // -------------------------------------------------
             // BAIL
-            // =================================================
+            // -------------------------------------------------
 
             lease: {
 
@@ -324,10 +765,10 @@ class TemplateRendererService {
                     lease.end_date,
 
                 monthly_rent:
-                    lease.monthly_rent,
+                    monthlyRent,
 
                 common_charges:
-                    lease.common_charges,
+                    commonCharges,
 
                 deposit:
                     lease.deposit,
@@ -346,13 +787,12 @@ class TemplateRendererService {
 
                 level:
                     lease.level
-
             },
 
 
-            // =================================================
+            // -------------------------------------------------
             // LOCATAIRE
-            // =================================================
+            // -------------------------------------------------
 
             tenant: {
 
@@ -360,13 +800,7 @@ class TemplateRendererService {
                     lease.tenant_id,
 
                 name:
-                    lease.tenant_name ||
-                    [
-                        lease.tenant_first_name,
-                        lease.tenant_last_name
-                    ]
-                        .filter(Boolean)
-                        .join(" "),
+                    tenantName,
 
                 first_name:
                     lease.tenant_first_name,
@@ -383,16 +817,21 @@ class TemplateRendererService {
                 profession:
                     lease.tenant_profession,
 
+                birth_date:
+                    lease.tenant_birth_date,
+
+                birth_place:
+                    lease.tenant_birth_place,
+
                 identity_number:
                     lease.identity_number ||
                     lease.tenant_identity_number
-
             },
 
 
-            // =================================================
+            // -------------------------------------------------
             // BAILLEUR
-            // =================================================
+            // -------------------------------------------------
 
             landlord: {
 
@@ -400,13 +839,7 @@ class TemplateRendererService {
                     lease.landlord_id,
 
                 name:
-                    lease.landlord_name ||
-                    [
-                        lease.landlord_first_name,
-                        lease.landlord_last_name
-                    ]
-                        .filter(Boolean)
-                        .join(" "),
+                    landlordName,
 
                 first_name:
                     lease.landlord_first_name,
@@ -428,13 +861,12 @@ class TemplateRendererService {
 
                 identity_number:
                     lease.landlord_identity_number
-
             },
 
 
-            // =================================================
+            // -------------------------------------------------
             // APPARTEMENT
-            // =================================================
+            // -------------------------------------------------
 
             apartment: {
 
@@ -458,13 +890,12 @@ class TemplateRendererService {
 
                 level:
                     lease.level
-
             },
 
 
-            // =================================================
+            // -------------------------------------------------
             // IMMEUBLE
-            // =================================================
+            // -------------------------------------------------
 
             building: {
 
@@ -478,22 +909,20 @@ class TemplateRendererService {
                     lease.building_address,
 
                 city:
-                    lease.building_city,
+                    buildingCity,
 
                 country:
-                    lease.building_country
-
+                    buildingCountry
             },
 
 
-            // =================================================
+            // -------------------------------------------------
             // AGENCE
-            // =================================================
+            // -------------------------------------------------
 
             agency: {
 
                 id:
-                    lease.agency_id ||
                     lease.agency_id,
 
                 name:
@@ -525,47 +954,19 @@ class TemplateRendererService {
 
                 logo_path:
                     lease.agency_logo_path
-
             },
 
-            // =================================================
-            // TERMES DE L'AGENCE
-            // =================================================
+
+            // -------------------------------------------------
+            // TERMES
+            // -------------------------------------------------
 
             terms: {}
-
         };
 
 
         // =====================================================
-        // CALCULS
-        // =====================================================
-
-        const monthlyRent =
-            Number(
-                lease.monthly_rent || 0
-            );
-
-        const commonCharges =
-            Number(
-                lease.common_charges || 0
-            );
-
-        context.monthly_total =
-            monthlyRent +
-            commonCharges;
-
-
-        // =====================================================
-        // ALIASES DIRECTS
-        //
-        // Permet aux templates d'utiliser :
-        //
-        // {{tenant_name}}
-        //
-        // au lieu de :
-        //
-        // {{tenant.name}}
+        // ALIAS LOCATAIRE
         // =====================================================
 
         context.tenant_name =
@@ -586,9 +987,19 @@ class TemplateRendererService {
         context.tenant_profession =
             context.tenant.profession;
 
+        context.tenant_birth_date =
+            context.tenant.birth_date;
+
+        context.tenant_birth_place =
+            context.tenant.birth_place;
+
         context.tenant_identity_number =
             context.tenant.identity_number;
 
+
+        // =====================================================
+        // ALIAS BAILLEUR
+        // =====================================================
 
         context.landlord_name =
             context.landlord.name;
@@ -598,6 +1009,9 @@ class TemplateRendererService {
 
         context.landlord_last_name =
             context.landlord.last_name;
+
+        context.landlord_company_name =
+            context.landlord.company_name;
 
         context.landlord_phone =
             context.landlord.phone;
@@ -612,6 +1026,10 @@ class TemplateRendererService {
             context.landlord.identity_number;
 
 
+        // =====================================================
+        // ALIAS APPARTEMENT
+        // =====================================================
+
         context.apartment_number =
             context.apartment.number;
 
@@ -624,6 +1042,10 @@ class TemplateRendererService {
         context.apartment_level =
             context.apartment.level;
 
+
+        // =====================================================
+        // ALIAS IMMEUBLE
+        // =====================================================
 
         context.building_name =
             context.building.name;
@@ -638,6 +1060,10 @@ class TemplateRendererService {
             context.building.country;
 
 
+        // =====================================================
+        // VALEURS PRINCIPALES
+        // =====================================================
+
         context.monthly_rent =
             monthlyRent;
 
@@ -645,7 +1071,7 @@ class TemplateRendererService {
             commonCharges;
 
         context.monthly_total =
-            context.monthly_total;
+            monthlyTotal;
 
         context.deposit =
             lease.deposit;
@@ -666,64 +1092,77 @@ class TemplateRendererService {
             lease.end_date;
 
         context.payment_method =
-            null;
+            paymentMethod;
 
 
         // =====================================================
-        // TERMES DE L'AGENCE
+        // COMPTEURS
         // =====================================================
 
-        for (
-            const term
-            of agencyTerms
-        ) {
+        context.electricity_meter_number =
+            electricityMeter;
 
-            if (!term.code) {
+        context.water_meter_number =
+            waterMeter;
+
+
+        // =====================================================
+        // TERMES AGENCE
+        // Puis TERMES DU BAIL
+        //
+        // Le terme du bail est prioritaire.
+        // =====================================================
+
+        for (const term of agencyTerms) {
+
+            if (!term || !term.code) {
                 continue;
-            }
-
-            let value =
-                term.default_value;
-
-            // JSONB PostgreSQL peut être null
-            // ou déjà désérialisé.
-
-            if (
-                value !== null &&
-                value !== undefined
-            ) {
-
-                if (
-                    typeof value === "object" &&
-                    value !== null &&
-                    Object.prototype.hasOwnProperty.call(
-                        value,
-                        "value"
-                    )
-                ) {
-
-                    value =
-                        value.value;
-
-                }
-
             }
 
             context.terms[
                 term.code
-            ] = value;
-
-            // Alias direct :
-            //
-            // {{common_charges_amount}}
-            //
-            // {{sublease_policy}}
+            ] =
+                agencyTermMap[term.code];
 
             context[
                 term.code
-            ] = value;
-
+            ] =
+                agencyTermMap[term.code];
         }
+
+
+        for (const term of leaseTerms) {
+
+            if (!term || !term.code) {
+                continue;
+            }
+
+            context.terms[
+                term.code
+            ] =
+                leaseTermMap[term.code];
+
+            context[
+                term.code
+            ] =
+                leaseTermMap[term.code];
+        }
+
+
+        // =====================================================
+        // VALEURS CALCULÉES
+        // =====================================================
+
+        context.common_charges_amount =
+            leaseTermMap.common_charges_amount ??
+            agencyTermMap.common_charges_amount ??
+            commonCharges;
+
+
+        context.individual_meters =
+            leaseTermMap.individual_meters ??
+            agencyTermMap.individual_meters ??
+            false;
 
 
         return context;
@@ -731,7 +1170,7 @@ class TemplateRendererService {
 
 
     // =========================================================
-    // CALCUL DURÉE
+    // CALCUL DURÉE DU BAIL
     // =========================================================
 
     static calculateDurationMonths(
@@ -743,9 +1182,7 @@ class TemplateRendererService {
             !startDate ||
             !endDate
         ) {
-
             return null;
-
         }
 
         const start =
@@ -762,20 +1199,56 @@ class TemplateRendererService {
                 end.getTime()
             )
         ) {
-
             return null;
-
         }
 
         return (
             (end.getFullYear() -
                 start.getFullYear()) *
-                12
+            12
         ) +
         (
             end.getMonth() -
             start.getMonth()
         ) + 1;
+    }
+
+
+    // =========================================================
+    // EXTRAIRE LES VARIABLES
+    // =========================================================
+
+    static extractVariables(
+        text = ""
+    ) {
+
+        const variables = [];
+
+        const regex =
+            /\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g;
+
+        let match;
+
+        while (
+            (match = regex.exec(text)) !== null
+        ) {
+
+            const variable =
+                match[1];
+
+            if (
+                !variables.includes(
+                    variable
+                )
+            ) {
+
+                variables.push(
+                    variable
+                );
+            }
+        }
+
+        return variables;
     }
 
 
@@ -820,108 +1293,72 @@ class TemplateRendererService {
                         clause.enabled,
 
                     variables:
-                        clause.variables || []
+                        this.extractVariables(
+                            content
+                        )
 
                 };
-
             }
         );
     }
 
 
     // =========================================================
-    // VÉRIFIER LES VARIABLES MANQUANTES
+    // VARIABLES MANQUANTES
+    //
+    // IMPORTANT :
+    // seules les variables marquées required=true
+    // dans template_fields bloquent le rendu.
     // =========================================================
 
     static findMissingVariables(
         clauses,
-        context
+        context,
+        fields = []
     ) {
 
         const missing =
             new Set();
 
+
+        // =====================================================
+        // VARIABLES OBLIGATOIRES DU TEMPLATE
+        // =====================================================
+
+        const requiredFields =
+            fields.filter(
+                field =>
+                    field.required === true
+            );
+
+
         for (
-            const clause
-            of clauses
+            const field
+            of requiredFields
         ) {
 
-            const variables =
-                this.extractVariables(
-                    clause.content
+            const value =
+                this.getContextValue(
+                    context,
+                    field.code
                 );
 
-            for (
-                const variable
-                of variables
+            if (
+                value === undefined ||
+                value === null ||
+                value === ""
             ) {
 
-                const value =
-                    this.getContextValue(
-                        context,
-                        variable
-                    );
-
-                if (
-                    value === undefined ||
-                    value === null ||
-                    value === ""
-                ) {
-
-                    missing.add(
-                        variable
-                    );
-
-                }
-
+                missing.add(
+                    field.code
+                );
             }
-
         }
+
 
         return Array.from(
             missing
         );
-    }
-
-
-    // =========================================================
-    // EXTRAIRE LES VARIABLES
-    // =========================================================
-
-    static extractVariables(
-        text = ""
-    ) {
-
-        const variables = [];
-
-        const regex =
-            /\{\{\s*([a-zA-Z0-9_.-]+)\s*\}\}/g;
-
-        let match;
-
-        while (
-            (match = regex.exec(text))
-            !== null
-        ) {
-
-            const variable =
-                match[1];
-
-            if (
-                !variables.includes(
-                    variable
-                )
-            ) {
-
-                variables.push(
-                    variable
-                );
-
-            }
-
-        }
-
-        return variables;
     }
 
 
@@ -935,12 +1372,15 @@ class TemplateRendererService {
         agencyId
     }) {
 
+        // =====================================================
+        // VALIDATION
+        // =====================================================
+
         if (!templateId) {
 
             throw new Error(
                 "templateId est obligatoire."
             );
-
         }
 
         if (!leaseId) {
@@ -948,7 +1388,6 @@ class TemplateRendererService {
             throw new Error(
                 "leaseId est obligatoire."
             );
-
         }
 
         if (!agencyId) {
@@ -956,7 +1395,6 @@ class TemplateRendererService {
             throw new Error(
                 "agencyId est obligatoire."
             );
-
         }
 
 
@@ -972,7 +1410,17 @@ class TemplateRendererService {
 
 
         // =====================================================
-        // 2. BAIL COMPLET
+        // 2. CHAMPS
+        // =====================================================
+
+        const fields =
+            await this.getFields(
+                template.id
+            );
+
+
+        // =====================================================
+        // 3. BAIL COMPLET
         // =====================================================
 
         const lease =
@@ -986,12 +1434,11 @@ class TemplateRendererService {
             throw new Error(
                 `Bail introuvable : ${leaseId}`
             );
-
         }
 
 
         // =====================================================
-        // 3. CLAUSES
+        // 4. CLAUSES
         // =====================================================
 
         const clauses =
@@ -1001,7 +1448,7 @@ class TemplateRendererService {
 
 
         // =====================================================
-        // 4. TERMES AGENCE
+        // 5. TERMES AGENCE
         // =====================================================
 
         const agencyTerms =
@@ -1011,29 +1458,43 @@ class TemplateRendererService {
 
 
         // =====================================================
-        // 5. CONTEXTE
+        // 6. TERMES DU BAIL
+        // =====================================================
+
+        const leaseTerms =
+            await this.getLeaseTerms(
+                leaseId,
+                agencyId
+            );
+
+
+        // =====================================================
+        // 7. CONTEXTE
         // =====================================================
 
         const context =
             await this.buildLeaseContext(
                 lease,
-                agencyTerms
+                agencyTerms,
+                fields,
+                leaseTerms
             );
 
 
         // =====================================================
-        // 6. VARIABLES MANQUANTES
+        // 8. VARIABLES OBLIGATOIRES MANQUANTES
         // =====================================================
 
         const missingVariables =
             this.findMissingVariables(
                 clauses,
-                context
+                context,
+                fields
             );
 
 
         // =====================================================
-        // 7. RENDU
+        // 9. RENDU
         // =====================================================
 
         const renderedClauses =
@@ -1044,7 +1505,7 @@ class TemplateRendererService {
 
 
         // =====================================================
-        // RÉSULTAT
+        // 10. RÉSULTAT
         // =====================================================
 
         return {

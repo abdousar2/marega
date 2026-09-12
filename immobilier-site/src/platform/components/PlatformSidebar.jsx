@@ -20,6 +20,11 @@ export default function PlatformSidebar() {
         },
 
         {
+            label: "Modèles IA",
+            path: "/platform/document-templates"
+        },
+
+        {
             label: "Demandes",
             path: "/platform/requests"
         },

@@ -15,6 +15,7 @@ import PlatformDashboard from "./platform/pages/PlatformDashboard";
 import PlatformProtectedRoute from "./platform/routes/PlatformProtectedRoute";
 import PlatformAgencyCreate from "./platform/pages/PlatformAgencyCreate";
 import PlatformRequests from "./platform/pages/PlatformRequests";
+import DocumentTemplates from "./platform/pages/DocumentTemplates";
 
 
 // ADMIN
@@ -178,6 +179,13 @@ function App() {
                         <PlatformProtectedRoute>
                             <PlatformRequests />
                         </PlatformProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/platform/document-templates"
+                    element={
+                        <DocumentTemplates />
                     }
                 />
 
