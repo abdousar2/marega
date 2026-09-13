@@ -6,6 +6,9 @@ import PlatformSidebar
 import PlatformHeader
     from "../components/PlatformHeader";
 
+import PlatformAuthService
+    from "../../services/platformAuth.service";
+
 import "../styles/DocumentTemplates.css";
 
 const API_URL =
@@ -14,8 +17,6 @@ const API_URL =
 
 const API_ORIGIN =
     API_URL.replace(/\/api\/?$/, "");
-
-const AUTH_KEY = "marega_token";
 
 export default function DocumentTemplates() {
 
@@ -31,8 +32,14 @@ export default function DocumentTemplates() {
     const [templateName, setTemplateName] =
         useState("");
 
+    const [leases, setLeases] =
+        useState([]);
+
     const [leaseId, setLeaseId] =
         useState("");
+
+    const [loadingLeases, setLoadingLeases] =
+        useState(false);
 
     const [loadingAgencies, setLoadingAgencies] =
         useState(true);
@@ -66,6 +73,22 @@ export default function DocumentTemplates() {
 
     }, []);
 
+    useEffect(() => {
+
+        if (!agencyId) {
+
+            setLeases([]);
+            setLeaseId("");
+
+            return;
+        }
+
+        loadLeases(
+            agencyId
+        );
+
+    }, [agencyId]);
+
 
     async function loadAgencies() {
 
@@ -75,9 +98,7 @@ export default function DocumentTemplates() {
         try {
 
             const token =
-                localStorage.getItem(
-                    AUTH_KEY
-                );
+                PlatformAuthService.getToken();
 
             const response =
                 await fetch(
@@ -126,6 +147,75 @@ export default function DocumentTemplates() {
         }
     }
 
+    // =====================================================
+    // CHARGER LES BAUX DE L'AGENCE
+    // =====================================================
+
+    async function loadLeases(
+        selectedAgencyId
+    ) {
+
+        setLoadingLeases(true);
+        setLeases([]);
+        setLeaseId("");
+        setError("");
+
+        try {
+
+            const token =
+                PlatformAuthService.getToken();
+
+
+            const response =
+                await fetch(
+                    `${API_URL}/platform/agencies/${selectedAgencyId}/leases`,
+                    {
+                        headers: {
+                            Authorization:
+                                `Bearer ${token}`
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    data.message ||
+                    "Impossible de charger les baux."
+                );
+            }
+
+
+            setLeases(
+                Array.isArray(
+                    data.leases
+                )
+                    ? data.leases
+                    : []
+            );
+
+        }
+
+        catch (err) {
+
+            setError(
+                err.message
+            );
+
+        }
+
+        finally {
+
+            setLoadingLeases(false);
+        }
+    }
+
 
     // =====================================================
     // ANALYSER LE DOCUMENT
@@ -166,9 +256,7 @@ export default function DocumentTemplates() {
         try {
 
             const token =
-                localStorage.getItem(
-                    AUTH_KEY
-                );
+                PlatformAuthService.getToken();
 
             const formData =
                 new FormData();
@@ -278,7 +366,7 @@ export default function DocumentTemplates() {
         if (!leaseId) {
 
             setError(
-                "Saisis l'identifiant du bail."
+                "Sélectionne un bail."
             );
 
             return;
@@ -290,9 +378,7 @@ export default function DocumentTemplates() {
         try {
 
             const token =
-                localStorage.getItem(
-                    AUTH_KEY
-                );
+                PlatformAuthService.getToken();
 
 
             const response =
@@ -869,24 +955,61 @@ export default function DocumentTemplates() {
                                         <div>
 
                                             <label>
-                                                Identifiant du bail
+                                                Bail à générer
                                             </label>
 
-                                            <input
-                                                type="number"
-                                                min="1"
+                                            <select
                                                 value={leaseId}
                                                 onChange={(event) =>
                                                     setLeaseId(
                                                         event.target.value
                                                     )
                                                 }
-                                                placeholder="Ex. 12"
                                                 disabled={
                                                     !template ||
-                                                    generating
+                                                    generating ||
+                                                    loadingLeases ||
+                                                    !agencyId
                                                 }
-                                            />
+                                            >
+
+                                                <option value="">
+                                                    {loadingLeases
+                                                        ? "Chargement des baux..."
+                                                        : leases.length === 0
+                                                            ? "Aucun bail disponible"
+                                                            : "Sélectionner un bail"
+                                                    }
+                                                </option>
+
+                                                {leases.map(
+                                                    (lease) => (
+
+                                                        <option
+                                                            key={lease.id}
+                                                            value={lease.id}
+                                                        >
+
+                                                            {lease.contract_number}
+                                                            {" — "}
+                                                            {lease.tenant_name ||
+                                                                "Locataire non renseigné"
+                                                            }
+                                                            {" — "}
+                                                            {lease.apartment_number ||
+                                                                "Logement non renseigné"
+                                                            }
+                                                            {lease.building_name
+                                                                ? ` — ${lease.building_name}`
+                                                                : ""
+                                                            }
+
+                                                        </option>
+
+                                                    )
+                                                )}
+
+                                            </select>
 
                                         </div>
 

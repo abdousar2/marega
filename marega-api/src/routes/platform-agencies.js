@@ -2,7 +2,13 @@ const express = require("express");
 
 const router = express.Router();
 
-const pool = require("../config/database");
+const pool =
+    require("../config/database");
+
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
 
 
 // =====================================================
@@ -60,6 +66,155 @@ router.get("/", async (req, res) => {
     }
 
 });
+
+// =====================================================
+// GET /api/platform/agencies/:agencyId/leases
+// Liste des baux d'une agence
+// =====================================================
+
+router.get(
+    "/:agencyId/leases",
+
+    authenticateToken,
+
+    authorizeRoles("PLATFORM_ADMIN"),
+
+    async (req, res) => {
+
+        try {
+
+            const agencyId =
+                Number(
+                    req.params.agencyId
+                );
+
+
+            if (
+                !Number.isInteger(
+                    agencyId
+                )
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant d'agence invalide."
+
+                });
+
+            }
+
+
+            const result =
+                await pool.query(
+                    `
+                    SELECT
+                        l.id,
+                        l.contract_number,
+                        l.agency_id,
+                        l.start_date,
+                        l.end_date,
+                        l.status,
+
+                        t.first_name AS tenant_first_name,
+                        t.last_name AS tenant_last_name,
+
+                        a.number AS apartment_number,
+
+                        b.name AS building_name
+
+                    FROM marega.leases l
+
+                    LEFT JOIN marega.tenants t
+                        ON t.id = l.tenant_id
+
+                    LEFT JOIN marega.apartments a
+                        ON a.id = l.apartment_id
+
+                    LEFT JOIN marega.buildings b
+                        ON b.id = a.building_id
+
+                    WHERE l.agency_id = $1
+
+                    ORDER BY
+                        l.id DESC
+                    `,
+                    [agencyId]
+                );
+
+
+            const leases =
+                result.rows.map(
+                    lease => ({
+
+                        id:
+                            lease.id,
+
+                        contract_number:
+                            lease.contract_number,
+
+                        agency_id:
+                            lease.agency_id,
+
+                        start_date:
+                            lease.start_date,
+
+                        end_date:
+                            lease.end_date,
+
+                        status:
+                            lease.status,
+
+                        tenant_name:
+                            [
+                                lease.tenant_first_name,
+                                lease.tenant_last_name
+                            ]
+                                .filter(Boolean)
+                                .join(" ")
+                                .trim(),
+
+                        apartment_number:
+                            lease.apartment_number ||
+                            "",
+
+                        building_name:
+                            lease.building_name ||
+                            ""
+
+                    })
+                );
+
+
+            return res.json({
+
+                success: true,
+
+                leases
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                "❌ PLATFORM AGENCY LEASES ERROR:",
+                err
+            );
+
+
+            return res.status(500).json({
+
+                error:
+                    "Erreur lors du chargement des baux."
+
+            });
+
+        }
+
+    }
+);
 
 // =====================================================
 // GET /api/platform/agencies/:id
