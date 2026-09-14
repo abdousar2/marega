@@ -1,13 +1,66 @@
-import { api } from "./api";
+const AuditLog = require("../models/audit.model");
+
 
 const AuditService = {
 
-    getAll() {
+    // =========================================================
+    // ENREGISTRER UNE ACTION
+    // =========================================================
 
-        return api("/audit");
+    async log(
+        req,
+        {
+            user_id = null,
+            action,
+            module,
+            entity_id = null,
+            details = null
+        }
+    ) {
+
+        try {
+
+            await AuditLog.create({
+
+                user_id:
+                    user_id ||
+                    req?.user?.id ||
+                    null,
+
+                agency_id:
+                    req?.user?.agency_id ||
+                    null,
+
+                action,
+
+                module,
+
+                entity_id,
+
+                details,
+
+                ip_address:
+                    req?.ip || null,
+
+                user_agent:
+                    req?.get("user-agent") || null
+
+            });
+
+        }
+
+        catch (err) {
+
+            console.error(
+                "Erreur journalisation audit :",
+                err
+            );
+
+        }
 
     }
 
 };
 
-export default AuditService;
+
+module.exports = AuditService;
