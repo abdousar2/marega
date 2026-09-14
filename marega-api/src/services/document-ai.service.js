@@ -2869,6 +2869,302 @@ class DocumentAIService {
     }
 
     // =========================================================
+    // DÉTECTION DE LA STRUCTURE / MISE EN PAGE
+    // =========================================================
+
+    static detectLayout(text = "", clauses = []) {
+
+        const normalized = this.normalizeSearchText(text);
+
+        const sections = [];
+
+        const has = (...keywords) =>
+            keywords.some(keyword =>
+                normalized.includes(
+                    this.normalizeSearchText(keyword)
+                )
+            );
+
+        // ---------------------------------------------------------
+        // EN-TÊTE
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "agence immobilière",
+                "agence immobiliere",
+                "agence test"
+            )
+        ) {
+            sections.push({
+                type: "HEADER"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // TITRE
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "contrat de location",
+                "contrat de bail"
+            )
+        ) {
+            sections.push({
+                type: "TITLE"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // PARTIES
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "entre les soussignés",
+                "entre les soussignes",
+                "bailleur",
+                "locataire",
+                "preneur"
+            )
+        ) {
+            sections.push({
+                type: "PARTIES"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // LOGEMENT
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "logement",
+                "appartement",
+                "immeuble",
+                "résidence",
+                "residence"
+            )
+        ) {
+            sections.push({
+                type: "PROPERTY"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // DURÉE
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "durée",
+                "duree",
+                "durée du bail",
+                "duree du bail",
+                "prenant effet",
+                "échéance",
+                "echeance"
+            )
+        ) {
+            sections.push({
+                type: "DURATION"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // LOYER
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "loyer",
+                "loyer mensuel"
+            )
+        ) {
+            sections.push({
+                type: "RENT"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // DÉTAIL DU LOYER
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "charges communes",
+                "total mensuel",
+                "dépôt de garantie",
+                "depot de garantie",
+                "caution"
+            )
+        ) {
+            sections.push({
+                type: "RENT_BREAKDOWN"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // CONDITIONS
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "charges et conditions",
+                "charges et conditions :"
+            )
+        ) {
+            sections.push({
+                type: "CONDITIONS"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // ARTICLES
+        // ---------------------------------------------------------
+
+        if (
+            clauses &&
+            Array.isArray(clauses) &&
+            clauses.length > 0
+        ) {
+            sections.push({
+                type: "ARTICLES"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // CLAUSES RÉSOLUTOIRES
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "clauses résolutoires",
+                "clauses resolutoires",
+                "clause résolutoire",
+                "clause resolutoire"
+            )
+        ) {
+            sections.push({
+                type: "RESOLUTORY_CLAUSES"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // ÉLECTION DE DOMICILE
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "élection de domicile",
+                "election de domicile",
+                "domicile"
+            )
+        ) {
+            sections.push({
+                type: "DOMICILE"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // ENREGISTREMENT
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "enregistrement",
+                "enregistré",
+                "enregistre"
+            )
+        ) {
+            sections.push({
+                type: "REGISTRATION"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // PRÉAVIS
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "préavis",
+                "preavis"
+            )
+        ) {
+            sections.push({
+                type: "NOTICE"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // SIGNATURES
+        // ---------------------------------------------------------
+
+        if (
+            has(
+                "signature",
+                "signatures",
+                "le bailleur",
+                "le locataire",
+                "le preneur"
+            )
+        ) {
+            sections.push({
+                type: "SIGNATURES"
+            });
+        }
+
+        // ---------------------------------------------------------
+        // FALLBACK
+        // ---------------------------------------------------------
+
+        if (sections.length === 0) {
+
+            sections.push(
+                {
+                    type: "HEADER"
+                },
+                {
+                    type: "TITLE"
+                },
+                {
+                    type: "PARTIES"
+                },
+                {
+                    type: "PROPERTY"
+                },
+                {
+                    type: "DURATION"
+                },
+                {
+                    type: "RENT"
+                },
+                {
+                    type: "RENT_BREAKDOWN"
+                },
+                {
+                    type: "CONDITIONS"
+                },
+                {
+                    type: "ARTICLES"
+                },
+                {
+                    type: "SIGNATURES"
+                }
+            );
+        }
+
+        return {
+            version: 1,
+            page_format: "A4",
+            orientation: "portrait",
+            sections
+        };
+    }
+
+    // =========================================================
     // ANALYSE GLOBALE
     // =========================================================
 
@@ -2877,6 +3173,7 @@ class DocumentAIService {
         const extraction =
             await this.extractPDF(filePath);
 
+
         // -----------------------------------------------------
         // PDF SCANNÉ / IMAGE
         // -----------------------------------------------------
@@ -2884,6 +3181,7 @@ class DocumentAIService {
         if (!extraction.hasText) {
 
             return {
+
                 status: "OCR_REQUIRED",
 
                 document: {
@@ -2895,30 +3193,47 @@ class DocumentAIService {
                     document_type: "UNKNOWN",
                     fields: [],
                     terms: [],
-                    clauses: []
+                    clauses: [],
+                    layout: {
+                        version: 2,
+                        page_format: "A4",
+                        orientation: "portrait",
+                        adaptive: true,
+                        sections: []
+                    }
                 }
             };
         }
 
+
         // -----------------------------------------------------
-        // NETTOYAGE DU TEXTE
+        // NETTOYAGE
         // -----------------------------------------------------
 
         const cleanedText =
-            this.cleanDocumentText(extraction.text);
+            this.cleanDocumentText(
+                extraction.text
+            );
+
 
         // -----------------------------------------------------
-        // ANALYSE DU DOCUMENT
+        // ANALYSE
         // -----------------------------------------------------
 
         const documentType =
-            this.detectDocumentType(cleanedText);
+            this.detectDocumentType(
+                cleanedText
+            );
 
         const fields =
-            this.detectFields(cleanedText);
+            this.detectFields(
+                cleanedText
+            );
 
         const terms =
-            this.detectTerms(cleanedText);
+            this.detectTerms(
+                cleanedText
+            );
 
         const clauses =
             this.detectClauses(
@@ -2926,6 +3241,22 @@ class DocumentAIService {
                 fields,
                 terms
             );
+
+        const parameterizedText =
+            this.parameterizeText(
+                cleanedText,
+                fields,
+                terms
+            );
+
+        const layout =
+            this.detectLayout(
+                cleanedText,
+                clauses,
+                fields,
+                terms
+            );
+
 
         // -----------------------------------------------------
         // RÉSULTAT
@@ -2936,10 +3267,18 @@ class DocumentAIService {
             status: "ANALYZED",
 
             document: {
-                pages: extraction.pages,
-                has_text: true,
-                text_length: cleanedText.length,
-                text: cleanedText
+
+                pages:
+                    extraction.pages,
+
+                has_text:
+                    true,
+
+                text_length:
+                    cleanedText.length,
+
+                text:
+                    cleanedText
             },
 
             analysis: {
@@ -2951,7 +3290,12 @@ class DocumentAIService {
 
                 terms,
 
-                clauses
+                clauses,
+
+                source_text:
+                    parameterizedText,
+
+                layout
             }
         };
     }

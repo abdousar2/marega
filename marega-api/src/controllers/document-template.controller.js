@@ -206,7 +206,30 @@ class DocumentTemplateController {
             // =====================================================
 
             const result =
+
+            console.log("===== ANALYSIS AVANT INSERT =====");
+
+console.log(
+    JSON.stringify(
+        analysis,
+        null,
+        2
+    )
+);
+
+console.log("===== LAYOUT AVANT INSERT =====");
+
+console.log(
+    JSON.stringify(
+        analysis?.layout,
+        null,
+        2
+    )
+);
+
+console.log("===============================");
                 await DocumentTemplateService.createFromAnalysis({
+                    
 
                     agencyId,
 
@@ -346,6 +369,22 @@ class DocumentTemplateController {
                 await DocumentAIService.analyze(
                     req.file.path
                 );
+
+            console.log(
+                "===== LAYOUT DÉTECTÉ ====="
+            );
+
+            console.log(
+                JSON.stringify(
+                    analysisResult.analysis?.layout,
+                    null,
+                    2
+                )
+            );
+
+            console.log(
+                "=========================="
+            );
 
 
             // -------------------------------------------------

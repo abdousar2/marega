@@ -1,22 +1,209 @@
-import { useState } from "react";
+import {
+    useEffect,
+    useState
+} from "react";
 
 import Sidebar from "./Sidebar";
-
 import AuthService from "../services/auth.service";
+
 
 export default function Layout({ children }) {
 
-    const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [
+        sidebarOpen,
+        setSidebarOpen
+    ] = useState(false);
 
-    const user = AuthService.getUser();
+
+    const user =
+        AuthService.getUser();
+
+
+    // =========================================================
+    // AGENCE COURANTE
+    // =========================================================
+
+    const [
+        agency,
+        setAgency
+    ] = useState(() => {
+
+        /*
+         * 1. PRIORITÉ :
+         *    agence sélectionnée lors de la connexion
+         */
+
+        try {
+
+            const storedAgency =
+                sessionStorage.getItem(
+                    "techtradisport_selected_agency"
+                );
+
+
+            if (storedAgency) {
+
+                const parsedAgency =
+                    JSON.parse(
+                        storedAgency
+                    );
+
+
+                if (parsedAgency) {
+                    return parsedAgency;
+                }
+            }
+
+        } catch (error) {
+
+            console.error(
+                "Erreur récupération agence :",
+                error
+            );
+        }
+
+
+        /*
+         * 2. FALLBACK :
+         *    agence éventuellement présente
+         *    directement dans l'utilisateur
+         */
+
+        if (user?.agency) {
+            return user.agency;
+        }
+
+
+        /*
+         * 3. FALLBACK :
+         *    informations éventuelles dans le JWT/user
+         */
+
+        if (
+            user?.agency_name ||
+            user?.agency_type ||
+            user?.agency_city
+        ) {
+
+            return {
+
+                id:
+                    user?.agency_id,
+
+                name:
+                    user?.agency_name,
+
+                type:
+                    user?.agency_type,
+
+                city:
+                    user?.agency_city,
+
+                country:
+                    user?.agency_country,
+
+                logo_path:
+                    user?.agency_logo_path
+            };
+        }
+
+
+        return null;
+    });
+
+
+    // =========================================================
+    // RECHARGER L'AGENCE SI LA SESSION CHANGE
+    // =========================================================
+
+    useEffect(() => {
+
+        function loadAgency() {
+
+            try {
+
+                const storedAgency =
+                    sessionStorage.getItem(
+                        "techtradisport_selected_agency"
+                    );
+
+
+                if (!storedAgency) {
+                    return;
+                }
+
+
+                const parsedAgency =
+                    JSON.parse(
+                        storedAgency
+                    );
+
+
+                if (parsedAgency) {
+
+                    setAgency(
+                        parsedAgency
+                    );
+                }
+
+
+            } catch (error) {
+
+                console.error(
+                    "Erreur chargement agence :",
+                    error
+                );
+            }
+        }
+
+
+        loadAgency();
+
+
+        window.addEventListener(
+            "storage",
+            loadAgency
+        );
+
+
+        return () => {
+
+            window.removeEventListener(
+                "storage",
+                loadAgency
+            );
+
+        };
+
+    }, []);
+
+
+    // =========================================================
+    // DÉCONNEXION
+    // =========================================================
 
     function handleLogout() {
 
         AuthService.logout();
 
-        window.location.href = "/";
+        /*
+         * On supprime aussi l'agence sélectionnée.
+         * Ainsi, une prochaine connexion avec une autre
+         * agence ne récupérera pas l'ancienne.
+         */
 
+        sessionStorage.removeItem(
+            "techtradisport_selected_agency"
+        );
+
+
+        window.location.href = "/";
     }
+
+
+    // =========================================================
+    // UTILISATEUR
+    // =========================================================
 
     const initials =
         user
@@ -24,15 +211,79 @@ export default function Layout({ children }) {
                 .toUpperCase()
             : "U";
 
+
+    // =========================================================
+    // NOM AGENCE
+    // =========================================================
+
+    const agencyName =
+        agency?.name ||
+        agency?.company_name ||
+        (
+            agency?.id
+                ? `Agence ${agency.id}`
+                : "Agence immobilière"
+        );
+
+
+    // =========================================================
+    // TYPE AGENCE
+    // =========================================================
+
+    const agencyType =
+        agency?.type ||
+        "Agence immobilière";
+
+
+    // =========================================================
+    // LOCALISATION
+    // =========================================================
+
+    const agencyLocation =
+        [
+            agency?.city,
+            agency?.country
+        ]
+            .filter(Boolean)
+            .join(" • ");
+
+
+    // =========================================================
+    // SOUS-TITRE
+    // =========================================================
+
+    let agencySubtitle =
+        agencyType;
+
+
+    if (agencyLocation) {
+
+        agencySubtitle +=
+            ` • ${agencyLocation}`;
+    }
+
+
+    // =========================================================
+    // RENDER
+    // =========================================================
+
     return (
 
-        <div className="h-screen bg-slate-100 flex">
+        <div className="
+            h-screen
+            bg-slate-100
+            flex
+        ">
+
 
             {/* =====================================================
                 SIDEBAR DESKTOP
             ====================================================== */}
 
-            <div className="hidden lg:flex">
+            <div className="
+                hidden
+                lg:flex
+            ">
 
                 <Sidebar />
 
@@ -45,20 +296,33 @@ export default function Layout({ children }) {
 
             {sidebarOpen && (
 
-                <div className="fixed inset-0 z-50 flex">
+                <div className="
+                    fixed
+                    inset-0
+                    z-50
+                    flex
+                ">
 
-                    <div className="w-72">
+                    <div className="
+                        w-72
+                    ">
 
                         <Sidebar
+
                             closeSidebar={() =>
                                 setSidebarOpen(false)
                             }
+
                         />
 
                     </div>
 
+
                     <div
-                        className="flex-1 bg-black/50"
+                        className="
+                            flex-1
+                            bg-black/50
+                        "
                         onClick={() =>
                             setSidebarOpen(false)
                         }
@@ -73,7 +337,12 @@ export default function Layout({ children }) {
                 CONTENU PRINCIPAL
             ====================================================== */}
 
-            <div className="flex-1 flex flex-col overflow-hidden">
+            <div className="
+                flex-1
+                flex
+                flex-col
+                overflow-hidden
+            ">
 
 
                 {/* =================================================
@@ -95,15 +364,24 @@ export default function Layout({ children }) {
                 ">
 
 
-                    {/* GAUCHE */}
+                    {/* =================================================
+                        GAUCHE
+                    ================================================== */}
 
-                    <div className="flex items-center gap-4">
+                    <div className="
+                        flex
+                        items-center
+                        gap-4
+                    ">
 
 
                         {/* Hamburger */}
 
                         <button
-                            className="lg:hidden text-3xl"
+                            className="
+                                lg:hidden
+                                text-3xl
+                            "
                             onClick={() =>
                                 setSidebarOpen(true)
                             }
@@ -112,6 +390,10 @@ export default function Layout({ children }) {
                         </button>
 
 
+                        {/* =================================================
+                            IDENTITÉ AGENCE
+                        ================================================== */}
+
                         <div>
 
                             <h1 className="
@@ -119,14 +401,19 @@ export default function Layout({ children }) {
                                 font-bold
                                 text-slate-800
                             ">
-                                IBM MAREGA
+
+                                {agencyName}
+
                             </h1>
+
 
                             <p className="
                                 text-sm
                                 text-slate-500
                             ">
-                                Agence Immobilière • Gestion locative
+
+                                {agencySubtitle}
+
                             </p>
 
                         </div>
@@ -134,7 +421,9 @@ export default function Layout({ children }) {
                     </div>
 
 
-                    {/* DROITE */}
+                    {/* =================================================
+                        DROITE
+                    ================================================== */}
 
                     <div className="
                         flex
@@ -158,7 +447,9 @@ export default function Layout({ children }) {
                         </button>
 
 
-                        {/* UTILISATEUR */}
+                        {/* =================================================
+                            UTILISATEUR
+                        ================================================== */}
 
                         <div className="
                             hidden
@@ -167,24 +458,33 @@ export default function Layout({ children }) {
                             gap-3
                         ">
 
-                            <div className="text-right">
+                            <div className="
+                                text-right
+                            ">
 
                                 <p className="
                                     text-sm
                                     font-semibold
                                     text-slate-800
                                 ">
+
                                     {user
                                         ? `${user.first_name} ${user.last_name}`
                                         : "Utilisateur"
                                     }
+
                                 </p>
+
 
                                 <p className="
                                     text-xs
                                     text-slate-500
                                 ">
-                                    {user?.role || "Utilisateur"}
+
+                                    {user?.role ||
+                                        "Utilisateur"
+                                    }
+
                                 </p>
 
                             </div>
@@ -209,11 +509,15 @@ export default function Layout({ children }) {
                         </div>
 
 
-                        {/* DÉCONNEXION */}
+                        {/* =================================================
+                            DÉCONNEXION
+                        ================================================== */}
 
                         <button
                             type="button"
-                            onClick={handleLogout}
+                            onClick={
+                                handleLogout
+                            }
                             title="Se déconnecter"
                             className="
                                 group
@@ -238,24 +542,25 @@ export default function Layout({ children }) {
                                 duration-200
                             "
                         >
+
+
                             {/* Icône */}
 
-                            <span
-                                className="
-                                    flex
-                                    items-center
-                                    justify-center
-                                    w-9
-                                    h-9
-                                    rounded-xl
-                                    bg-blue-100
-                                    text-blue-700
-                                    group-hover:bg-red-100
-                                    group-hover:text-red-600
-                                    transition-all
-                                    duration-200
-                                "
-                            >
+                            <span className="
+                                flex
+                                items-center
+                                justify-center
+                                w-9
+                                h-9
+                                rounded-xl
+                                bg-blue-100
+                                text-blue-700
+                                group-hover:bg-red-100
+                                group-hover:text-red-600
+                                transition-all
+                                duration-200
+                            ">
+
                                 <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 24 24"
@@ -270,11 +575,19 @@ export default function Layout({ children }) {
                                         group-hover:translate-x-0.5
                                     "
                                 >
+
                                     <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
-                                        d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6A2.25 2.25 0 0 0 5.25 5.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15"
+                                        d="
+                                            M15.75 9V5.25
+                                            A2.25 2.25 0 0 0 13.5 3
+                                            h-6A2.25 2.25 0 0 0 5.25 5.25
+                                            v13.5A2.25 2.25 0 0 0 7.5 21
+                                            h6a2.25 2.25 0 0 0 2.25-2.25V15
+                                        "
                                     />
+
 
                                     <path
                                         strokeLinecap="round"
@@ -282,27 +595,32 @@ export default function Layout({ children }) {
                                         d="M18 12H9.75"
                                     />
 
+
                                     <path
                                         strokeLinecap="round"
                                         strokeLinejoin="round"
                                         d="m15 9 3 3-3 3"
                                     />
+
                                 </svg>
+
                             </span>
+
 
                             {/* Texte */}
 
-                            <span
-                                className="
-                                    hidden
-                                    lg:block
-                                    text-sm
-                                    font-semibold
-                                    whitespace-nowrap
-                                "
-                            >
+                            <span className="
+                                hidden
+                                lg:block
+                                text-sm
+                                font-semibold
+                                whitespace-nowrap
+                            ">
+
                                 Déconnexion
+
                             </span>
+
                         </button>
 
                     </div>
@@ -314,7 +632,10 @@ export default function Layout({ children }) {
                     CONTENU
                 ================================================== */}
 
-                <main className="flex-1 overflow-y-auto">
+                <main className="
+                    flex-1
+                    overflow-y-auto
+                ">
 
                     <div className="
                         max-w-7xl
@@ -336,5 +657,4 @@ export default function Layout({ children }) {
         </div>
 
     );
-
 }

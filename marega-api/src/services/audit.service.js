@@ -27,6 +27,10 @@ const AuditService = {
                     req?.user?.id ||
                     null,
 
+                agency_id:
+                    req?.user?.agency_id ||
+                    null,
+
                 action,
 
                 module,

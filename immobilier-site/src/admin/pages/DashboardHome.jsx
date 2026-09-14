@@ -163,7 +163,7 @@ export default function DashboardHome() {
 
             <PageHeader
                 title="Tableau de bord"
-                subtitle="Bienvenue sur votre plateforme de gestion immobilière MAREGA."
+                subtitle="Bienvenue sur votre plateforme de gestion immobilière TECHTRADISPORT."
             />
 
         </div>

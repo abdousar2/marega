@@ -10,6 +10,8 @@ class AuditLog {
 
         user_id = null,
 
+        agency_id = null,
+
         action,
 
         module,
@@ -28,8 +30,9 @@ class AuditLog {
 
             `
             INSERT INTO marega.audit_logs
-            (
+(
                 user_id,
+                agency_id,
                 action,
                 module,
                 entity_id,
@@ -46,12 +49,14 @@ class AuditLog {
                 $4,
                 $5,
                 $6,
-                $7
+                $7,
+                $8
             )
 
             RETURNING
                 id,
                 user_id,
+                agency_id,
                 action,
                 module,
                 entity_id,
@@ -84,11 +89,13 @@ class AuditLog {
 
     static async getAll({
 
-        limit = 100,
+            agencyId,
 
-        offset = 0
+            limit = 100,
 
-    } = {}) {
+            offset = 0
+
+        } = {}) {
 
         const result = await db.query(
 
@@ -96,6 +103,7 @@ class AuditLog {
             SELECT
                 a.id,
                 a.user_id,
+                a.agency_id,
                 a.action,
                 a.module,
                 a.entity_id,
@@ -114,13 +122,16 @@ class AuditLog {
             LEFT JOIN marega.users u
                 ON u.id = a.user_id
 
+            WHERE a.agency_id = $1
+
             ORDER BY a.created_at DESC
 
-            LIMIT $1
-            OFFSET $2
+            LIMIT $2
+            OFFSET $3
             `,
 
             [
+                agencyId,
                 limit,
                 offset
             ]

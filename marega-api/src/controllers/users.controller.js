@@ -31,8 +31,24 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                Number(req.user.agency_id);
+
+            if (!Number.isInteger(agencyId)) {
+
+                return res.status(403).json({
+
+                    error:
+                        "Agence utilisateur invalide."
+
+                });
+
+            }
+
             const users =
-                await User.getAll();
+                await User.getAll(
+                    agencyId
+                );
 
             res.json(users);
 
@@ -372,7 +388,10 @@ class UsersController {
             // ---------------------------------------------
 
             const existingUser =
-                await User.findById(id);
+                await User.findById(
+                    id,
+                    req.user.agency_id
+                );
 
 
             if (!existingUser) {
@@ -537,7 +556,10 @@ class UsersController {
 
 
             const user =
-                await User.findById(id);
+                await User.findById(
+                    id,
+                    req.user.agency_id
+                );
 
 
             if (!user) {
@@ -667,7 +689,10 @@ class UsersController {
 
 
             const user =
-                await User.findById(id);
+                await User.findById(
+                    id,
+                    req.user.agency_id
+                );
 
 
             if (!user) {
@@ -767,7 +792,10 @@ class UsersController {
 
 
             const user =
-                await User.findById(id);
+                await User.findById(
+                    id,
+                    req.user.agency_id
+                );
 
 
             if (!user) {

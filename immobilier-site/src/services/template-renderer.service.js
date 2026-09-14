@@ -1510,6 +1510,10 @@ class TemplateRendererService {
 
         return {
 
+            // =====================================================
+            // TEMPLATE COMPLET
+            // =====================================================
+
             template: {
 
                 id:
@@ -1525,9 +1529,36 @@ class TemplateRendererService {
                     template.document_type,
 
                 status:
-                    template.status
+                    template.status,
 
+                // IMPORTANT :
+                // conserver la définition complète
+                definition:
+                    template.definition || null
             },
+
+
+            // =====================================================
+            // LAYOUT
+            // =====================================================
+
+            layout:
+                template.definition?.layout ||
+                null,
+
+
+            // =====================================================
+            // TEXTE SOURCE PARAMÉTRÉ
+            // =====================================================
+
+            source_text:
+                template.definition?.source_text ||
+                null,
+
+
+            // =====================================================
+            // BAIL
+            // =====================================================
 
             lease: {
 
@@ -1536,20 +1567,38 @@ class TemplateRendererService {
 
                 contract_number:
                     lease.contract_number
-
             },
 
+
+            // =====================================================
+            // CONTEXTE
+            // =====================================================
+
             context,
+
+
+            // =====================================================
+            // VARIABLES MANQUANTES
+            // =====================================================
 
             missing_variables:
                 missingVariables,
 
+
+            // =====================================================
+            // ÉTAT
+            // =====================================================
+
             ready:
                 missingVariables.length === 0,
 
+
+            // =====================================================
+            // CLAUSES
+            // =====================================================
+
             clauses:
                 renderedClauses
-
         };
     }
 }

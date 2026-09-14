@@ -6,26 +6,41 @@ class User {
     // TOUS LES UTILISATEURS
     // =========================================================
 
-    static async getAll() {
+    static async getAll(agencyId) {
 
-        const result = await db.query(`
+        const result = await db.query(
+
+            `
 
             SELECT
-                id,
-                first_name,
-                last_name,
-                email,
-                role,
-                active,
-                created_at,
-                updated_at
+                u.id,
+                u.first_name,
+                u.last_name,
+                u.email,
+                au.role,
+                u.active,
+                u.created_at,
+                u.updated_at
 
-            FROM marega.users
+            FROM marega.users u
 
-            ORDER BY last_name ASC,
-                     first_name ASC
+            INNER JOIN marega.agency_users au
+                ON au.user_id = u.id
 
-        `);
+            WHERE
+                au.agency_id = $1
+
+                AND au.active = TRUE
+
+            ORDER BY
+                u.last_name ASC,
+                u.first_name ASC
+
+            `,
+
+            [agencyId]
+
+        );
 
         return result.rows;
 
@@ -36,29 +51,44 @@ class User {
     // UTILISATEUR PAR ID
     // =========================================================
 
-    static async findById(id) {
+    static async findById(
+        id,
+        agencyId
+    ) {
 
         const result = await db.query(
 
             `
 
             SELECT
-                id,
-                first_name,
-                last_name,
-                email,
-                role,
-                active,
-                created_at,
-                updated_at
+                u.id,
+                u.first_name,
+                u.last_name,
+                u.email,
+                au.role,
+                au.active AS agency_active,
+                u.active,
+                u.created_at,
+                u.updated_at
 
-            FROM marega.users
+            FROM marega.users u
 
-            WHERE id = $1
+            INNER JOIN marega.agency_users au
+                ON au.user_id = u.id
+
+            WHERE
+                u.id = $1
+                AND au.agency_id = $2
+                AND au.active = TRUE
+
+            LIMIT 1
 
             `,
 
-            [id]
+            [
+                id,
+                agencyId
+            ]
 
         );
 

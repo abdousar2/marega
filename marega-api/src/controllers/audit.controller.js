@@ -24,10 +24,29 @@ class AuditController {
                 );
 
 
+            const agencyId =
+                Number(req.user.agency_id);
+
+            if (!Number.isInteger(agencyId)) {
+
+                return res.status(403).json({
+
+                    error:
+                        "Agence utilisateur invalide."
+
+                });
+
+            }
+
             const logs =
                 await AuditLog.getAll({
+
+                    agencyId,
+
                     limit,
+
                     offset
+
                 });
 
 
