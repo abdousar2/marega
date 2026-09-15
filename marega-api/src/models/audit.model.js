@@ -30,7 +30,7 @@ class AuditLog {
 
             `
             INSERT INTO marega.audit_logs
-(
+            (
                 user_id,
                 agency_id,
                 action,

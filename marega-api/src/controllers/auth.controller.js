@@ -212,7 +212,8 @@ class AuthController {
 
             const user =
                 await User.findById(
-                    req.user.id
+                    req.user.id,
+                    req.user.agency_id
                 );
 
 
