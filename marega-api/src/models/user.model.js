@@ -1,24 +1,25 @@
 const db = require("../config/database");
 
+
 class User {
 
     // =========================================================
-    // TOUS LES UTILISATEURS
+    // TOUS LES UTILISATEURS D'UNE AGENCE
     // =========================================================
 
     static async getAll(agencyId) {
 
         const result = await db.query(
-
             `
-
             SELECT
                 u.id,
                 u.first_name,
                 u.last_name,
                 u.email,
+
                 au.role,
-                u.active,
+                au.active,
+
                 u.created_at,
                 u.updated_at
 
@@ -30,43 +31,35 @@ class User {
             WHERE
                 au.agency_id = $1
 
-                AND au.active = TRUE
-
             ORDER BY
                 u.last_name ASC,
                 u.first_name ASC
-
             `,
-
             [agencyId]
-
         );
 
         return result.rows;
-
     }
 
 
     // =========================================================
-    // UTILISATEUR PAR ID
+    // UTILISATEUR PAR ID + AGENCE
     // =========================================================
 
-    static async findById(
-        id,
-        agencyId
-    ) {
+    static async findById(id, agencyId) {
 
         const result = await db.query(
-
             `
-
             SELECT
                 u.id,
                 u.first_name,
                 u.last_name,
                 u.email,
+                u.password_hash,
+
                 au.role,
                 au.active AS agency_active,
+
                 u.active,
                 u.created_at,
                 u.updated_at
@@ -79,21 +72,16 @@ class User {
             WHERE
                 u.id = $1
                 AND au.agency_id = $2
-                AND au.active = TRUE
 
             LIMIT 1
-
             `,
-
             [
                 id,
                 agencyId
             ]
-
         );
 
         return result.rows[0];
-
     }
 
 
@@ -104,29 +92,30 @@ class User {
     static async findByEmail(email) {
 
         const result = await db.query(
-
             `
-
             SELECT *
 
             FROM marega.users
 
-            WHERE LOWER(email) = LOWER($1)
+            WHERE
+                LOWER(email) = LOWER($1)
 
+            LIMIT 1
             `,
-
             [email]
-
         );
 
         return result.rows[0];
-
     }
+
+
+    // =========================================================
+    // UTILISATEUR PAR EMAIL + AGENCE
+    // =========================================================
 
     static async findByEmailAndAgency(email, agencyId) {
 
         const result = await db.query(
-
             `
             SELECT
 
@@ -162,74 +151,226 @@ class User {
 
             LIMIT 1
             `,
-
             [
                 email,
                 agencyId
             ]
-
         );
 
         return result.rows[0];
-
     }
 
 
     // =========================================================
-    // CRÉATION
+    // CRÉATION D'UN UTILISATEUR + RATTACHEMENT AGENCE
     // =========================================================
 
-    static async create(data) {
+    static async create(data, agencyId) {
 
-        const result = await db.query(
+        const client =
+            await db.connect();
 
-            `
+        try {
 
-            INSERT INTO marega.users
-            (
-                first_name,
-                last_name,
-                email,
-                password_hash,
-                role,
-                active
-            )
+            await client.query("BEGIN");
 
-            VALUES
-            (
-                $1,
-                $2,
-                $3,
-                $4,
-                $5,
-                $6
-            )
 
-            RETURNING
-                id,
-                first_name,
-                last_name,
-                email,
-                role,
-                active,
-                created_at,
-                updated_at
+            // -------------------------------------------------
+            // VÉRIFIER QUE L'AGENCE EXISTE ET EST ACTIVE
+            // -------------------------------------------------
 
-            `,
+            const agencyResult =
+                await client.query(
+                    `
+                    SELECT id, status
 
-            [
-                data.first_name,
-                data.last_name,
-                data.email,
-                data.password_hash,
-                data.role,
-                data.active
-            ]
+                    FROM marega.agencies
 
-        );
+                    WHERE id = $1
+                    `,
+                    [agencyId]
+                );
 
-        return result.rows[0];
 
+            if (agencyResult.rows.length === 0) {
+
+                const error =
+                    new Error(
+                        "Agence introuvable."
+                    );
+
+                error.status = 404;
+
+                throw error;
+            }
+
+
+            if (
+                agencyResult.rows[0].status !==
+                "active"
+            ) {
+
+                const error =
+                    new Error(
+                        "Cette agence n'est pas active."
+                    );
+
+                error.status = 403;
+
+                throw error;
+            }
+
+
+            // -------------------------------------------------
+            // EMAIL GLOBAL
+            // -------------------------------------------------
+
+            const existingUser =
+                await client.query(
+                    `
+                    SELECT id
+
+                    FROM marega.users
+
+                    WHERE
+                        LOWER(email) =
+                        LOWER($1)
+
+                    LIMIT 1
+                    `,
+                    [data.email]
+                );
+
+
+            if (existingUser.rows.length > 0) {
+
+                const error =
+                    new Error(
+                        "Un utilisateur avec cet email existe déjà."
+                    );
+
+                error.status = 409;
+
+                throw error;
+            }
+
+
+            // -------------------------------------------------
+            // CRÉER LE COMPTE GLOBAL
+            // -------------------------------------------------
+
+            const userResult =
+                await client.query(
+                    `
+                    INSERT INTO marega.users
+                    (
+                        first_name,
+                        last_name,
+                        email,
+                        password_hash,
+                        role,
+                        active
+                    )
+
+                    VALUES
+                    (
+                        $1,
+                        $2,
+                        $3,
+                        $4,
+                        $5,
+                        TRUE
+                    )
+
+                    RETURNING
+                        id,
+                        first_name,
+                        last_name,
+                        email,
+                        role,
+                        active,
+                        created_at,
+                        updated_at
+                    `,
+                    [
+                        data.first_name,
+                        data.last_name,
+                        data.email,
+                        data.password_hash,
+                        data.role
+                    ]
+                );
+
+
+            const user =
+                userResult.rows[0];
+
+
+            // -------------------------------------------------
+            // RATTACHER À L'AGENCE
+            // -------------------------------------------------
+
+            const membershipResult =
+                await client.query(
+                    `
+                    INSERT INTO marega.agency_users
+                    (
+                        agency_id,
+                        user_id,
+                        role,
+                        active
+                    )
+
+                    VALUES
+                    (
+                        $1,
+                        $2,
+                        $3,
+                        TRUE
+                    )
+
+                    RETURNING
+                        agency_id,
+                        role,
+                        active
+                    `,
+                    [
+                        agencyId,
+                        user.id,
+                        data.role
+                    ]
+                );
+
+
+            await client.query("COMMIT");
+
+
+            return {
+                ...user,
+
+                role:
+                    membershipResult.rows[0].role,
+
+                active:
+                    membershipResult.rows[0].active
+
+            };
+
+        }
+
+        catch (err) {
+
+            await client.query("ROLLBACK");
+
+            throw err;
+
+        }
+
+        finally {
+
+            client.release();
+
+        }
     }
 
 
@@ -237,50 +378,174 @@ class User {
     // MODIFICATION
     // =========================================================
 
-    static async update(id, data) {
+    static async update(
+        id,
+        data,
+        agencyId
+    ) {
 
-        const result = await db.query(
+        const client =
+            await db.connect();
 
-            `
+        try {
 
-            UPDATE marega.users
+            await client.query("BEGIN");
 
-            SET
 
-                first_name = $1,
-                last_name = $2,
-                email = $3,
-                role = $4,
-                active = $5,
-                updated_at = CURRENT_TIMESTAMP
+            // -------------------------------------------------
+            // VÉRIFIER L'APPARTENANCE À L'AGENCE
+            // -------------------------------------------------
 
-            WHERE id = $6
+            const membership =
+                await client.query(
+                    `
+                    SELECT
+                        user_id,
+                        role,
+                        active
 
-            RETURNING
-                id,
-                first_name,
-                last_name,
-                email,
-                role,
-                active,
-                created_at,
-                updated_at
+                    FROM marega.agency_users
 
-            `,
+                    WHERE
+                        user_id = $1
+                        AND agency_id = $2
 
-            [
-                data.first_name,
-                data.last_name,
-                data.email,
-                data.role,
-                data.active,
-                id
-            ]
+                    FOR UPDATE
+                    `,
+                    [
+                        id,
+                        agencyId
+                    ]
+                );
 
-        );
 
-        return result.rows[0];
+            if (
+                membership.rows.length === 0
+            ) {
 
+                await client.query("ROLLBACK");
+
+                return null;
+            }
+
+
+            // -------------------------------------------------
+            // MODIFIER L'IDENTITÉ GLOBALE
+            // -------------------------------------------------
+
+            const userResult =
+                await client.query(
+                    `
+                    UPDATE marega.users
+
+                    SET
+
+                        first_name = $1,
+
+                        last_name = $2,
+
+                        email = $3,
+
+                        updated_at =
+                            CURRENT_TIMESTAMP
+
+                    WHERE
+                        id = $4
+
+                    RETURNING
+                        id,
+                        first_name,
+                        last_name,
+                        email,
+                        active,
+                        created_at,
+                        updated_at
+                    `,
+                    [
+                        data.first_name,
+                        data.last_name,
+                        data.email,
+                        id
+                    ]
+                );
+
+
+            if (
+                userResult.rows.length === 0
+            ) {
+
+                await client.query("ROLLBACK");
+
+                return null;
+            }
+
+
+            // -------------------------------------------------
+            // MODIFIER LE RÔLE / STATUT
+            // DE CETTE AGENCE UNIQUEMENT
+            // -------------------------------------------------
+
+            const membershipResult =
+                await client.query(
+                    `
+                    UPDATE marega.agency_users
+
+                    SET
+
+                        role = $1,
+
+                        active = $2,
+
+                        updated_at =
+                            CURRENT_TIMESTAMP
+
+                    WHERE
+                        user_id = $3
+                        AND agency_id = $4
+
+                    RETURNING
+                        role,
+                        active
+                    `,
+                    [
+                        data.role,
+                        data.active !== false,
+                        id,
+                        agencyId
+                    ]
+                );
+
+
+            await client.query("COMMIT");
+
+
+            return {
+
+                ...userResult.rows[0],
+
+                role:
+                    membershipResult.rows[0].role,
+
+                active:
+                    membershipResult.rows[0].active
+
+            };
+
+        }
+
+        catch (err) {
+
+            await client.query("ROLLBACK");
+
+            throw err;
+
+        }
+
+        finally {
+
+            client.release();
+
+        }
     }
 
 
@@ -290,108 +555,188 @@ class User {
 
     static async updatePassword(
         id,
-        passwordHash
+        passwordHash,
+        agencyId
     ) {
 
-        const result = await db.query(
+        const membership =
+            await db.query(
+                `
+                SELECT user_id
 
-            `
+                FROM marega.agency_users
 
-            UPDATE marega.users
+                WHERE
+                    user_id = $1
+                    AND agency_id = $2
 
-            SET
+                LIMIT 1
+                `,
+                [
+                    id,
+                    agencyId
+                ]
+            );
 
-                password_hash = $1,
-                updated_at = CURRENT_TIMESTAMP
 
-            WHERE id = $2
+        if (
+            membership.rows.length === 0
+        ) {
 
-            RETURNING
-                id
+            return null;
+        }
 
-            `,
 
-            [
-                passwordHash,
-                id
-            ]
+        const result =
+            await db.query(
+                `
+                UPDATE marega.users
 
-        );
+                SET
+                    password_hash = $1,
+
+                    updated_at =
+                        CURRENT_TIMESTAMP
+
+                WHERE
+                    id = $2
+
+                RETURNING
+                    id
+                `,
+                [
+                    passwordHash,
+                    id
+                ]
+            );
+
 
         return result.rows[0];
-
     }
 
 
     // =========================================================
-    // ACTIVATION / DÉSACTIVATION
+    // ACTIVATION / DÉSACTIVATION DANS UNE AGENCE
     // =========================================================
 
     static async updateActive(
         id,
-        active
+        active,
+        agencyId
     ) {
 
-        const result = await db.query(
+        const result =
+            await db.query(
+                `
+                UPDATE marega.agency_users
 
-            `
+                SET
 
-            UPDATE marega.users
+                    active = $1,
 
-            SET
+                    updated_at =
+                        CURRENT_TIMESTAMP
 
-                active = $1,
-                updated_at = CURRENT_TIMESTAMP
+                WHERE
+                    user_id = $2
+                    AND agency_id = $3
 
-            WHERE id = $2
+                RETURNING
+                    user_id,
+                    role,
+                    active
+                `,
+                [
+                    active,
+                    id,
+                    agencyId
+                ]
+            );
 
-            RETURNING
-                id,
-                first_name,
-                last_name,
-                email,
-                role,
-                active,
-                updated_at
 
-            `,
+        if (
+            result.rows.length === 0
+        ) {
 
-            [
-                active,
-                id
-            ]
+            return null;
+        }
 
-        );
 
-        return result.rows[0];
+        const user =
+            await db.query(
+                `
+                SELECT
+                    id,
+                    first_name,
+                    last_name,
+                    email,
+                    role,
+                    active,
+                    created_at,
+                    updated_at
 
+                FROM marega.users
+
+                WHERE id = $1
+                `,
+                [id]
+            );
+
+
+        if (
+            user.rows.length === 0
+        ) {
+
+            return null;
+        }
+
+
+        return {
+
+            ...user.rows[0],
+
+            role:
+                result.rows[0].role,
+
+            active:
+                result.rows[0].active
+
+        };
     }
 
 
     // =========================================================
-    // SUPPRESSION
+    // RETIRER UN UTILISATEUR D'UNE AGENCE
     // =========================================================
 
-    static async delete(id) {
+    static async delete(
+        id,
+        agencyId
+    ) {
 
-        await db.query(
+        const result =
+            await db.query(
+                `
+                DELETE FROM marega.agency_users
 
-            `
+                WHERE
+                    user_id = $1
+                    AND agency_id = $2
 
-            DELETE FROM marega.users
+                RETURNING
+                    user_id
+                `,
+                [
+                    id,
+                    agencyId
+                ]
+            );
 
-            WHERE id = $1
 
-            `,
-
-            [id]
-
-        );
-
-        return true;
-
+        return result.rows.length > 0;
     }
 
 }
+
 
 module.exports = User;

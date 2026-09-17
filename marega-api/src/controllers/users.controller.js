@@ -21,6 +21,34 @@ const ALLOWED_ROLES = [
 
 class UsersController {
 
+    // =====================================================
+    // UTILITAIRE : AGENCE DU JWT
+    // =====================================================
+
+    static getAgencyId(req, res) {
+
+        const agencyId =
+            Number(req.user?.agency_id);
+
+        if (
+            !Number.isInteger(agencyId)
+            ||
+            agencyId <= 0
+        ) {
+
+            res.status(403).json({
+
+                error:
+                    "Agence utilisateur invalide."
+
+            });
+
+            return null;
+        }
+
+        return agencyId;
+    }
+
 
     // =====================================================
     // LISTE DES UTILISATEURS
@@ -32,23 +60,16 @@ class UsersController {
         try {
 
             const agencyId =
-                Number(req.user.agency_id);
+                UsersController.getAgencyId(req, res);
 
-            if (!Number.isInteger(agencyId)) {
+            if (!agencyId) return;
 
-                return res.status(403).json({
-
-                    error:
-                        "Agence utilisateur invalide."
-
-                });
-
-            }
 
             const users =
                 await User.getAll(
                     agencyId
                 );
+
 
             res.json(users);
 
@@ -82,9 +103,36 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                UsersController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
+            const id =
+                Number(req.params.id);
+
+
+            if (
+                !Number.isInteger(id)
+                ||
+                id <= 0
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant utilisateur invalide."
+
+                });
+
+            }
+
+
             const user =
                 await User.findById(
-                    req.params.id
+                    id,
+                    agencyId
                 );
 
 
@@ -132,6 +180,12 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                UsersController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const {
                 first_name,
                 last_name,
@@ -141,15 +195,19 @@ class UsersController {
             } = req.body;
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // VALIDATION
-            // ---------------------------------------------
+            // -------------------------------------------------
 
             if (
-                !first_name ||
-                !last_name ||
-                !email ||
-                !password ||
+                !first_name
+                ||
+                !last_name
+                ||
+                !email
+                ||
+                !password
+                ||
                 !role
             ) {
 
@@ -163,9 +221,9 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // RÔLE
-            // ---------------------------------------------
+            // -------------------------------------------------
 
             if (
                 !ALLOWED_ROLES.includes(role)
@@ -181,13 +239,19 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // EMAIL
-            // ---------------------------------------------
+            // -------------------------------------------------
+
+            const normalizedEmail =
+                email
+                    .trim()
+                    .toLowerCase();
+
 
             const existingUser =
                 await User.findByEmail(
-                    email.trim()
+                    normalizedEmail
                 );
 
 
@@ -203,11 +267,13 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // MOT DE PASSE
-            // ---------------------------------------------
+            // -------------------------------------------------
 
-            if (password.length < 8) {
+            if (
+                password.length < 8
+            ) {
 
                 return res.status(400).json({
 
@@ -226,61 +292,83 @@ class UsersController {
                 );
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // CRÉATION
-            // ---------------------------------------------
+            // + RATTACHEMENT À L'AGENCE DU JWT
+            // -------------------------------------------------
 
             const user =
-                await User.create({
+                await User.create(
 
-                    first_name:
-                        first_name.trim(),
+                    {
 
-                    last_name:
-                        last_name.trim(),
+                        first_name:
+                            first_name.trim(),
 
-                    email:
-                        email.trim().toLowerCase(),
+                        last_name:
+                            last_name.trim(),
 
-                    password_hash:
-                        passwordHash,
+                        email:
+                            normalizedEmail,
 
-                    role,
+                        password_hash:
+                            passwordHash,
 
-                    active:
-                        true
+                        role,
 
-                });
+                        active:
+                            true
+
+                    },
+
+                    agencyId
+
+                );
 
 
-            await AuditService.log(req, {
+            // -------------------------------------------------
+            // AUDIT
+            // -------------------------------------------------
 
-                action: "CREATE",
+            await AuditService.log(
+                req,
+                {
 
-                module: "users",
+                    action:
+                        "CREATE",
 
-                entity_id: user.id,
+                    module:
+                        "users",
 
-                details: {
+                    entity_id:
+                        user.id,
 
-                    first_name:
-                        user.first_name,
+                    details: {
 
-                    last_name:
-                        user.last_name,
+                        agency_id:
+                            agencyId,
 
-                    email:
-                        user.email,
+                        first_name:
+                            user.first_name,
 
-                    role:
-                        user.role
+                        last_name:
+                            user.last_name,
+
+                        email:
+                            user.email,
+
+                        role:
+                            user.role
+
+                    }
 
                 }
+            );
 
-            });
 
-
-            res.status(201).json(user);
+            res.status(201).json(
+                user
+            );
 
         }
 
@@ -291,10 +379,17 @@ class UsersController {
                 err
             );
 
-            res.status(500).json({
+
+            const status =
+                err.status || 500;
+
+
+            res.status(status).json({
 
                 error:
-                    "Erreur lors de la création de l'utilisateur."
+                    err.status
+                        ? err.message
+                        : "Erreur lors de la création de l'utilisateur."
 
             });
 
@@ -312,8 +407,30 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                UsersController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const id =
                 Number(req.params.id);
+
+
+            if (
+                !Number.isInteger(id)
+                ||
+                id <= 0
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant utilisateur invalide."
+
+                });
+
+            }
 
 
             const {
@@ -325,15 +442,17 @@ class UsersController {
             } = req.body;
 
 
-            // ---------------------------------------------
-            // EMPÊCHER L'ADMIN DE MODIFIER SON PROPRE
-            // RÔLE OU SON PROPRE STATUT
-            // ---------------------------------------------
+            // -------------------------------------------------
+            // EMPÊCHER L'ADMIN DE MODIFIER
+            // SON PROPRE RÔLE OU STATUT
+            // -------------------------------------------------
 
             if (
-                id === req.user.id &&
+                id === req.user.id
+                &&
                 (
-                    role !== "ADMIN" ||
+                    role !== "ADMIN"
+                    ||
                     active === false
                 )
             ) {
@@ -348,14 +467,17 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // VALIDATION
-            // ---------------------------------------------
+            // -------------------------------------------------
 
             if (
-                !first_name ||
-                !last_name ||
-                !email ||
+                !first_name
+                ||
+                !last_name
+                ||
+                !email
+                ||
                 !role
             ) {
 
@@ -383,14 +505,15 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // VÉRIFIER L'UTILISATEUR
-            // ---------------------------------------------
+            // DANS CETTE AGENCE
+            // -------------------------------------------------
 
             const existingUser =
                 await User.findById(
                     id,
-                    req.user.agency_id
+                    agencyId
                 );
 
 
@@ -406,18 +529,25 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
-            // VÉRIFIER L'EMAIL
-            // ---------------------------------------------
+            // -------------------------------------------------
+            // VÉRIFIER L'EMAIL GLOBAL
+            // -------------------------------------------------
+
+            const normalizedEmail =
+                email
+                    .trim()
+                    .toLowerCase();
+
 
             const emailUser =
                 await User.findByEmail(
-                    email.trim()
+                    normalizedEmail
                 );
 
 
             if (
-                emailUser &&
+                emailUser
+                &&
                 emailUser.id !== id
             ) {
 
@@ -431,9 +561,9 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // MODIFICATION
-            // ---------------------------------------------
+            // -------------------------------------------------
 
             const user =
                 await User.update(
@@ -449,26 +579,53 @@ class UsersController {
                             last_name.trim(),
 
                         email:
-                            email.trim().toLowerCase(),
+                            normalizedEmail,
 
                         role,
 
                         active:
                             active !== false
 
-                    }
+                    },
+
+                    agencyId
 
                 );
 
-                await AuditService.log(req, {
 
-                    action: "UPDATE",
+            if (!user) {
 
-                    module: "users",
+                return res.status(404).json({
 
-                    entity_id: user.id,
+                    error:
+                        "Utilisateur introuvable."
+
+                });
+
+            }
+
+
+            // -------------------------------------------------
+            // AUDIT
+            // -------------------------------------------------
+
+            await AuditService.log(
+                req,
+                {
+
+                    action:
+                        "UPDATE",
+
+                    module:
+                        "users",
+
+                    entity_id:
+                        user.id,
 
                     details: {
+
+                        agency_id:
+                            agencyId,
 
                         first_name:
                             user.first_name,
@@ -487,10 +644,11 @@ class UsersController {
 
                     }
 
-                });
+                }
+            );
 
 
-            res.json(user);            
+            res.json(user);
 
         }
 
@@ -500,6 +658,7 @@ class UsersController {
                 "Erreur update user :",
                 err
             );
+
 
             res.status(500).json({
 
@@ -522,8 +681,30 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                UsersController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const id =
                 Number(req.params.id);
+
+
+            if (
+                !Number.isInteger(id)
+                ||
+                id <= 0
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant utilisateur invalide."
+
+                });
+
+            }
 
 
             const {
@@ -543,7 +724,9 @@ class UsersController {
             }
 
 
-            if (password.length < 8) {
+            if (
+                password.length < 8
+            ) {
 
                 return res.status(400).json({
 
@@ -558,7 +741,7 @@ class UsersController {
             const user =
                 await User.findById(
                     id,
-                    req.user.agency_id
+                    agencyId
                 );
 
 
@@ -581,30 +764,59 @@ class UsersController {
                 );
 
 
-            await User.updatePassword(
+            const updated =
+                await User.updatePassword(
 
-                id,
+                    id,
 
-                passwordHash
+                    passwordHash,
 
-            );
+                    agencyId
 
-            await AuditService.log(req, {
+                );
 
-                action: "PASSWORD_CHANGE",
 
-                module: "users",
+            if (!updated) {
 
-                entity_id: id,
+                return res.status(404).json({
 
-                details: {
+                    error:
+                        "Utilisateur introuvable."
 
-                    email:
-                        user.email
+                });
+
+            }
+
+
+            // -------------------------------------------------
+            // AUDIT
+            // -------------------------------------------------
+
+            await AuditService.log(
+                req,
+                {
+
+                    action:
+                        "PASSWORD_CHANGE",
+
+                    module:
+                        "users",
+
+                    entity_id:
+                        id,
+
+                    details: {
+
+                        agency_id:
+                            agencyId,
+
+                        email:
+                            user.email
+
+                    }
 
                 }
-
-            });
+            );
 
 
             res.json({
@@ -646,8 +858,30 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                UsersController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const id =
                 Number(req.params.id);
+
+
+            if (
+                !Number.isInteger(id)
+                ||
+                id <= 0
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant utilisateur invalide."
+
+                });
+
+            }
 
 
             const {
@@ -669,12 +903,13 @@ class UsersController {
             }
 
 
-            // ---------------------------------------------
+            // -------------------------------------------------
             // EMPÊCHER L'ADMIN DE SE DÉSACTIVER
-            // ---------------------------------------------
+            // -------------------------------------------------
 
             if (
-                id === req.user.id &&
+                id === req.user.id
+                &&
                 active === false
             ) {
 
@@ -691,7 +926,7 @@ class UsersController {
             const user =
                 await User.findById(
                     id,
-                    req.user.agency_id
+                    agencyId
                 );
 
 
@@ -712,21 +947,48 @@ class UsersController {
 
                     id,
 
-                    active
+                    active,
+
+                    agencyId
 
                 );
 
-                await AuditService.log(req, {
 
-                    action: active
-                        ? "ACTIVATE"
-                        : "DEACTIVATE",
+            if (!updatedUser) {
 
-                    module: "users",
+                return res.status(404).json({
 
-                    entity_id: id,
+                    error:
+                        "Utilisateur introuvable."
+
+                });
+
+            }
+
+
+            // -------------------------------------------------
+            // AUDIT
+            // -------------------------------------------------
+
+            await AuditService.log(
+                req,
+                {
+
+                    action:
+                        active
+                            ? "ACTIVATE"
+                            : "DEACTIVATE",
+
+                    module:
+                        "users",
+
+                    entity_id:
+                        id,
 
                     details: {
+
+                        agency_id:
+                            agencyId,
 
                         email:
                             updatedUser.email,
@@ -735,7 +997,10 @@ class UsersController {
                             updatedUser.active
 
                     }
-                });
+
+                }
+            );
+
 
             res.json(updatedUser);
 
@@ -761,7 +1026,7 @@ class UsersController {
 
 
     // =====================================================
-    // SUPPRESSION
+    // RETRAIT DE L'AGENCE
     // ADMIN UNIQUEMENT
     // =====================================================
 
@@ -769,13 +1034,35 @@ class UsersController {
 
         try {
 
+            const agencyId =
+                UsersController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const id =
                 Number(req.params.id);
 
 
-            // ---------------------------------------------
+            if (
+                !Number.isInteger(id)
+                ||
+                id <= 0
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant utilisateur invalide."
+
+                });
+
+            }
+
+
+            // -------------------------------------------------
             // EMPÊCHER LA SUPPRESSION DE SON PROPRE COMPTE
-            // ---------------------------------------------
+            // -------------------------------------------------
 
             if (
                 id === req.user.id
@@ -784,17 +1071,21 @@ class UsersController {
                 return res.status(403).json({
 
                     error:
-                        "Vous ne pouvez pas supprimer votre propre compte."
+                        "Vous ne pouvez pas retirer votre propre compte de cette agence."
 
                 });
 
             }
 
 
+            // -------------------------------------------------
+            // VÉRIFIER L'UTILISATEUR
+            // -------------------------------------------------
+
             const user =
                 await User.findById(
                     id,
-                    req.user.agency_id
+                    agencyId
                 );
 
 
@@ -810,38 +1101,75 @@ class UsersController {
             }
 
 
-            await User.delete(id);
+            // -------------------------------------------------
+            // RETIRER UNIQUEMENT DE CETTE AGENCE
+            // -------------------------------------------------
 
-            await AuditService.log(req, {
+            const deleted =
+                await User.delete(
+                    id,
+                    agencyId
+                );
 
-                action: "DELETE",
 
-                module: "users",
+            if (!deleted) {
 
-                entity_id: id,
+                return res.status(404).json({
 
-                details: {
+                    error:
+                        "Utilisateur introuvable."
 
-                    first_name:
-                        user.first_name,
+                });
 
-                    last_name:
-                        user.last_name,
+            }
 
-                    email:
-                        user.email,
 
-                    role:
-                        user.role
+            // -------------------------------------------------
+            // AUDIT
+            // -------------------------------------------------
+
+            await AuditService.log(
+                req,
+                {
+
+                    action:
+                        "DELETE",
+
+                    module:
+                        "users",
+
+                    entity_id:
+                        id,
+
+                    details: {
+
+                        agency_id:
+                            agencyId,
+
+                        first_name:
+                            user.first_name,
+
+                        last_name:
+                            user.last_name,
+
+                        email:
+                            user.email,
+
+                        role:
+                            user.role
+
+                    }
 
                 }
-
-            });
+            );
 
 
             res.json({
 
-                success: true
+                success: true,
+
+                message:
+                    "Utilisateur retiré de l'agence."
 
             });
 
@@ -857,7 +1185,7 @@ class UsersController {
             res.status(500).json({
 
                 error:
-                    "Erreur lors de la suppression de l'utilisateur."
+                    "Erreur lors du retrait de l'utilisateur."
 
             });
 

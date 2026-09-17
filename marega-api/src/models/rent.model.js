@@ -199,7 +199,10 @@ class Rent {
     }
     
 
-    static async markAsUnpaidByPayment(paymentId) {
+    static async markAsUnpaidByPayment(
+        paymentId,
+        agencyId
+    ) {
 
         const result = await db.query(
 
@@ -207,20 +210,21 @@ class Rent {
             UPDATE marega.rents
 
             SET
-
                 status = 'Impayé',
-
                 payment_id = NULL,
-
                 updated_at = CURRENT_TIMESTAMP
 
-            WHERE payment_id = $1
+            WHERE
+                payment_id = $1
+
+                AND agency_id = $2
 
             RETURNING *
             `,
 
             [
-                paymentId
+                paymentId,
+                agencyId
             ]
 
         );
@@ -290,7 +294,10 @@ class Rent {
     // VÉRIFIER SI UN CONTRAT POSSÈDE DES PAIEMENTS
     // =========================================================
 
-    static async hasPayments(leaseId) {
+    static async hasPayments(
+        leaseId,
+        agencyId
+    ) {
 
         const result = await db.query(
 
@@ -302,14 +309,23 @@ class Rent {
                 FROM marega.rents r
 
                 INNER JOIN marega.payments p
+
                     ON p.id = r.payment_id
 
-                WHERE r.lease_id = $1
+                    AND p.agency_id = r.agency_id
+
+                WHERE
+                    r.lease_id = $1
+
+                    AND r.agency_id = $2
 
             ) AS has_payments
             `,
 
-            [leaseId]
+            [
+                leaseId,
+                agencyId
+            ]
 
         );
 
@@ -318,43 +334,48 @@ class Rent {
     }
 
         // =========================================================
-    // SYNCHRONISATION DES LOYERS NON PAYÉS
-    // =========================================================
+        // SYNCHRONISATION DES LOYERS NON PAYÉS
+        // =========================================================
 
-    static async syncUnpaidFromLease(lease) {
+        static async syncUnpaidFromLease(
+            lease,
+            agencyId
+        ) {
 
-        const result = await db.query(
+            const result = await db.query(
 
-            `
-            UPDATE marega.rents
+                `
+                UPDATE marega.rents
 
-            SET
+                SET
+                    tenant_id = $1,
+                    amount = $2,
+                    updated_at = CURRENT_TIMESTAMP
 
-                tenant_id = $1,
-                amount = $2,
-                updated_at = CURRENT_TIMESTAMP
+                WHERE
+                    lease_id = $3
 
-            WHERE lease_id = $3
+                    AND agency_id = $4
 
-              AND payment_id IS NULL
+                    AND payment_id IS NULL
 
-              AND status <> 'Payé'
+                    AND status <> 'Payé'
 
-            RETURNING *
+                RETURNING *
+                `,
 
-            `,
+                [
+                    lease.tenant_id,
+                    lease.monthly_rent,
+                    lease.id,
+                    agencyId
+                ]
 
-            [
-                lease.tenant_id,
-                lease.monthly_rent,
-                lease.id
-            ]
+            );
 
-        );
+            return result.rows;
 
-        return result.rows;
-
-    }
+        }
 
     static async generateFromLease(lease) {
 

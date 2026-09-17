@@ -5,6 +5,27 @@ const AuditService = require("../services/audit.service");
 class ExpensesController {
 
     // =========================================================
+    // UTILITAIRE : RÉCUPÉRER L'AGENCE DU JWT
+    // =========================================================
+
+    static getAgencyId(req, res) {
+
+        const agencyId = Number(req.user?.agency_id);
+
+        if (!Number.isInteger(agencyId) || agencyId <= 0) {
+
+            res.status(403).json({
+                error: "Agence invalide."
+            });
+
+            return null;
+        }
+
+        return agencyId;
+    }
+
+
+    // =========================================================
     // LECTURE
     // =========================================================
 
@@ -12,8 +33,15 @@ class ExpensesController {
 
         try {
 
+            const agencyId =
+                ExpensesController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const expenses =
-                await Expense.getAll();
+                await Expense.getAll(agencyId);
+
 
             res.json(expenses);
 
@@ -35,13 +63,24 @@ class ExpensesController {
     }
 
 
+    // =========================================================
+    // LECTURE PAR ID
+    // =========================================================
+
     static async getById(req, res) {
 
         try {
 
+            const agencyId =
+                ExpensesController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const expense =
                 await Expense.getById(
-                    req.params.id
+                    req.params.id,
+                    agencyId
                 );
 
 
@@ -85,15 +124,23 @@ class ExpensesController {
 
         try {
 
+            const agencyId =
+                ExpensesController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const expense =
                 await Expense.create(
-                    req.body
+                    req.body,
+                    agencyId
                 );
 
 
             const completeExpense =
                 await Expense.getById(
-                    expense.id
+                    expense.id,
+                    agencyId
                 );
 
 
@@ -166,10 +213,16 @@ class ExpensesController {
             );
 
 
-            res.status(500).json({
+            const status =
+                err.status || 500;
+
+
+            res.status(status).json({
 
                 error:
-                    "Erreur lors de l'enregistrement de la dépense."
+                    err.status
+                        ? err.message
+                        : "Erreur lors de l'enregistrement de la dépense."
 
             });
 
@@ -186,17 +239,36 @@ class ExpensesController {
 
         try {
 
+            const agencyId =
+                ExpensesController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const id =
                 Number(req.params.id);
 
 
+            if (!Number.isInteger(id) || id <= 0) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant de dépense invalide."
+
+                });
+
+            }
+
+
             // -------------------------------------------------
-            // VÉRIFIER QUE LA DÉPENSE EXISTE
+            // VÉRIFIER QUE LA DÉPENSE APPARTIENT À L'AGENCE
             // -------------------------------------------------
 
             const existingExpense =
                 await Expense.getById(
-                    id
+                    id,
+                    agencyId
                 );
 
 
@@ -221,7 +293,9 @@ class ExpensesController {
 
                     id,
 
-                    req.body
+                    req.body,
+
+                    agencyId
 
                 );
 
@@ -240,7 +314,8 @@ class ExpensesController {
 
             const completeExpense =
                 await Expense.getById(
-                    id
+                    id,
+                    agencyId
                 );
 
 
@@ -354,10 +429,16 @@ class ExpensesController {
             );
 
 
-            res.status(500).json({
+            const status =
+                err.status || 500;
+
+
+            res.status(status).json({
 
                 error:
-                    "Erreur lors de la mise à jour de la dépense."
+                    err.status
+                        ? err.message
+                        : "Erreur lors de la mise à jour de la dépense."
 
             });
 
@@ -374,17 +455,36 @@ class ExpensesController {
 
         try {
 
+            const agencyId =
+                ExpensesController.getAgencyId(req, res);
+
+            if (!agencyId) return;
+
+
             const id =
                 Number(req.params.id);
 
 
+            if (!Number.isInteger(id) || id <= 0) {
+
+                return res.status(400).json({
+
+                    error:
+                        "Identifiant de dépense invalide."
+
+                });
+
+            }
+
+
             // -------------------------------------------------
-            // VÉRIFIER QUE LA DÉPENSE EXISTE
+            // VÉRIFIER QUE LA DÉPENSE APPARTIENT À L'AGENCE
             // -------------------------------------------------
 
             const expense =
                 await Expense.getById(
-                    id
+                    id,
+                    agencyId
                 );
 
 
@@ -462,9 +562,23 @@ class ExpensesController {
             // SUPPRESSION
             // -------------------------------------------------
 
-            await Expense.delete(
-                id
-            );
+            const deleted =
+                await Expense.delete(
+                    id,
+                    agencyId
+                );
+
+
+            if (!deleted) {
+
+                return res.status(404).json({
+
+                    error:
+                        "Dépense introuvable."
+
+                });
+
+            }
 
 
             // -------------------------------------------------

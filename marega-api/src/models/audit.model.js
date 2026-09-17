@@ -1,5 +1,6 @@
 const db = require("../config/database");
 
+
 class AuditLog {
 
     // =========================================================
@@ -68,6 +69,7 @@ class AuditLog {
 
             [
                 user_id,
+                agency_id,
                 action,
                 module,
                 entity_id,
@@ -84,18 +86,18 @@ class AuditLog {
 
 
     // =========================================================
-    // TOUS LES JOURNAUX
+    // TOUS LES JOURNAUX D'UNE AGENCE
     // =========================================================
 
     static async getAll({
 
-            agencyId,
+        agencyId,
 
-            limit = 100,
+        limit = 100,
 
-            offset = 0
+        offset = 0
 
-        } = {}) {
+    } = {}) {
 
         const result = await db.query(
 
@@ -115,16 +117,23 @@ class AuditLog {
                 u.first_name,
                 u.last_name,
                 u.email,
-                u.role
+
+                au.role AS role
 
             FROM marega.audit_logs a
 
             LEFT JOIN marega.users u
                 ON u.id = a.user_id
 
-            WHERE a.agency_id = $1
+            LEFT JOIN marega.agency_users au
+                ON au.user_id = a.user_id
+                AND au.agency_id = a.agency_id
 
-            ORDER BY a.created_at DESC
+            WHERE
+                a.agency_id = $1
+
+            ORDER BY
+                a.created_at DESC
 
             LIMIT $2
             OFFSET $3
@@ -143,5 +152,6 @@ class AuditLog {
     }
 
 }
+
 
 module.exports = AuditLog;

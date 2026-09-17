@@ -11,11 +11,40 @@ class FinanceController {
 
         try {
 
+            // -------------------------------------------------
+            // AGENCE DEPUIS LE JWT
+            // -------------------------------------------------
+
+            const agencyId =
+                Number(req.user?.agency_id);
+
+
+            if (
+                !Number.isInteger(agencyId)
+                ||
+                agencyId <= 0
+            ) {
+
+                return res.status(403).json({
+
+                    error:
+                        "Agence invalide."
+
+                });
+
+            }
+
+
             const {
+
                 period = "daily",
+
                 date,
+
                 start,
+
                 end
+
             } = req.query;
 
 
@@ -25,8 +54,8 @@ class FinanceController {
 
             const referenceDate =
                 date
-                ? new Date(`${date}T00:00:00`)
-                : new Date();
+                    ? new Date(`${date}T00:00:00`)
+                    : new Date();
 
 
             if (
@@ -104,7 +133,8 @@ class FinanceController {
 
                 sunday.setDate(
                     monday.getDate()
-                    + 6
+                    +
+                    6
                 );
 
 
@@ -244,9 +274,11 @@ class FinanceController {
                 }
 
 
-                startDate = start;
+                startDate =
+                    start;
 
-                endDate = end;
+                endDate =
+                    end;
 
             }
 
@@ -274,7 +306,8 @@ class FinanceController {
             const report =
                 await Finance.getReport(
                     startDate,
-                    endDate
+                    endDate,
+                    agencyId
                 );
 
 

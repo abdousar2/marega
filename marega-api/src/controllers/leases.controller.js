@@ -358,7 +358,8 @@ class LeasesController {
             // -------------------------------------------------
 
             await Rent.syncUnpaidFromLease(
-                lease
+                lease,
+                agencyId
             );
 
 
@@ -541,7 +542,10 @@ class LeasesController {
             // -------------------------------------------------
 
             const hasPayments =
-                await Rent.hasPayments(id);
+                await Rent.hasPayments(
+                    id,
+                    agencyId
+                );
 
 
             if (hasPayments) {

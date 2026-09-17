@@ -7,14 +7,13 @@ class Finance {
     // RAPPORT FINANCIER
     // =========================================================
 
-    static async getReport(startDate, endDate) {
+    static async getReport(startDate, endDate, agencyId) {
 
         // -----------------------------------------------------
         // ENCAISSEMENTS
         // -----------------------------------------------------
 
         const incomeResult = await db.query(
-
             `
             SELECT
 
@@ -27,18 +26,17 @@ class Finance {
 
             FROM marega.payments p
 
-            WHERE p.status = 'Payé'
-
-            AND p.payment_date >= $1
-
-            AND p.payment_date < ($2::date + INTERVAL '1 day')
+            WHERE
+                p.agency_id = $1
+                AND p.status = 'Payé'
+                AND p.payment_date >= $2
+                AND p.payment_date < ($3::date + INTERVAL '1 day')
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
 
@@ -47,7 +45,6 @@ class Finance {
         // -----------------------------------------------------
 
         const expenseResult = await db.query(
-
             `
             SELECT
 
@@ -60,16 +57,16 @@ class Finance {
 
             FROM marega.expenses e
 
-            WHERE e.expense_date >= $1
-
-            AND e.expense_date < ($2::date + INTERVAL '1 day')
+            WHERE
+                e.agency_id = $1
+                AND e.expense_date >= $2
+                AND e.expense_date < ($3::date + INTERVAL '1 day')
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
 
@@ -78,7 +75,6 @@ class Finance {
         // -----------------------------------------------------
 
         const paymentMethodsResult = await db.query(
-
             `
             SELECT
 
@@ -96,22 +92,23 @@ class Finance {
 
             FROM marega.payments p
 
-            WHERE p.status = 'Payé'
+            WHERE
+                p.agency_id = $1
+                AND p.status = 'Payé'
+                AND p.payment_date >= $2
+                AND p.payment_date < ($3::date + INTERVAL '1 day')
 
-            AND p.payment_date >= $1
+            GROUP BY
+                p.payment_method
 
-            AND p.payment_date < ($2::date + INTERVAL '1 day')
-
-            GROUP BY p.payment_method
-
-            ORDER BY total DESC
+            ORDER BY
+                total DESC
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
 
@@ -120,7 +117,6 @@ class Finance {
         // -----------------------------------------------------
 
         const cashiersResult = await db.query(
-
             `
             SELECT
 
@@ -132,7 +128,7 @@ class Finance {
                     u.last_name
                 ) AS cashier_name,
 
-                u.role AS cashier_role,
+                au.role AS cashier_role,
 
                 COALESCE(
                     SUM(p.amount),
@@ -146,27 +142,32 @@ class Finance {
             LEFT JOIN marega.users u
                 ON u.id = p.cashier_user_id
 
-            WHERE p.status = 'Payé'
+            LEFT JOIN marega.agency_users au
+                ON au.user_id = p.cashier_user_id
+                AND au.agency_id = p.agency_id
+                AND au.active = TRUE
 
-            AND p.payment_date >= $1
-
-            AND p.payment_date < ($2::date + INTERVAL '1 day')
+            WHERE
+                p.agency_id = $1
+                AND p.status = 'Payé'
+                AND p.payment_date >= $2
+                AND p.payment_date < ($3::date + INTERVAL '1 day')
 
             GROUP BY
 
                 p.cashier_user_id,
                 u.first_name,
                 u.last_name,
-                u.role
+                au.role
 
-            ORDER BY total DESC
+            ORDER BY
+                total DESC
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
 
@@ -175,7 +176,6 @@ class Finance {
         // -----------------------------------------------------
 
         const expenseCategoriesResult = await db.query(
-
             `
             SELECT
 
@@ -190,20 +190,22 @@ class Finance {
 
             FROM marega.expenses e
 
-            WHERE e.expense_date >= $1
+            WHERE
+                e.agency_id = $1
+                AND e.expense_date >= $2
+                AND e.expense_date < ($3::date + INTERVAL '1 day')
 
-            AND e.expense_date < ($2::date + INTERVAL '1 day')
+            GROUP BY
+                e.category
 
-            GROUP BY e.category
-
-            ORDER BY total DESC
+            ORDER BY
+                total DESC
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
 
@@ -212,7 +214,6 @@ class Finance {
         // -----------------------------------------------------
 
         const paymentsResult = await db.query(
-
             `
             SELECT
 
@@ -242,7 +243,7 @@ class Finance {
                     u.last_name
                 ) AS cashier_name,
 
-                u.role AS cashier_role,
+                au.role AS cashier_role,
 
                 b.name AS building_name,
 
@@ -252,35 +253,43 @@ class Finance {
 
             JOIN marega.tenants t
                 ON t.id = p.tenant_id
+                AND t.agency_id = p.agency_id
 
             LEFT JOIN marega.users u
                 ON u.id = p.cashier_user_id
 
+            LEFT JOIN marega.agency_users au
+                ON au.user_id = p.cashier_user_id
+                AND au.agency_id = p.agency_id
+                AND au.active = TRUE
+
             LEFT JOIN marega.leases l
                 ON l.id = p.lease_id
+                AND l.agency_id = p.agency_id
 
             LEFT JOIN marega.apartments a
                 ON a.id = l.apartment_id
+                AND a.agency_id = p.agency_id
 
             LEFT JOIN marega.buildings b
                 ON b.id = a.building_id
+                AND b.agency_id = p.agency_id
 
-            WHERE p.status = 'Payé'
-
-            AND p.payment_date >= $1
-
-            AND p.payment_date < ($2::date + INTERVAL '1 day')
+            WHERE
+                p.agency_id = $1
+                AND p.status = 'Payé'
+                AND p.payment_date >= $2
+                AND p.payment_date < ($3::date + INTERVAL '1 day')
 
             ORDER BY
                 p.payment_date DESC,
                 p.id DESC
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
 
@@ -289,7 +298,6 @@ class Finance {
         // -----------------------------------------------------
 
         const expensesResult = await db.query(
-
             `
             SELECT
 
@@ -319,38 +327,47 @@ class Finance {
 
             LEFT JOIN marega.buildings b
                 ON b.id = e.building_id
+                AND b.agency_id = e.agency_id
 
             LEFT JOIN marega.apartments a
                 ON a.id = e.apartment_id
+                AND a.agency_id = e.agency_id
 
-            WHERE e.expense_date >= $1
-
-            AND e.expense_date < ($2::date + INTERVAL '1 day')
+            WHERE
+                e.agency_id = $1
+                AND e.expense_date >= $2
+                AND e.expense_date < ($3::date + INTERVAL '1 day')
 
             ORDER BY
                 e.expense_date DESC,
                 e.id DESC
             `,
-
             [
+                agencyId,
                 startDate,
                 endDate
             ]
-
         );
 
+
+        // -----------------------------------------------------
+        // CALCULS
+        // -----------------------------------------------------
 
         const income =
             Number(
                 incomeResult.rows[0].total
             );
 
-
         const expenses =
             Number(
                 expenseResult.rows[0].total
             );
 
+
+        // -----------------------------------------------------
+        // RAPPORT
+        // -----------------------------------------------------
 
         return {
 
