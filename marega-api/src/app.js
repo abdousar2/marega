@@ -72,21 +72,7 @@ app.use(
 // DOCUMENTS DES AGENCES
 // =========================================================
 
-const uploadsPath =
-    path.resolve(
-        process.cwd(),
-        "uploads"
-    );
 
-console.log(
-    "Serving uploads from:",
-    uploadsPath
-);
-
-app.use(
-    "/uploads",
-    express.static(uploadsPath)
-);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/platform/auth", platformAuthRoutes);
