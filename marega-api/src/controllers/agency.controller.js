@@ -10,18 +10,19 @@ class AgencyController {
     // TOUTES LES AGENCES
     // =========================================================
 
-    static async getAll(req, res) {
+    static async getAll(
+        req,
+        res
+    ) {
 
         try {
 
             const agencies =
-                await Agency.getAll();
+                await Agency.getPublicAll();
 
             res.json(agencies);
 
-        }
-
-        catch (err) {
+        } catch (err) {
 
             console.error(
                 "Erreur chargement agences :",
@@ -44,15 +45,20 @@ class AgencyController {
     // AGENCE PAR ID
     // =========================================================
 
-    static async getById(req, res) {
+    static async getById(
+        req,
+        res
+    ) {
 
         try {
 
-            const agency =
-                await Agency.getById(
-                    Number(req.params.id)
-                );
+            const agencyId =
+                Number(req.user.agency_id);
 
+            const agency =
+                await Agency.getForAgency(
+                    agencyId
+                );
 
             if (!agency) {
 
@@ -65,12 +71,9 @@ class AgencyController {
 
             }
 
-
             res.json(agency);
 
-        }
-
-        catch (err) {
+        } catch (err) {
 
             console.error(
                 "Erreur chargement agence :",
@@ -349,6 +352,124 @@ class AgencyController {
                 error:
                     "Erreur lors de l'enregistrement des documents."
 
+            });
+
+        }
+
+    }
+
+    // =========================================================
+    // PARAMÈTRES DE L'AGENCE
+    // =========================================================
+
+    static async updateSettings(
+        req,
+        res
+    ) {
+
+        try {
+
+            const agencyId =
+                Number(req.user.agency_id);
+
+
+            if (!Number.isInteger(agencyId)) {
+
+                return res.status(400).json({
+                    error:
+                        "Agence invalide."
+                });
+
+            }
+
+
+            const {
+                name,
+                type,
+                city,
+                country,
+                address,
+                phone,
+                email,
+                ninea,
+                rccm
+            } = req.body;
+
+
+            // =================================================
+            // VALIDATION
+            // =================================================
+
+            if (
+                !name ||
+                !type ||
+                !city ||
+                !country
+            ) {
+
+                return res.status(400).json({
+                    error:
+                        "Le nom, le type, la ville et le pays sont obligatoires."
+                });
+
+            }
+
+
+            const updatedAgency =
+                await Agency.updateSettings(
+                    agencyId,
+                    {
+                        name: name.trim(),
+                        type: type.trim(),
+                        city: city.trim(),
+                        country: country.trim(),
+                        address:
+                            address?.trim() || null,
+                        phone:
+                            phone?.trim() || null,
+                        email:
+                            email?.trim() || null,
+                        ninea:
+                            ninea?.trim() || null,
+                        rccm:
+                            rccm?.trim() || null
+                    }
+                );
+
+
+            if (!updatedAgency) {
+
+                return res.status(404).json({
+                    error:
+                        "Agence introuvable."
+                });
+
+            }
+
+
+            return res.json({
+
+                success: true,
+
+                message:
+                    "Paramètres de l'agence enregistrés avec succès.",
+
+                agency:
+                    updatedAgency
+
+            });
+
+        }
+        catch (err) {
+
+            console.error(
+                "Erreur mise à jour paramètres agence :",
+                err
+            );
+
+            return res.status(500).json({
+                error:
+                    "Erreur lors de la mise à jour des paramètres de l'agence."
             });
 
         }

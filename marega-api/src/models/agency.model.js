@@ -206,6 +206,134 @@ class Agency {
 
     }
 
+    static async getPublicAll() {
+
+        const result = await db.query(`
+
+            SELECT
+                id,
+                name,
+                type,
+                city,
+                country
+
+            FROM marega.agencies
+
+            WHERE status = 'active'
+
+            ORDER BY name ASC
+
+        `);
+
+        return result.rows;
+    }
+
+    static async getForAgency(
+        agencyId
+    ) {
+
+        const result = await db.query(
+
+            `
+            SELECT
+
+                id,
+                name,
+                type,
+                city,
+                country,
+                address,
+                phone,
+                email,
+                status,
+                ninea,
+                rccm,
+                logo_path,
+                contract_template_path,
+                receipt_template_path,
+                created_at,
+                updated_at
+
+            FROM marega.agencies
+
+            WHERE
+                id = $1
+            `,
+
+            [
+                agencyId
+            ]
+
+        );
+
+        return result.rows[0];
+
+    }
+
+    // =========================================================
+    // MISE À JOUR DES PARAMÈTRES DE L'AGENCE
+    // =========================================================
+
+    static async updateSettings(
+        agencyId,
+        data
+    ) {
+
+        const result =
+            await db.query(
+                `
+                UPDATE marega.agencies
+
+                SET
+                    name = $1,
+                    type = $2,
+                    city = $3,
+                    country = $4,
+                    address = $5,
+                    phone = $6,
+                    email = $7,
+                    ninea = $8,
+                    rccm = $9,
+                    updated_at = CURRENT_TIMESTAMP
+
+                WHERE id = $10
+
+                RETURNING
+                    id,
+                    name,
+                    type,
+                    city,
+                    country,
+                    address,
+                    phone,
+                    email,
+                    status,
+                    ninea,
+                    rccm,
+                    logo_path,
+                    contract_template_path,
+                    receipt_template_path,
+                    created_at,
+                    updated_at
+                `,
+                [
+                    data.name,
+                    data.type,
+                    data.city,
+                    data.country,
+                    data.address,
+                    data.phone,
+                    data.email,
+                    data.ninea,
+                    data.rccm,
+                    agencyId
+                ]
+            );
+
+        return result.rows[0];
+
+    }
+
 }
 
 

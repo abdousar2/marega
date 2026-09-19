@@ -16,7 +16,8 @@ const AgencyController =
 // =========================================================
 
 const {
-    authenticateToken
+    authenticateToken,
+    authorizeRoles
 } = require("../middleware/auth.middleware");
 
 
@@ -40,17 +41,38 @@ router.get(
 
 );
 
+// =========================================================
+// AGENCE CONNECTÉE
+// =========================================================
+
+router.get(
+    "/me",
+    authenticateToken,
+    AgencyController.getById
+);
+
+
+// =========================================================
+// PARAMÈTRES DE L'AGENCE
+// ADMIN UNIQUEMENT
+// =========================================================
+
+router.put(
+    "/settings",
+    authenticateToken,
+    authorizeRoles("ADMIN"),
+    AgencyController.updateSettings
+);
+
 
 // =========================================================
 // AGENCE PAR ID
 // =========================================================
 
 router.get(
-
     "/:id",
-
+    authenticateToken,
     AgencyController.getById
-
 );
 
 
@@ -59,10 +81,10 @@ router.get(
 // =========================================================
 
 router.post(
-
     "/documents",
 
     authenticateToken,
+    authorizeRoles("ADMIN"),
 
     uploadAgencyDocuments.fields([
 

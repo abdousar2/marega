@@ -38,6 +38,7 @@ import Users from "./admin/pages/Users";
 import AdminRoute from "./admin/AdminRoute";
 import Connexion from "./admin/pages/Connexion";
 import AgencyDocuments from "./admin/pages/AgencyDocuments";
+import AgencySettings from "./admin/pages/AgencySettings";
 
 
 // Providers
@@ -278,6 +279,11 @@ function App() {
                     <Route
                         element={<AdminRoute />}
                     >
+
+                        <Route
+                            path="/admin/agency-settings"
+                            element={<AgencySettings />}
+                        />
 
                         <Route
                             path="/admin/audit"

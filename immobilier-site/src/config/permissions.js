@@ -9,6 +9,7 @@ export const ROLES = {
 export const PERMISSIONS = {
 
     ADMIN: {
+
         dashboard: true,
 
         buildings: {
@@ -79,6 +80,13 @@ export const PERMISSIONS = {
             create: true,
             update: true,
             delete: true
+        },
+
+        agency_settings: {
+            view: true,
+            create: false,
+            update: true,
+            delete: false
         },
 
         agency_documents: {
@@ -91,10 +99,12 @@ export const PERMISSIONS = {
         audit: {
             view: true
         }
+
     },
 
 
     RESPONSABLE: {
+
         dashboard: true,
 
         buildings: {
@@ -165,11 +175,27 @@ export const PERMISSIONS = {
             create: false,
             update: false,
             delete: false
+        },
+
+        agency_settings: {
+            view: false,
+            create: false,
+            update: false,
+            delete: false
+        },
+
+        agency_documents: {
+            view: false,
+            create: false,
+            update: false,
+            delete: false
         }
+
     },
 
 
     COMPTABLE: {
+
         dashboard: true,
 
         buildings: {
@@ -240,11 +266,27 @@ export const PERMISSIONS = {
             create: false,
             update: false,
             delete: false
+        },
+
+        agency_settings: {
+            view: false,
+            create: false,
+            update: false,
+            delete: false
+        },
+
+        agency_documents: {
+            view: false,
+            create: false,
+            update: false,
+            delete: false
         }
+
     },
 
 
     AGENT: {
+
         dashboard: true,
 
         buildings: {
@@ -315,7 +357,22 @@ export const PERMISSIONS = {
             create: false,
             update: false,
             delete: false
+        },
+
+        agency_settings: {
+            view: false,
+            create: false,
+            update: false,
+            delete: false
+        },
+
+        agency_documents: {
+            view: false,
+            create: false,
+            update: false,
+            delete: false
         }
+
     }
 
 };

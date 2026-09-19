@@ -1,0 +1,2 @@
+ALTER TABLE marega.agency_users
+ADD COLUMN IF NOT EXISTS suspended_by_agency BOOLEAN NOT NULL DEFAULT FALSE;

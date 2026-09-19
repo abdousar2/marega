@@ -120,6 +120,13 @@ export default function Sidebar({
                 },
 
                 {
+                    icon: "⚙️",
+                    label: "Paramètres de l'agence",
+                    url: "/admin/agency-settings",
+                    module: "agency_settings"
+                },
+
+                {
                     icon: "📁",
                     label: "Documents de l'agence",
                     url: "/admin/agency-documents",
