@@ -560,20 +560,65 @@ export default function Contracts() {
 
         }
 
-        catch (err) {
+            catch (err) {
 
-            console.error(
-                err
-            );
+        console.error(
+            "Erreur sauvegarde contrat :",
+            err
+        );
 
+
+        // =================================================
+        // MESSAGE D'ERREUR API
+        // =================================================
+
+        const errorMessage =
+            err?.data?.error ||
+            err?.message ||
+            "";
+
+
+        // =================================================
+        // CONFLIT DE PÉRIODE
+        // =================================================
+
+        if (
+            err?.status === 409 ||
+            errorMessage.includes(
+                "contrat actif"
+            ) ||
+            errorMessage.includes(
+                "période"
+            )
+        ) {
 
             alert(
-                editingContract
-                    ? "Impossible de modifier le contrat."
-                    : "Impossible de créer le contrat."
+                errorMessage ||
+                "Impossible de créer ce contrat : cet appartement possède déjà un contrat actif sur cette période."
             );
 
+            return;
+
         }
+
+
+        // =================================================
+        // ERREUR STANDARD
+        // =================================================
+
+        alert(
+
+            editingContract
+
+                ? "Impossible de modifier le contrat."
+
+                : "Impossible de créer le contrat."
+
+        );
+
+        
+
+    }
 
         finally {
 

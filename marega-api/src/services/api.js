@@ -41,6 +41,7 @@ export async function api(
                 ...options,
 
                 headers
+
             }
 
         );
@@ -48,29 +49,45 @@ export async function api(
 
     if (!response.ok) {
 
-        let error;
+        let errorData = {};
 
         try {
 
-            error =
+            errorData =
                 await response.json();
 
         }
 
         catch {
 
-            error = {};
+            errorData = {};
 
         }
 
 
-        throw new Error(
+        const error =
+            new Error(
 
-            error.error ||
-            error.message ||
-            "Erreur API"
+                errorData.error ||
+                errorData.message ||
+                `Erreur API (${response.status})`
 
-        );
+            );
+
+
+        // =====================================================
+        // INFORMATIONS HTTP CONSERVÉES
+        // =====================================================
+
+        error.status =
+            response.status;
+
+
+        error.data =
+            errorData;
+
+
+        throw error;
 
     }
 

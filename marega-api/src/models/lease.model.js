@@ -204,47 +204,187 @@ class Lease {
         const year =
             new Date().getFullYear();
 
-        const result = await db.query(
 
-            `
-            SELECT contract_number
+        const result =
+            await db.query(
 
-            FROM marega.leases
+                `
+                SELECT
 
-            WHERE contract_number LIKE $1
-              AND agency_id = $2
+                    COALESCE(
 
-            ORDER BY id DESC
+                        MAX(
 
-            LIMIT 1
-            `,
+                            (
+                                SUBSTRING(
+                                    contract_number
+                                    FROM
+                                    '^MRG-[0-9]{4}-([0-9]+)$'
+                                )
+                            )::INTEGER
 
-            [
-                `MRG-${year}-%`,
-                agencyId
-            ]
+                        ),
 
+                        0
+
+                    ) + 1 AS next_number
+
+                FROM marega.leases
+
+                WHERE agency_id = $1
+
+                AND contract_number LIKE $2
+                `,
+
+                [
+                    agencyId,
+                    `MRG-${year}-%`
+                ]
+
+            );
+
+
+        const nextNumber =
+            Number(
+                result.rows[0].next_number
+            );
+
+
+        return (
+            `MRG-${year}-` +
+            String(nextNumber).padStart(
+                6,
+                "0"
+            )
         );
 
-        let next = 1;
+    }
 
-        if (result.rows.length > 0) {
+    // =========================================================
+    // VÉRIFICATION CHEVAUCHEMENT DES CONTRATS ACTIFS
+    // =========================================================
 
-            const last =
-                result.rows[0].contract_number;
+    static async checkActiveOverlap(
+        apartmentId,
+        startDate,
+        endDate,
+        agencyId,
+        excludeId = null
+    ) {
 
-            const lastNumber =
-                parseInt(
-                    last.split("-")[2],
-                    10
+        // -----------------------------------------------------
+        // DATES OBLIGATOIRES
+        // -----------------------------------------------------
+
+        if (!startDate || !endDate) {
+
+            const error =
+                new Error(
+                    "Les dates de début et de fin du contrat sont obligatoires."
                 );
 
-            next =
-                lastNumber + 1;
+            error.code =
+                "INVALID_LEASE_DATES";
+
+            throw error;
 
         }
 
-        return `MRG-${year}-${String(next).padStart(6, "0")}`;
+
+        // -----------------------------------------------------
+        // COHÉRENCE DES DATES
+        // -----------------------------------------------------
+
+        if (
+            String(startDate) >
+            String(endDate)
+        ) {
+
+            const error =
+                new Error(
+                    "La date de début du contrat doit être antérieure ou égale à la date de fin."
+                );
+
+            error.code =
+                "INVALID_LEASE_DATES";
+
+            throw error;
+
+        }
+
+
+        // -----------------------------------------------------
+        // RECHERCHE D'UN CONTRAT ACTIF EN CONFLIT
+        // -----------------------------------------------------
+
+        const result =
+            await db.query(
+
+                `
+                SELECT
+                    id,
+                    contract_number,
+                    start_date,
+                    end_date
+
+                FROM marega.leases
+
+                WHERE agency_id = $1
+
+                AND apartment_id = $2
+
+                AND status = 'Actif'
+
+                AND start_date <= $4
+
+                AND end_date >= $3
+
+                AND (
+                        $5::integer IS NULL
+                        OR id <> $5
+                )
+
+                ORDER BY start_date ASC, id ASC
+
+                LIMIT 1
+                `,
+
+                [
+                    agencyId,
+                    apartmentId,
+                    startDate,
+                    endDate,
+                    excludeId
+                ]
+
+            );
+
+
+        if (
+            result.rows.length > 0
+        ) {
+
+            const conflict =
+                result.rows[0];
+
+
+            const error =
+                new Error(
+                    `L'appartement possède déjà un contrat actif sur cette période (${conflict.contract_number}).`
+                );
+
+
+            error.code =
+                "LEASE_PERIOD_CONFLICT";
+
+
+            error.conflictingLease =
+                conflict;
+
+
+            throw error;
+
+        }
 
     }
 
@@ -305,6 +445,26 @@ class Lease {
 
         }
 
+        // -----------------------------------------------------
+        // VÉRIFIER LE CHEVAUCHEMENT
+        // -----------------------------------------------------
+
+        if (data.status === "Actif") {
+
+            await Lease.checkActiveOverlap(
+
+                data.apartment_id,
+
+                data.start_date,
+
+                data.end_date,
+
+                agencyId
+
+            );
+
+        }
+
 
         // -----------------------------------------------------
         // NUMÉRO DE CONTRAT
@@ -316,77 +476,162 @@ class Lease {
             );
 
 
+        
         // -----------------------------------------------------
-        // CRÉATION
+        // CRÉATION AVEC RETRY EN CAS DE COLLISION
         // -----------------------------------------------------
 
-        const result =
-            await db.query(
-
-                `
-                INSERT INTO marega.leases
-                (
-                    agency_id,
-                    apartment_id,
-                    tenant_id,
-                    contract_number,
-                    start_date,
-                    end_date,
-                    monthly_rent,
-                    charges,
-                    deposit,
-                    payment_day,
-                    status,
-                    notes,
-                    identity_number,
-                    level
-                )
-
-                VALUES
-                (
-                    $1,$2,$3,$4,$5,$6,$7,
-                    $8,$9,$10,$11,$12,$13,$14
-                )
-
-                RETURNING *
-                `,
-
-                [
-
-                    agencyId,
-
-                    data.apartment_id,
-
-                    data.tenant_id,
-
-                    contractNumber,
-
-                    data.start_date,
-
-                    data.end_date,
-
-                    data.monthly_rent,
-
-                    data.charges,
-
-                    data.deposit,
-
-                    data.payment_day,
-
-                    data.status,
-
-                    data.notes,
-
-                    data.identity_number,
-
-                    data.level
-
-                ]
-
-            );
+        const MAX_ATTEMPTS = 5;
 
 
-        return result.rows[0];
+        for (
+            let attempt = 1;
+            attempt <= MAX_ATTEMPTS;
+            attempt++
+        ) {
+
+            const contractNumber =
+                await Lease.generateContractNumber(
+                    agencyId
+                );
+
+
+            try {
+
+                // -------------------------------------------------
+                // INSERTION
+                // -------------------------------------------------
+
+                const result =
+                    await db.query(
+
+                        `
+                        INSERT INTO marega.leases
+                        (
+                            agency_id,
+                            apartment_id,
+                            tenant_id,
+                            contract_number,
+                            start_date,
+                            end_date,
+                            monthly_rent,
+                            charges,
+                            deposit,
+                            payment_day,
+                            status,
+                            notes,
+                            identity_number,
+                            level
+                        )
+
+                        VALUES
+                        (
+                            $1,$2,$3,$4,$5,$6,$7,
+                            $8,$9,$10,$11,$12,$13,$14
+                        )
+
+                        RETURNING *
+                        `,
+
+                        [
+
+                            agencyId,
+
+                            data.apartment_id,
+
+                            data.tenant_id,
+
+                            contractNumber,
+
+                            data.start_date,
+
+                            data.end_date,
+
+                            data.monthly_rent,
+
+                            data.charges,
+
+                            data.deposit,
+
+                            data.payment_day,
+
+                            data.status,
+
+                            data.notes,
+
+                            data.identity_number,
+
+                            data.level
+
+                        ]
+
+                    );
+
+
+                // -------------------------------------------------
+                // SUCCÈS
+                // -------------------------------------------------
+
+                return result.rows[0];
+
+            }
+
+            catch (err) {
+
+                // -------------------------------------------------
+                // COLLISION DE NUMÉRO
+                // -------------------------------------------------
+
+                if (
+                    err.code === "23505" &&
+                    err.constraint ===
+                        "leases_agency_contract_number_unique"
+                ) {
+
+                    console.warn(
+                        `⚠️ Collision numéro de contrat : ${contractNumber} `
+                        + `(tentative ${attempt}/${MAX_ATTEMPTS})`
+                    );
+
+
+                    if (
+                        attempt <
+                        MAX_ATTEMPTS
+                    ) {
+
+                        continue;
+
+                    }
+
+
+                    // -------------------------------------------------
+                    // TROP DE COLLISIONS
+                    // -------------------------------------------------
+
+                    const error =
+                        new Error(
+                            "Impossible de générer un numéro de contrat unique après plusieurs tentatives."
+                        );
+
+
+                    error.code =
+                        "CONTRACT_NUMBER_GENERATION_FAILED";
+
+
+                    throw error;
+
+                }
+
+
+                // -------------------------------------------------
+                // AUTRE ERREUR
+                // -------------------------------------------------
+
+                throw err;
+
+            }
+
+        }
 
     }
 
@@ -445,6 +690,28 @@ class Lease {
                 "AGENCY_MISMATCH";
 
             throw error;
+
+        }
+
+        // -----------------------------------------------------
+        // VÉRIFIER LE CHEVAUCHEMENT
+        // -----------------------------------------------------
+
+        if (data.status === "Actif") {
+
+            await Lease.checkActiveOverlap(
+
+                data.apartment_id,
+
+                data.start_date,
+
+                data.end_date,
+
+                agencyId,
+
+                id
+
+            );
 
         }
 

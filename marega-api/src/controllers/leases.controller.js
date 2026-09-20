@@ -270,6 +270,81 @@ class LeasesController {
 
             }
 
+                if (
+                err.code ===
+                "INVALID_LEASE_DATES"
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        err.message
+
+                });
+
+            }
+
+
+            if (
+                err.code ===
+                "LEASE_PERIOD_CONFLICT"
+            ) {
+
+                return res.status(409).json({
+
+                    error:
+                        err.message,
+
+                    conflict:
+                        err.conflictingLease || null
+
+                });
+
+            }
+
+            if (err.code === "23P01") {
+
+                return res.status(409).json({
+
+                    error:
+                        "L'appartement possède déjà un contrat actif sur cette période."
+
+                });
+
+            }
+
+            if (err.code === "23505") {
+
+                if (
+                    err.constraint ===
+                    "leases_agency_contract_number_unique"
+                ) {
+
+                    return res.status(409).json({
+
+                        error:
+                            "Le numéro de contrat généré existe déjà dans cette agence. Veuillez réessayer."
+
+                    });
+
+                }
+
+            }
+
+            if (
+                err.code ===
+                "CONTRACT_NUMBER_GENERATION_FAILED"
+            ) {
+
+                return res.status(409).json({
+
+                    error:
+                        err.message
+
+                });
+
+            }
+
 
             res.status(500).json({
 
@@ -483,6 +558,67 @@ class LeasesController {
                         err.message
 
                 });
+
+            }
+
+            if (
+                err.code ===
+                "INVALID_LEASE_DATES"
+            ) {
+
+                return res.status(400).json({
+
+                    error:
+                        err.message
+
+                });
+
+            }
+
+
+            if (
+                err.code ===
+                "LEASE_PERIOD_CONFLICT"
+            ) {
+
+                return res.status(409).json({
+
+                    error:
+                        err.message,
+
+                    conflict:
+                        err.conflictingLease || null
+
+                });
+
+            }
+
+            if (err.code === "23P01") {
+
+                return res.status(409).json({
+
+                    error:
+                        "L'appartement possède déjà un contrat actif sur cette période."
+
+                });
+
+            }
+
+            if (err.code === "23505") {
+
+                if (
+                    err.constraint ===
+                    "leases_agency_contract_number_unique"
+                ) {
+
+                    return res.status(409).json({
+
+                        error:
+                            "Le numéro de contrat généré existe déjà dans cette agence. Veuillez réessayer."
+
+                    });
+
+                }
 
             }
 

@@ -50,24 +50,109 @@ export default function DashboardHome() {
 
     const { expenses } = useContext(ExpensesContext);
 
+    // =========================================================
+    // CONTRATS ACTIFS
+    // =========================================================
+
     const activeContracts =
         contracts.filter(
             contract =>
                 contract.status === "Actif"
         );
 
+
+    // =========================================================
+    // CONTRATS ACTUELLEMENT EN COURS
+    // =========================================================
+
+    // Date du jour au format YYYY-MM-DD
+    const today =
+        new Date();
+
+    const todayString =
+        `${today.getFullYear()}-${String(
+            today.getMonth() + 1
+        ).padStart(2, "0")}-${String(
+            today.getDate()
+        ).padStart(2, "0")}`;
+
+
+    // Un contrat est actuellement en cours si :
+    // start_date <= aujourd'hui <= end_date
+
+    const currentContracts =
+        activeContracts.filter(
+            contract => {
+
+                if (
+                    !contract.start_date ||
+                    !contract.end_date
+                ) {
+
+                    return false;
+
+                }
+
+
+                const startDate =
+                    String(
+                        contract.start_date
+                    ).substring(0, 10);
+
+
+                const endDate =
+                    String(
+                        contract.end_date
+                    ).substring(0, 10);
+
+
+                return (
+                    startDate <=
+                        todayString &&
+                    endDate >=
+                        todayString
+                );
+
+            }
+        );
+
+
+    // =========================================================
+    // APPARTEMENTS OCCUPÉS
+    // =========================================================
+
+    // Un appartement ne doit être compté qu'une seule fois,
+    // même s'il possède plusieurs contrats historiques.
+
+    const occupiedApartmentIds =
+        new Set(
+
+            currentContracts
+                .map(
+                    contract =>
+                        contract.apartment_id
+                )
+                .filter(Boolean)
+
+        );
+
+
     const occupied =
-        activeContracts.length;
-    
-    const available = Math.max(
-        0,
-        apartments.length - occupied
-    );
+        occupiedApartmentIds.size;
+
+
+    const available =
+        Math.max(
+            0,
+            apartments.length - occupied
+        );
+
 
     const occupationRate =
         apartments.length > 0
             ? Math.round(
-                occupied * 100 / apartments.length
+                occupied * 100 /
+                apartments.length
             )
             : 0;
 
