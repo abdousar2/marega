@@ -78,6 +78,38 @@ export default function Payments() {
     const [method, setMethod] =
         useState("Espèces");   
 
+    function formatPaymentMonth(value) {
+
+        if (!value) {
+            return "—";
+        }
+
+        const text =
+            String(value).substring(0, 10);
+
+        const [year, month] =
+            text.split("-").map(Number);
+
+        if (
+            !Number.isFinite(year) ||
+            !Number.isFinite(month)
+        ) {
+            return "—";
+        }
+
+        return new Date(
+            Date.UTC(year, month - 1, 1)
+        ).toLocaleDateString(
+            "fr-FR",
+            {
+                month: "long",
+                year: "numeric",
+                timeZone: "UTC"
+            }
+        );
+
+    }
+
     async function addPayment(e) {
 
         e.preventDefault();
@@ -539,7 +571,9 @@ export default function Payments() {
 
                                     <strong>
                                         {" "}
-                                        {payment.payment_month}
+                                        {formatPaymentMonth(
+                                            payment.payment_month
+                                        )}
                                     </strong>
 
                                 </p>

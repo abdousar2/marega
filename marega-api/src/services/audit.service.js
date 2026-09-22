@@ -1,4 +1,5 @@
-const AuditLog = require("../models/audit.model");
+const AuditLog =
+    require("../models/audit.model");
 
 
 const AuditService = {
@@ -11,6 +12,7 @@ const AuditService = {
         req,
         {
             user_id = null,
+            agency_id = null,
             action,
             module,
             entity_id = null,
@@ -28,7 +30,8 @@ const AuditService = {
                     null,
 
                 agency_id:
-                    req?.user?.agency_id ||
+                    agency_id ??
+                    req?.user?.agency_id ??
                     null,
 
                 action,

@@ -34,6 +34,10 @@ import {
 
 import "./DashboardHome.css";
 
+import {
+    RentsContext
+} from "../../context/RentsContext";
+
 export default function DashboardHome() {
 
     const navigate = useNavigate();
@@ -47,6 +51,8 @@ export default function DashboardHome() {
     const { contracts } = useContext(ContractsContext);
 
     const { payments } = useContext(PaymentsContext);
+
+    const { rents } = useContext(RentsContext);
 
     const { expenses } = useContext(ExpensesContext);
 
@@ -168,15 +174,34 @@ export default function DashboardHome() {
         payment => payment.status === "Payé"
     );
 
-    const totalUnpaid = payments
-        .filter(
-            payment => payment.status !== "Payé"
-        )
-        .reduce(
-            (total, payment) =>
-                total + Number(payment.amount),
-            0
-        );
+    function getRentBusinessStatus(rent) {
+
+        if (rent.business_status) {
+            return rent.business_status;
+        }
+
+        if (
+            rent.status === "Payé" ||
+            rent.payment_id !== null
+        ) {
+            return "Payé";
+        }
+
+        return "En attente";
+    }
+
+
+    const lateRents = rents.filter(
+        rent =>
+            getRentBusinessStatus(rent) === "En retard"
+    );
+
+
+    const lateRentAmount = lateRents.reduce(
+        (total, rent) =>
+            total + Number(rent.amount || 0),
+        0
+    );
 
     const totalExpenses = expenses.reduce(
 
@@ -381,11 +406,11 @@ export default function DashboardHome() {
                     <div className="rent-box rent-unpaid">
 
                         <p>
-                            Loyers impayés
+                            Loyers en retard
                         </p>
 
                         <h2>
-                            {totalUnpaid.toLocaleString("fr-FR")}
+                            {lateRentAmount.toLocaleString("fr-FR")}
                         </h2>
 
                         <span>
@@ -689,15 +714,11 @@ export default function DashboardHome() {
 
                     <div>
                         <span>
-                            Paiements impayés
+                            Loyers en retard
                         </span>
 
                         <Badge color="red">
-                            {
-                                payments.filter(
-                                    p => p.status !== "Payé"
-                                ).length
-                            }
+                            {lateRents.length}
                         </Badge>
                     </div>
 

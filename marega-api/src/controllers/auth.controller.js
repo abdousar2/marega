@@ -113,19 +113,28 @@ class AuthController {
 
             await AuditService.log(req, {
 
-                user_id: user.id,
+                user_id:
+                    user.id,
 
-                action: "LOGIN",
+                agency_id:
+                    user.agency_id,
 
-                module: "auth",
+                action:
+                    "LOGIN",
 
-                entity_id: user.id,
+                module:
+                    "auth",
+
+                entity_id:
+                    user.id,
 
                 details: {
 
-                    email: user.email,
+                    email:
+                        user.email,
 
-                    role: user.role
+                    role:
+                        user.role
 
                 }
 
