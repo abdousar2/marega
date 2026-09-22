@@ -76,39 +76,89 @@ export default function Rents() {
 
     }
 
-    
+    function getRentStatus(rent) {
+
+        if (rent.business_status) {
+            return rent.business_status;
+        }
+
+        if (
+            rent.status === "Payé" ||
+            rent.payment_id !== null
+        ) {
+            return "Payé";
+        }
+
+        return "En attente";
+    }
 
     const paidRents =
-        rents.filter(r => r.status === "Payé");
+        rents.filter(
+            r => getRentStatus(r) === "Payé"
+        );
 
     const waitingRents =
-        rents.filter(r => r.status === "En attente");
+        rents.filter(
+            r => getRentStatus(r) === "En attente"
+        );
+
+    const todayRents =
+        rents.filter(
+            r => getRentStatus(r) === "À échéance aujourd'hui"
+        );
 
     const lateRents =
-        rents.filter(r => r.status === "En retard");
+        rents.filter(
+            r => getRentStatus(r) === "En retard"
+        );
 
     const filteredRents = useMemo(() => {
 
         return rents
 
+            // =====================================================
+            // FILTRE PAR STATUT MÉTIER
+            // =====================================================
             .filter((rent) => {
 
-                if (filter === "paid")
-                    return rent.status === "Payé";
+                const status = getRentStatus(rent);
 
-                if (filter === "waiting")
-                    return rent.status === "En attente";
+                if (filter === "paid") {
+                    return status === "Payé";
+                }
 
-                if (filter === "late")
-                    return rent.status === "En retard";
+                if (filter === "waiting") {
+                    return status === "En attente";
+                }
+
+                if (filter === "today") {
+                    return status === "À échéance aujourd'hui";
+                }
+
+                if (filter === "late") {
+                    return status === "En retard";
+                }
 
                 return true;
 
             })
 
+            // =====================================================
+            // RECHERCHE
+            // =====================================================
             .filter((rent) => {
 
-                const keyword = search.toLowerCase();
+                const keyword =
+                    search
+                        .toLowerCase()
+                        .trim();
+
+                if (!keyword) {
+                    return true;
+                }
+
+                const rentStatus =
+                    getRentStatus(rent);
 
                 return (
 
@@ -130,6 +180,12 @@ export default function Rents() {
 
                     ||
 
+                    (rentStatus || "")
+                        .toLowerCase()
+                        .includes(keyword)
+
+                    ||
+
                     (rent.status || "")
                         .toLowerCase()
                         .includes(keyword)
@@ -137,16 +193,19 @@ export default function Rents() {
                     ||
 
                     new Date(rent.due_month)
-                        .toLocaleDateString("fr-FR", {
-                            month: "long",
-                            year: "numeric"
-                        })
+                        .toLocaleDateString(
+                            "fr-FR",
+                            {
+                                month: "long",
+                                year: "numeric"
+                            }
+                        )
                         .toLowerCase()
                         .includes(keyword)
 
                 );
 
-            })
+            });
 
     }, [rents, search, filter]);
 
@@ -195,7 +254,7 @@ export default function Rents() {
 
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6 mb-8">
 
                 <StatsCard
                     title="Total"
@@ -213,6 +272,12 @@ export default function Rents() {
                     title="En attente"
                     value={waitingRents.length}
                     color="orange"
+                />
+
+                <StatsCard
+                    title="Aujourd'hui"
+                    value={todayRents.length}
+                    color="blue"
                 />
 
                 <StatsCard
@@ -258,6 +323,18 @@ export default function Rents() {
                 </Button>
 
                 <Button
+                    variant={
+                        filter === "today"
+                            ? "primary"
+                            : "secondary"
+                    }
+                    onClick={() => setFilter("today")}
+                    color="blue"
+                >
+                    Aujourd'hui
+                </Button>
+
+                <Button
                     variant={filter === "late" ? "primary" : "secondary"}
                     onClick={() => setFilter("late")}
                     color="red"
@@ -297,11 +374,11 @@ export default function Rents() {
                                         className={`
                                             rent-avatar
                                             ${
-                                                rent.status === "Payé"
-                                                    ? "rent-avatar-paid"
-                                                    : rent.status === "En attente"
-                                                    ? "rent-avatar-waiting"
-                                                    : "rent-avatar-late"
+                                                getRentStatus(rent) === "Payé"
+                                                ? "rent-avatar-paid"
+                                                : getRentStatus(rent) === "En retard"
+                                                ? "rent-avatar-late"
+                                                : "rent-avatar-waiting"
                                             }
                                         `}
                                     >
@@ -332,16 +409,16 @@ export default function Rents() {
 
                                 <Badge
                                     color={
-                                        rent.status === "Payé"
+                                        getRentStatus(rent) === "Payé"
                                             ? "green"
-                                            : rent.status === "En attente"
-                                            ? "orange"
-                                            : "red"
+                                            : getRentStatus(rent) === "En retard"
+                                            ? "red"
+                                            : getRentStatus(rent) === "À échéance aujourd'hui"
+                                            ? "blue"
+                                            : "orange"
                                     }
                                 >
-
-                                    {rent.status}
-
+                                    {getRentStatus(rent)}
                                 </Badge>
 
                             </div>
@@ -402,7 +479,7 @@ export default function Rents() {
                                 </p>
 
 
-                                {rent.status === "En retard" && (
+                                {getRentStatus(rent) === "En retard" && (
 
                                     <p className="rent-late">
 
@@ -438,7 +515,7 @@ export default function Rents() {
                                 </div>
 
 
-                                {rent.status === "Payé" && (
+                                {getRentStatus(rent) === "Payé" && (
 
                                     <>
 
@@ -460,7 +537,7 @@ export default function Rents() {
                                 )}
 
 
-                                {rent.status === "Payé" &&
+                                {getRentStatus(rent) === "Payé" &&
                                 rent.payment_date && (
 
                                     <div className="rent-payment-date">
@@ -486,7 +563,7 @@ export default function Rents() {
 
                             <div className="rent-actions">
 
-                                {rent.status === "Payé" ? (
+                                {getRentStatus(rent) === "Payé" ? (
 
                                     rent.receipt_path && (
 
