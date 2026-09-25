@@ -137,9 +137,14 @@ class Payment {
     // MODIFICATION
     // =========================================================
 
-    static async update(id, data, agencyId) {
+    static async update(
+        id,
+        data,
+        agencyId,
+        client = db
+    ) {
 
-        const result = await db.query(
+        const result = await client.query(
 
             `
             UPDATE marega.payments
@@ -225,10 +230,11 @@ class Payment {
     static async updateReceiptPath(
         id,
         receiptPath,
-        agencyId
+        agencyId,
+        client = db
     ) {
 
-        await db.query(
+        await client.query(
 
             `
             UPDATE marega.payments
@@ -263,10 +269,11 @@ class Payment {
 
     static async getCompleteById(
         id,
-        agencyId
+        agencyId,
+        client = db
     ) {
 
-        const result = await db.query(
+        const result = await client.query(
 
             `
             SELECT

@@ -433,17 +433,16 @@ class Rent {
 
     static async syncUnpaidFromLease(
         lease,
-        agencyId,
-        externalClient = null
+        agencyId
     ) {
 
         const schedule =
             Rent.buildRentSchedule(lease);
 
 
-        // =========================================================
+        // -----------------------------------------------------
         // PROTECTION ABSOLUE
-        // =========================================================
+        // -----------------------------------------------------
 
         if (!schedule.length) {
 
@@ -456,99 +455,93 @@ class Rent {
                 "EMPTY_RENT_SCHEDULE";
 
             throw error;
+
         }
 
 
-        // =========================================================
-        // CLIENT
-        // =========================================================
-
-        let client =
-            externalClient;
-
-        let ownTransaction =
-            false;
-
-
-        if (!client) {
-
-            client =
-                await db.connect();
-
-            ownTransaction =
-                true;
-        }
+        const client =
+            await db.connect();
 
 
         try {
 
-            if (ownTransaction) {
-                await client.query("BEGIN");
-            }
+            await client.query("BEGIN");
 
 
-            // =====================================================
+            // =================================================
             // 1. CRÉER / METTRE À JOUR LES LOYERS NON PAYÉS
-            // =====================================================
+            // =================================================
 
             for (const item of schedule) {
 
                 await client.query(
+
                     `
-                        INSERT INTO marega.rents
-                        (
-                            agency_id,
-                            lease_id,
-                            tenant_id,
-                            due_month,
-                            due_date,
-                            amount,
-                            status
-                        )
+                    INSERT INTO marega.rents
+                    (
+                        agency_id,
+                        lease_id,
+                        tenant_id,
+                        due_month,
+                        due_date,
+                        amount,
+                        status
+                    )
 
-                        VALUES
-                        (
-                            $1,$2,$3,$4,$5,$6,$7
-                        )
+                    VALUES
+                    (
+                        $1,$2,$3,$4,$5,$6,$7
+                    )
 
-                        ON CONFLICT (
-                            lease_id,
-                            due_month
-                        )
+                    ON CONFLICT (
+                        lease_id,
+                        due_month
+                    )
 
-                        DO UPDATE SET
+                    DO UPDATE SET
 
-                            tenant_id =
-                                EXCLUDED.tenant_id,
+                        tenant_id =
+                            EXCLUDED.tenant_id,
 
-                            due_date =
-                                EXCLUDED.due_date,
+                        due_date =
+                            EXCLUDED.due_date,
 
-                            amount =
-                                EXCLUDED.amount,
+                        amount =
+                            EXCLUDED.amount,
 
-                            updated_at =
-                                CURRENT_TIMESTAMP
+                        updated_at =
+                            CURRENT_TIMESTAMP
 
-                        WHERE
-                            marega.rents.payment_id IS NULL
+                    WHERE
+                        marega.rents.payment_id IS NULL
                     `,
+
                     [
+
                         agencyId,
+
                         lease.id,
+
                         lease.tenant_id,
+
                         item.dueMonth,
+
                         item.dueDate,
+
                         lease.monthly_rent,
+
                         "Impayé"
+
                     ]
+
                 );
+
             }
 
 
-            // =====================================================
+            // =================================================
             // 2. MOIS AUTORISÉS
-            // =====================================================
+            // =================================================
 
             const dueMonths =
                 schedule.map(
@@ -557,17 +550,21 @@ class Rent {
                 );
 
 
-            // =====================================================
+            // =================================================
             // 3. SUPPRIMER UNIQUEMENT LES LOYERS NON PAYÉS
             //    QUI NE FONT PLUS PARTIE DU CONTRAT
-            // =====================================================
+            // =================================================
 
             await client.query(
-                `
-                    DELETE FROM marega.rents
 
-                    WHERE lease_id = $1
+                `
+                DELETE FROM marega.rents
+
+                WHERE
+                    lease_id = $1
+
                     AND agency_id = $2
+
                     AND payment_id IS NULL
 
                     AND NOT (
@@ -576,39 +573,51 @@ class Rent {
                         )
                     )
                 `,
+
                 [
+
                     lease.id,
+
                     agencyId,
+
                     dueMonths
+
                 ]
+
             );
 
 
-            if (ownTransaction) {
-                await client.query("COMMIT");
-            }
+            await client.query(
+                "COMMIT"
+            );
 
 
-            // =====================================================
+            // =================================================
             // 4. RETOUR FINAL
-            // =====================================================
+            // =================================================
 
             const result =
-                await client.query(
+                await db.query(
+
                     `
-                        SELECT *
+                    SELECT *
 
-                        FROM marega.rents
+                    FROM marega.rents
 
-                        WHERE lease_id = $1
+                    WHERE
+                        lease_id = $1
+
                         AND agency_id = $2
 
-                        ORDER BY due_month ASC
+                    ORDER BY
+                        due_month ASC
                     `,
+
                     [
                         lease.id,
                         agencyId
                     ]
+
                 );
 
 
@@ -618,12 +627,9 @@ class Rent {
 
         catch (err) {
 
-            if (ownTransaction) {
-
-                try {
-                    await client.query("ROLLBACK");
-                } catch {}
-            }
+            await client.query(
+                "ROLLBACK"
+            );
 
             throw err;
 
@@ -631,10 +637,10 @@ class Rent {
 
         finally {
 
-            if (ownTransaction) {
-                client.release();
-            }
+            client.release();
+
         }
+
     }
 
     // =========================================================
@@ -913,18 +919,15 @@ class Rent {
     // GÉNÉRATION DES LOYERS À PARTIR DU CONTRAT
     // =========================================================
 
-    static async generateFromLease(
-        lease,
-        client = null
-    ) {
+    static async generateFromLease(lease) {
 
         const schedule =
             Rent.buildRentSchedule(lease);
 
 
-        // =========================================================
+        // -----------------------------------------------------
         // PROTECTION
-        // =========================================================
+        // -----------------------------------------------------
 
         if (!schedule.length) {
 
@@ -937,157 +940,73 @@ class Rent {
                 "EMPTY_RENT_SCHEDULE";
 
             throw error;
-        }
-
-
-        // =========================================================
-        // MODE TRANSACTIONNEL EXTERNE
-        // =========================================================
-
-        if (client) {
-
-            for (const item of schedule) {
-
-                await client.query(
-                    `
-                        INSERT INTO marega.rents
-                        (
-                            agency_id,
-                            lease_id,
-                            tenant_id,
-                            due_month,
-                            due_date,
-                            amount,
-                            status
-                        )
-
-                        VALUES
-                        (
-                            $1,$2,$3,$4,$5,$6,$7
-                        )
-
-                        ON CONFLICT (
-                            lease_id,
-                            due_month
-                        )
-
-                        DO UPDATE SET
-
-                            tenant_id =
-                                EXCLUDED.tenant_id,
-
-                            due_date =
-                                EXCLUDED.due_date,
-
-                            amount =
-                                EXCLUDED.amount,
-
-                            updated_at =
-                                CURRENT_TIMESTAMP
-
-                        WHERE
-                            marega.rents.payment_id IS NULL
-                    `,
-                    [
-                        lease.agency_id,
-                        lease.id,
-                        lease.tenant_id,
-                        item.dueMonth,
-                        item.dueDate,
-                        lease.monthly_rent,
-                        "Impayé"
-                    ]
-                );
-            }
-
-            return;
-        }
-
-
-        // =========================================================
-        // APPEL DIRECT HORS TRANSACTION EXTERNE
-        // =========================================================
-
-        const txClient =
-            await db.connect();
-
-        try {
-
-            await txClient.query("BEGIN");
-
-
-            for (const item of schedule) {
-
-                await txClient.query(
-                    `
-                        INSERT INTO marega.rents
-                        (
-                            agency_id,
-                            lease_id,
-                            tenant_id,
-                            due_month,
-                            due_date,
-                            amount,
-                            status
-                        )
-
-                        VALUES
-                        (
-                            $1,$2,$3,$4,$5,$6,$7
-                        )
-
-                        ON CONFLICT (
-                            lease_id,
-                            due_month
-                        )
-
-                        DO UPDATE SET
-
-                            tenant_id =
-                                EXCLUDED.tenant_id,
-
-                            due_date =
-                                EXCLUDED.due_date,
-
-                            amount =
-                                EXCLUDED.amount,
-
-                            updated_at =
-                                CURRENT_TIMESTAMP
-
-                        WHERE
-                            marega.rents.payment_id IS NULL
-                    `,
-                    [
-                        lease.agency_id,
-                        lease.id,
-                        lease.tenant_id,
-                        item.dueMonth,
-                        item.dueDate,
-                        lease.monthly_rent,
-                        "Impayé"
-                    ]
-                );
-            }
-
-
-            await txClient.query("COMMIT");
 
         }
 
-        catch (err) {
 
-            await txClient.query("ROLLBACK");
+        for (const item of schedule) {
 
-            throw err;
+            await db.query(
+
+                `
+                INSERT INTO marega.rents
+                (
+                    agency_id,
+                    lease_id,
+                    tenant_id,
+                    due_month,
+                    due_date,
+                    amount,
+                    status
+                )
+
+                VALUES
+                (
+                    $1,$2,$3,$4,$5,$6,$7
+                )
+
+                ON CONFLICT (
+                    lease_id,
+                    due_month
+                )
+
+                DO UPDATE SET
+
+                    tenant_id = EXCLUDED.tenant_id,
+
+                    due_date = EXCLUDED.due_date,
+
+                    amount = EXCLUDED.amount,
+
+                    updated_at = CURRENT_TIMESTAMP
+
+                WHERE
+                    marega.rents.payment_id IS NULL
+                `,
+
+                [
+
+                    lease.agency_id,
+
+                    lease.id,
+
+                    lease.tenant_id,
+
+                    item.dueMonth,
+
+                    item.dueDate,
+
+                    lease.monthly_rent,
+
+                    "Impayé"
+
+                ]
+
+            );
 
         }
 
-        finally {
-
-            txClient.release();
-        }
-    }  
+    }   
 
 }
 

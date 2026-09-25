@@ -1,6 +1,7 @@
 const PDFDocument = require("pdfkit");
 const fs = require("fs");
 const path = require("path");
+const os = require("os");
 
 
 class ReceiptService {
@@ -82,7 +83,7 @@ class ReceiptService {
         const folder = path.join(__dirname, "../../receipts");
 
         if (!fs.existsSync(folder)) {
-            fs.mkdirSync(folder);
+            fs.mkdirSync(folder, { recursive: true });
         }
 
         const filename = `RECU-${payment.id}.pdf`;
@@ -95,7 +96,9 @@ class ReceiptService {
             margin: 20
         });
 
-        doc.pipe(fs.createWriteStream(filepath));
+        const writeStream = fs.createWriteStream(filepath);
+
+        doc.pipe(writeStream);
 
         const primary = "#1E3A8A";
         const gray = "#6B7280";
@@ -600,9 +603,223 @@ class ReceiptService {
                 }
             );
 
-        doc.end();
+        await new Promise((resolve, reject) => {
+
+            writeStream.on("finish", resolve);
+            writeStream.on("error", reject);
+            doc.on("error", reject);
+
+            doc.end();
+
+        });
 
         return `/receipts/${filename}`;
+
+    }
+
+        // =========================================================
+    // CHEMIN PHYSIQUE D'UN REÇU
+    // =========================================================
+
+    static getReceiptPhysicalPath(receiptPath) {
+
+        if (!receiptPath) {
+            return null;
+        }
+
+        const folder =
+            path.join(
+                __dirname,
+                "../../receipts"
+            );
+
+        const filename =
+            path.basename(receiptPath);
+
+        return path.join(
+            folder,
+            filename
+        );
+    }
+
+
+    // =========================================================
+    // SAUVEGARDER L'ANCIEN REÇU AVANT MODIFICATION
+    // =========================================================
+
+    static async backupReceipt(receiptPath) {
+
+        if (!receiptPath) {
+            return null;
+        }
+
+        const sourcePath =
+            this.getReceiptPhysicalPath(
+                receiptPath
+            );
+
+        const backupFolder =
+            path.join(
+                os.tmpdir(),
+                "marega-receipt-backups"
+            );
+
+        await fs.promises.mkdir(
+            backupFolder,
+            {
+                recursive: true
+            }
+        );
+
+        const filename =
+            path.basename(receiptPath);
+
+        const backupFilename =
+            `${Date.now()}-${process.pid}-${filename}.bak`;
+
+        const backupPath =
+            path.join(
+                backupFolder,
+                backupFilename
+            );
+
+
+        // L'ancien fichier n'existe pas
+        if (!fs.existsSync(sourcePath)) {
+
+            return {
+
+                receiptPath,
+
+                exists: false,
+
+                backupPath: null
+
+            };
+
+        }
+
+
+        await fs.promises.copyFile(
+            sourcePath,
+            backupPath
+        );
+
+
+        return {
+
+            receiptPath,
+
+            exists: true,
+
+            backupPath
+
+        };
+
+    }
+
+
+    // =========================================================
+    // RESTAURER L'ANCIEN REÇU APRÈS ROLLBACK
+    // =========================================================
+
+    static async restoreReceiptBackup(
+        backup
+    ) {
+
+        if (!backup) {
+            return;
+        }
+
+        const targetPath =
+            this.getReceiptPhysicalPath(
+                backup.receiptPath
+            );
+
+
+        // Ancien reçu existant
+        if (
+            backup.exists &&
+            backup.backupPath
+        ) {
+
+            await fs.promises.copyFile(
+                backup.backupPath,
+                targetPath
+            );
+
+            try {
+
+                await fs.promises.unlink(
+                    backup.backupPath
+                );
+
+            }
+
+            catch (error) {
+
+                if (error.code !== "ENOENT") {
+                    throw error;
+                }
+
+            }
+
+            return;
+        }
+
+
+        // Aucun ancien reçu :
+        // supprimer celui généré pendant
+        // la transaction
+        try {
+
+            await fs.promises.unlink(
+                targetPath
+            );
+
+        }
+
+        catch (error) {
+
+            if (error.code !== "ENOENT") {
+                throw error;
+            }
+
+        }
+
+    }
+
+
+    // =========================================================
+    // SUPPRIMER LA SAUVEGARDE APRÈS COMMIT
+    // =========================================================
+
+    static async finalizeReceiptBackup(
+        backup
+    ) {
+
+        if (
+            !backup ||
+            !backup.backupPath
+        ) {
+            return;
+        }
+
+        try {
+
+            await fs.promises.unlink(
+                backup.backupPath
+            );
+
+        }
+
+        catch (error) {
+
+            if (error.code !== "ENOENT") {
+                throw error;
+            }
+
+        }
 
     }
 
@@ -617,6 +834,35 @@ class ReceiptService {
             }
         );
 
+    }
+
+    static async deleteReceipt(receiptPath) {
+
+        if (!receiptPath) {
+            return;
+        }
+
+        const folder = path.join(__dirname, "../../receipts");
+
+        const filename = path.basename(receiptPath);
+
+        const filepath = path.join(folder, filename);
+
+        try {
+
+            await fs.promises.unlink(filepath);
+
+            console.log(`🗑️ Reçu supprimé : ${filename}`);
+
+        } catch (error) {
+
+            // Le fichier n'existe déjà plus
+            if (error.code === "ENOENT") {
+                return;
+            }
+
+            throw error;
+        }
     }
 
     static formatMonth(date) {

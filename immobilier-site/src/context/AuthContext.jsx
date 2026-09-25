@@ -7,6 +7,10 @@ import {
 
 import AuthService from "../services/auth.service";
 
+import {
+    SESSION_EXPIRED_EVENT
+} from "../services/api";
+
 export const AuthContext =
     createContext(null);
 
@@ -18,6 +22,34 @@ export function AuthProvider({ children }) {
 
     const [loading, setLoading] =
         useState(true);
+
+
+    
+    useEffect(() => {
+
+        function handleSessionExpired() {
+
+            setUser(null);
+
+        }
+
+
+        window.addEventListener(
+            SESSION_EXPIRED_EVENT,
+            handleSessionExpired
+        );
+
+
+        return () => {
+
+            window.removeEventListener(
+                SESSION_EXPIRED_EVENT,
+                handleSessionExpired
+            );
+
+        };
+
+    }, []);
 
 
     // =========================================================

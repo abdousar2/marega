@@ -199,14 +199,14 @@ class Lease {
     // NUMÉRO DE CONTRAT
     // =========================================================
 
-    static async generateContractNumber(agencyId, executor = db) {
+    static async generateContractNumber(agencyId) {
 
         const year =
             new Date().getFullYear();
 
 
         const result =
-            await executor.query(
+            await db.query(
 
                 `
                 SELECT
@@ -269,8 +269,7 @@ class Lease {
         startDate,
         endDate,
         agencyId,
-        excludeId = null,
-        executor = db
+        excludeId = null
     ) {
 
         // -----------------------------------------------------
@@ -319,7 +318,7 @@ class Lease {
         // -----------------------------------------------------
 
         const result =
-            await executor.query(
+            await db.query(
 
                 `
                 SELECT
@@ -394,41 +393,41 @@ class Lease {
     // CRÉATION
     // =========================================================
 
-    static async create(
-        data,
-        agencyId,
-        executor = db
-    ) {
+    static async create(data, agencyId) {
 
-        // =========================================================
+        // -----------------------------------------------------
         // VÉRIFICATION APPARTEMENT + LOCATAIRE
-        // =========================================================
+        // -----------------------------------------------------
 
         const relation =
-            await executor.query(
+            await db.query(
+
                 `
-                    SELECT
+                SELECT
 
-                        a.id AS apartment_id,
-                        a.agency_id AS apartment_agency_id,
+                    a.id AS apartment_id,
+                    a.agency_id AS apartment_agency_id,
 
-                        t.id AS tenant_id,
-                        t.agency_id AS tenant_agency_id
+                    t.id AS tenant_id,
+                    t.agency_id AS tenant_agency_id
 
-                    FROM marega.apartments a
+                FROM marega.apartments a
 
-                    INNER JOIN marega.tenants t
-                        ON t.id = $2
+                INNER JOIN marega.tenants t
+                    ON t.id = $2
 
-                    WHERE a.id = $1
-                    AND a.agency_id = $3
-                    AND t.agency_id = $3
+                WHERE a.id = $1
+
+                  AND a.agency_id = $3
+                  AND t.agency_id = $3
                 `,
+
                 [
                     data.apartment_id,
                     data.tenant_id,
                     agencyId
                 ]
+
             );
 
 
@@ -443,32 +442,47 @@ class Lease {
                 "AGENCY_MISMATCH";
 
             throw error;
+
         }
 
-
-        // =========================================================
+        // -----------------------------------------------------
         // VÉRIFIER LE CHEVAUCHEMENT
-        // =========================================================
+        // -----------------------------------------------------
 
         if (data.status === "Actif") {
 
             await Lease.checkActiveOverlap(
+
                 data.apartment_id,
+
                 data.start_date,
+
                 data.end_date,
-                agencyId,
-                null,
-                executor
+
+                agencyId
+
             );
+
         }
 
 
-        // =========================================================
-        // CRÉATION AVEC RETRY
-        // SAVEPOINT = RETRY COMPATIBLE AVEC TRANSACTION
-        // =========================================================
+        // -----------------------------------------------------
+        // NUMÉRO DE CONTRAT
+        // -----------------------------------------------------
+
+        const contractNumber =
+            await Lease.generateContractNumber(
+                agencyId
+            );
+
+
+        
+        // -----------------------------------------------------
+        // CRÉATION AVEC RETRY EN CAS DE COLLISION
+        // -----------------------------------------------------
 
         const MAX_ATTEMPTS = 5;
+
 
         for (
             let attempt = 1;
@@ -476,84 +490,87 @@ class Lease {
             attempt++
         ) {
 
-            const savepoint =
-                `lease_contract_number_attempt_${attempt}`;
-
-
-            await executor.query(
-                `SAVEPOINT ${savepoint}`
-            );
+            const contractNumber =
+                await Lease.generateContractNumber(
+                    agencyId
+                );
 
 
             try {
 
-                // -----------------------------------------------------
-                // NUMÉRO DE CONTRAT
-                // -----------------------------------------------------
-
-                const contractNumber =
-                    await Lease.generateContractNumber(
-                        agencyId,
-                        executor
-                    );
-
-
-                // -----------------------------------------------------
+                // -------------------------------------------------
                 // INSERTION
-                // -----------------------------------------------------
+                // -------------------------------------------------
 
                 const result =
-                    await executor.query(
+                    await db.query(
+
                         `
-                            INSERT INTO marega.leases
-                            (
-                                agency_id,
-                                apartment_id,
-                                tenant_id,
-                                contract_number,
-                                start_date,
-                                end_date,
-                                monthly_rent,
-                                charges,
-                                deposit,
-                                payment_day,
-                                status,
-                                notes,
-                                identity_number,
-                                level
-                            )
+                        INSERT INTO marega.leases
+                        (
+                            agency_id,
+                            apartment_id,
+                            tenant_id,
+                            contract_number,
+                            start_date,
+                            end_date,
+                            monthly_rent,
+                            charges,
+                            deposit,
+                            payment_day,
+                            status,
+                            notes,
+                            identity_number,
+                            level
+                        )
 
-                            VALUES
-                            (
-                                $1,$2,$3,$4,$5,$6,$7,
-                                $8,$9,$10,$11,$12,$13,$14
-                            )
+                        VALUES
+                        (
+                            $1,$2,$3,$4,$5,$6,$7,
+                            $8,$9,$10,$11,$12,$13,$14
+                        )
 
-                            RETURNING *
+                        RETURNING *
                         `,
+
                         [
+
                             agencyId,
+
                             data.apartment_id,
+
                             data.tenant_id,
+
                             contractNumber,
+
                             data.start_date,
+
                             data.end_date,
+
                             data.monthly_rent,
+
                             data.charges,
+
                             data.deposit,
+
                             data.payment_day,
+
                             data.status,
+
                             data.notes,
+
                             data.identity_number,
+
                             data.level
+
                         ]
+
                     );
 
 
-                await executor.query(
-                    `RELEASE SAVEPOINT ${savepoint}`
-                );
-
+                // -------------------------------------------------
+                // SUCCÈS
+                // -------------------------------------------------
 
                 return result.rows[0];
 
@@ -561,9 +578,9 @@ class Lease {
 
             catch (err) {
 
-                // -----------------------------------------------------
-                // COLLISION NUMÉRO DE CONTRAT
-                // -----------------------------------------------------
+                // -------------------------------------------------
+                // COLLISION DE NUMÉRO
+                // -------------------------------------------------
 
                 if (
                     err.code === "23505" &&
@@ -572,45 +589,52 @@ class Lease {
                 ) {
 
                     console.warn(
-                        `⚠️ Collision numéro de contrat ` +
-                        `(tentative ${attempt}/${MAX_ATTEMPTS})`
+                        `⚠️ Collision numéro de contrat : ${contractNumber} `
+                        + `(tentative ${attempt}/${MAX_ATTEMPTS})`
                     );
 
 
-                    await executor.query(
-                        `ROLLBACK TO SAVEPOINT ${savepoint}`
-                    );
+                    if (
+                        attempt <
+                        MAX_ATTEMPTS
+                    ) {
 
-
-                    if (attempt < MAX_ATTEMPTS) {
                         continue;
+
                     }
 
+
+                    // -------------------------------------------------
+                    // TROP DE COLLISIONS
+                    // -------------------------------------------------
 
                     const error =
                         new Error(
                             "Impossible de générer un numéro de contrat unique après plusieurs tentatives."
                         );
 
+
                     error.code =
                         "CONTRACT_NUMBER_GENERATION_FAILED";
 
+
                     throw error;
+
                 }
 
 
-                // -----------------------------------------------------
+                // -------------------------------------------------
                 // AUTRE ERREUR
-                // -----------------------------------------------------
-
-                await executor.query(
-                    `ROLLBACK TO SAVEPOINT ${savepoint}`
-                );
+                // -------------------------------------------------
 
                 throw err;
+
             }
+
         }
-    }    
+
+    }
+
 
     // =========================================================
     // MODIFICATION
@@ -619,8 +643,7 @@ class Lease {
     static async update(
         id,
         data,
-        agencyId,
-        executor = db
+        agencyId
     ) {
 
         // -----------------------------------------------------
@@ -628,7 +651,7 @@ class Lease {
         // -----------------------------------------------------
 
         const relation =
-            await executor.query(
+            await db.query(
 
                 `
                 SELECT
@@ -677,19 +700,24 @@ class Lease {
         if (data.status === "Actif") {
 
             await Lease.checkActiveOverlap(
+
                 data.apartment_id,
+
                 data.start_date,
+
                 data.end_date,
+
                 agencyId,
-                id,
-                executor
+
+                id
+
             );
 
         }
 
 
         const result =
-            await executor.query(
+            await db.query(
 
                 `
                 UPDATE marega.leases
@@ -800,19 +828,25 @@ class Lease {
     ) {
 
         await db.query(
+
             `
             UPDATE marega.leases
+
             SET
+
                 pdf_path = $1,
                 updated_at = CURRENT_TIMESTAMP
+
             WHERE id = $2
-            AND agency_id = $3
+              AND agency_id = $3
             `,
+
             [
                 pdfPath,
                 id,
                 agencyId
             ]
+
         );
 
     }

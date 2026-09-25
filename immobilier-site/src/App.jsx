@@ -170,7 +170,9 @@ function App() {
                 <Route
                     path="/platform/agencies/new"
                     element={
-                        <PlatformAgencyCreate />
+                        <PlatformProtectedRoute>
+                            <PlatformAgencyCreate />
+                        </PlatformProtectedRoute>
                     }
                 />
 
@@ -186,7 +188,9 @@ function App() {
                 <Route
                     path="/platform/document-templates"
                     element={
-                        <DocumentTemplates />
+                        <PlatformProtectedRoute>
+                            <DocumentTemplates />
+                        </PlatformProtectedRoute>
                     }
                 />
 
@@ -206,12 +210,7 @@ function App() {
                         path="/admin"
                         element={<Dashboard />}
                     />
-
-                    <Route
-                        path="/admin/users"
-                        element={<Users />}
-                    />
-
+                    
                     <Route
                         path="/admin/buildings"
                         element={<Buildings />}
@@ -265,12 +264,7 @@ function App() {
                     <Route
                         path="/admin/finance"
                         element={<Finance />}
-                    />
-
-                    <Route
-                        path="/admin/agency-documents"
-                        element={<AgencyDocuments />}
-                    />
+                    />                    
 
                     {/* =============================================
                         ADMIN UNIQUEMENT
@@ -279,6 +273,16 @@ function App() {
                     <Route
                         element={<AdminRoute />}
                     >
+
+                        <Route
+                            path="/admin/users"
+                            element={<Users />}
+                        />
+
+                        <Route
+                            path="/admin/agency-documents"
+                            element={<AgencyDocuments />}
+                        />
 
                         <Route
                             path="/admin/agency-settings"

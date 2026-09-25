@@ -3,6 +3,37 @@ const API_URL =
     "http://localhost:5000/api";
 
 
+const AUTH_KEY =
+    "marega_token";
+
+const USER_KEY =
+    "marega_user";
+
+
+export const SESSION_EXPIRED_EVENT =
+    "marega:session-expired";
+
+
+function clearSessionAndNotify() {
+
+    localStorage.removeItem(
+        AUTH_KEY
+    );
+
+    localStorage.removeItem(
+        USER_KEY
+    );
+
+
+    window.dispatchEvent(
+        new Event(
+            SESSION_EXPIRED_EVENT
+        )
+    );
+
+}
+
+
 export async function api(
     url,
     options = {}
@@ -10,7 +41,7 @@ export async function api(
 
     const token =
         localStorage.getItem(
-            "marega_token"
+            AUTH_KEY
         );
 
 
@@ -46,31 +77,64 @@ export async function api(
         );
 
 
-    if (!response.ok) {
+    let errorData = null;
 
-        let error;
+
+    if (!response.ok) {
 
         try {
 
-            error =
+            errorData =
                 await response.json();
 
         }
 
         catch {
 
-            error = {};
+            errorData = {};
 
         }
 
 
-        throw new Error(
+        // =====================================================
+        // SESSION RÉVOQUÉE / EXPIRÉE
+        // =====================================================
 
-            error.error ||
-            error.message ||
-            "Erreur API"
+        if (
+            response.status === 401
+        ) {
 
-        );
+            clearSessionAndNotify();
+
+        }
+
+
+        const error =
+            new Error(
+
+                errorData.error ||
+                errorData.message ||
+                "Erreur API"
+
+            );
+
+
+        // Conserver les informations
+        // pour les composants appelants.
+
+        error.status =
+            response.status;
+
+
+        error.data =
+            errorData;
+
+
+        error.response =
+            response;
+
+
+        throw error;
 
     }
 

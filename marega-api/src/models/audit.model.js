@@ -10,24 +10,17 @@ class AuditLog {
     static async create({
 
         user_id = null,
-
         agency_id = null,
-
         action,
-
         module,
-
         entity_id = null,
-
         details = null,
-
         ip_address = null,
-
         user_agent = null
 
-    }) {
+    }, client = db) {
 
-        const result = await db.query(
+        const result = await client.query(
 
             `
             INSERT INTO marega.audit_logs

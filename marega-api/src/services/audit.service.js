@@ -16,39 +16,47 @@ const AuditService = {
             action,
             module,
             entity_id = null,
-            details = null
+            details = null,
+            client = null,
+            throwOnError = false
         }
     ) {
 
         try {
 
-            await AuditLog.create({
+            return await AuditLog.create(
 
-                user_id:
-                    user_id ||
-                    req?.user?.id ||
-                    null,
+                {
 
-                agency_id:
-                    agency_id ??
-                    req?.user?.agency_id ??
-                    null,
+                    user_id:
+                        user_id ||
+                        req?.user?.id ||
+                        null,
 
-                action,
+                    agency_id:
+                        agency_id ??
+                        req?.user?.agency_id ??
+                        null,
 
-                module,
+                    action,
 
-                entity_id,
+                    module,
 
-                details,
+                    entity_id,
 
-                ip_address:
-                    req?.ip || null,
+                    details,
 
-                user_agent:
-                    req?.get("user-agent") || null
+                    ip_address:
+                        req?.ip || null,
 
-            });
+                    user_agent:
+                        req?.get("user-agent") || null
+
+                },
+
+                client || undefined
+
+            );
 
         }
 
@@ -58,6 +66,12 @@ const AuditService = {
                 "Erreur journalisation audit :",
                 err
             );
+
+            if (throwOnError) {
+                throw err;
+            }
+
+            return null;
 
         }
 

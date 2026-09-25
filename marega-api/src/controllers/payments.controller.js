@@ -84,7 +84,10 @@ class PaymentsController {
 
     static async create(req, res) {
 
-        let client;
+        let client = null;
+        let transactionActive = false;
+        let transactionCommitted = false;
+        let receiptPath = null;
 
         try {
 
@@ -192,8 +195,9 @@ class PaymentsController {
             client =
                 await db.connect();
 
-
             await client.query("BEGIN");
+
+            transactionActive = true;
 
 
             // -------------------------------------------------
@@ -208,6 +212,16 @@ class PaymentsController {
                     client
 
                 );
+
+
+            // -------------------------------------------------
+            // CHEMIN ATTENDU DU REÇU
+            // Permet aussi de nettoyer un PDF partiel
+            // en cas d'erreur.
+            // -------------------------------------------------
+
+            receiptPath =
+                `/receipts/RECU-${payment.id}.pdf`;
 
 
             // -------------------------------------------------
@@ -244,23 +258,8 @@ class PaymentsController {
 
 
             // -------------------------------------------------
-            // VALIDER LA TRANSACTION
-            // -------------------------------------------------
-
-            await client.query("COMMIT");
-
-
-            // -------------------------------------------------
-            // LIBÉRER LE CLIENT
-            // -------------------------------------------------
-
-            client.release();
-
-            client = null;
-
-
-            // -------------------------------------------------
             // RÉCUPÉRER LE PAIEMENT COMPLET
+            // AVANT LE COMMIT
             // -------------------------------------------------
 
             const completePayment =
@@ -268,7 +267,9 @@ class PaymentsController {
 
                     payment.id,
 
-                    agencyId
+                    agencyId,
+
+                    client
 
                 );
 
@@ -288,7 +289,7 @@ class PaymentsController {
             // GÉNÉRER LE REÇU
             // -------------------------------------------------
 
-            const receiptPath =
+            receiptPath =
                 await ReceiptService.generateReceipt(
 
                     completePayment
@@ -298,6 +299,7 @@ class PaymentsController {
 
             // -------------------------------------------------
             // SAUVEGARDER LE CHEMIN DU REÇU
+            // TOUJOURS DANS LA MÊME TRANSACTION
             // -------------------------------------------------
 
             await Payment.updateReceiptPath(
@@ -306,13 +308,16 @@ class PaymentsController {
 
                 receiptPath,
 
-                agencyId
+                agencyId,
+
+                client
 
             );
 
 
             // -------------------------------------------------
             // AUDIT
+            // L'AUDIT FAIT PARTIE DE LA TRANSACTION
             // -------------------------------------------------
 
             await AuditService.log(
@@ -362,7 +367,11 @@ class PaymentsController {
                         cashier_user_id:
                             payment.cashier_user_id
 
-                    }
+                    },
+
+                    client,
+
+                    throwOnError: true
 
                 }
 
@@ -370,7 +379,26 @@ class PaymentsController {
 
 
             // -------------------------------------------------
-            // PAIEMENT FINAL
+            // VALIDATION FINALE
+            // -------------------------------------------------
+
+            await client.query("COMMIT");
+
+            transactionActive = false;
+            transactionCommitted = true;
+
+
+            // -------------------------------------------------
+            // LIBÉRER LE CLIENT
+            // -------------------------------------------------
+
+            client.release();
+            client = null;
+
+
+            // -------------------------------------------------
+            // RÉCUPÉRER LE PAIEMENT FINAL
+            // APRÈS COMMIT
             // -------------------------------------------------
 
             const finalPayment =
@@ -383,7 +411,22 @@ class PaymentsController {
                 );
 
 
-            res.status(201).json(
+            if (!finalPayment) {
+
+                throw new Error(
+
+                    "Paiement validé mais impossible de récupérer ses données finales."
+
+                );
+
+            }
+
+
+            // -------------------------------------------------
+            // RÉPONSE
+            // -------------------------------------------------
+
+            return res.status(201).json(
 
                 finalPayment
 
@@ -394,10 +437,13 @@ class PaymentsController {
         catch (err) {
 
             // -------------------------------------------------
-            // ROLLBACK SI TRANSACTION ACTIVE
+            // ROLLBACK
             // -------------------------------------------------
 
-            if (client) {
+            if (
+                transactionActive &&
+                client
+            ) {
 
                 try {
 
@@ -414,21 +460,56 @@ class PaymentsController {
 
                 }
 
+                finally {
+
+                    client.release();
+                    client = null;
+
+                }
+
+            }
+
+            else if (client) {
+
                 client.release();
+                client = null;
+
+            }
+
+
+            // -------------------------------------------------
+            // SUPPRESSION DU REÇU SI LA TRANSACTION ÉCHOUE
+            // -------------------------------------------------
+
+            if (receiptPath && !transactionCommitted) {
+
+                try {
+
+                    await ReceiptService.deleteReceipt(
+                        receiptPath
+                    );
+
+                }
+
+                catch (cleanupError) {
+
+                    console.error(
+                        "Erreur suppression reçu après rollback :",
+                        cleanupError
+                    );
+
+                }
 
             }
 
 
             console.error(
-
                 "Erreur création paiement :",
-
                 err
-
             );
 
 
-            res.status(500).json({
+            return res.status(500).json({
 
                 error:
                     "Erreur lors de l'enregistrement du paiement."
@@ -443,7 +524,14 @@ class PaymentsController {
     // MODIFICATION
     // =========================================================
 
-    static async update(req, res) {
+        static async update(req, res) {
+
+        let client = null;
+        let transactionActive = false;
+        let transactionCommitted = false;
+
+        let receiptPath = null;
+        let receiptBackup = null;
 
         try {
 
@@ -460,11 +548,8 @@ class PaymentsController {
 
             const existingPayment =
                 await Payment.getById(
-
                     id,
-
-                    req.user.agency_id
-
+                    agencyId
                 );
 
 
@@ -484,7 +569,9 @@ class PaymentsController {
             // PAIEMENT DÉJÀ ENCAISSÉ
             // -------------------------------------------------
 
-            if (existingPayment.status === "Payé") {
+            if (
+                existingPayment.status === "Payé"
+            ) {
 
                 // =============================================
                 // CHAMPS FINANCIERS / STRUCTURELS INTERDITS
@@ -598,7 +685,29 @@ class PaymentsController {
 
 
             // -------------------------------------------------
-            // MODIFICATION
+            // OUVRIR LA TRANSACTION
+            // -------------------------------------------------
+
+            client =
+                await db.connect();
+
+            await client.query("BEGIN");
+
+            transactionActive = true;
+
+
+            // -------------------------------------------------
+            // SAUVEGARDER L'ANCIEN REÇU
+            // -------------------------------------------------
+
+            receiptBackup =
+                await ReceiptService.backupReceipt(
+                    existingPayment.receipt_path
+                );
+
+
+            // -------------------------------------------------
+            // MODIFIER LE PAIEMENT
             // -------------------------------------------------
 
             const payment =
@@ -608,25 +717,30 @@ class PaymentsController {
 
                     paymentData,
 
-                    req.user.agency_id
+                    agencyId,
+
+                    client
 
                 );
 
 
             if (!payment) {
 
-                return res.status(404).json({
-
-                    error:
+                const error =
+                    new Error(
                         "Paiement introuvable."
+                    );
 
-                });
+                error.status = 404;
+
+                throw error;
 
             }
 
 
             // -------------------------------------------------
             // RÉCUPÉRER LE PAIEMENT COMPLET
+            // AVANT COMMIT
             // -------------------------------------------------
 
             const completePayment =
@@ -634,20 +748,37 @@ class PaymentsController {
 
                     id,
 
-                    req.user.agency_id
+                    agencyId,
+
+                    client
 
                 );
+
+
+            if (!completePayment) {
+
+                throw new Error(
+                    "Paiement modifié mais impossible de récupérer ses données complètes."
+                );
+
+            }
 
 
             // -------------------------------------------------
             // RÉGÉNÉRER LA QUITTANCE
             // -------------------------------------------------
 
-            const receiptPath =
+            receiptPath =
                 await ReceiptService.generateReceipt(
+
                     completePayment
+
                 );
 
+
+            // -------------------------------------------------
+            // METTRE À JOUR LE CHEMIN DU REÇU
+            // -------------------------------------------------
 
             await Payment.updateReceiptPath(
 
@@ -655,13 +786,16 @@ class PaymentsController {
 
                 receiptPath,
 
-                agencyId
+                agencyId,
+
+                client
 
             );
 
 
             // -------------------------------------------------
             // AUDIT
+            // L'AUDIT FAIT PARTIE DE LA TRANSACTION
             // -------------------------------------------------
 
             await AuditService.log(
@@ -737,7 +871,11 @@ class PaymentsController {
 
                         }
 
-                    }
+                    },
+
+                    client,
+
+                    throwOnError: true
 
                 }
 
@@ -745,7 +883,56 @@ class PaymentsController {
 
 
             // -------------------------------------------------
-            // PAIEMENT FINAL
+            // COMMIT
+            // -------------------------------------------------
+
+            await client.query(
+                "COMMIT"
+            );
+
+            transactionActive = false;
+            transactionCommitted = true;
+
+
+            // -------------------------------------------------
+            // SUPPRIMER LA SAUVEGARDE
+            // L'ANCIEN REÇU N'EST PLUS NÉCESSAIRE
+            // -------------------------------------------------
+
+            if (receiptBackup) {
+
+                try {
+
+                    await ReceiptService.finalizeReceiptBackup(
+                        receiptBackup
+                    );
+
+                }
+
+                catch (backupCleanupError) {
+
+                    console.error(
+                        "⚠️ Impossible de supprimer la sauvegarde du reçu :",
+                        backupCleanupError
+                    );
+
+                }
+
+                receiptBackup = null;
+
+            }
+
+
+            // -------------------------------------------------
+            // LIBÉRER LE CLIENT
+            // -------------------------------------------------
+
+            client.release();
+            client = null;
+
+
+            // -------------------------------------------------
+            // RÉCUPÉRER LA VERSION FINALE
             // -------------------------------------------------
 
             const finalPayment =
@@ -753,12 +940,25 @@ class PaymentsController {
 
                     id,
 
-                    req.user.agency_id
+                    agencyId
 
                 );
 
 
-            res.json(
+            if (!finalPayment) {
+
+                throw new Error(
+                    "Paiement validé mais impossible de récupérer ses données finales."
+                );
+
+            }
+
+
+            // -------------------------------------------------
+            // RÉPONSE
+            // -------------------------------------------------
+
+            return res.json(
                 finalPayment
             );
 
@@ -766,16 +966,93 @@ class PaymentsController {
 
         catch (err) {
 
+            // -------------------------------------------------
+            // ROLLBACK
+            // -------------------------------------------------
+
+            if (
+                transactionActive &&
+                client
+            ) {
+
+                try {
+
+                    await client.query(
+                        "ROLLBACK"
+                    );
+
+                }
+
+                catch (rollbackError) {
+
+                    console.error(
+                        "Erreur ROLLBACK :",
+                        rollbackError
+                    );
+
+                }
+
+                finally {
+
+                    client.release();
+                    client = null;
+
+                }
+
+            }
+
+            else if (client) {
+
+                client.release();
+                client = null;
+
+            }
+
+
+            // -------------------------------------------------
+            // RESTAURER L'ANCIEN REÇU
+            // UNIQUEMENT SI LE COMMIT N'A PAS RÉUSSI
+            // -------------------------------------------------
+
+            if (
+                receiptBackup &&
+                !transactionCommitted
+            ) {
+
+                try {
+
+                    await ReceiptService.restoreReceiptBackup(
+                        receiptBackup
+                    );
+
+                }
+
+                catch (restoreError) {
+
+                    console.error(
+                        "Erreur restauration ancien reçu :",
+                        restoreError
+                    );
+
+                }
+
+            }
+
+
             console.error(
                 "Erreur modification paiement :",
                 err
             );
 
 
-            res.status(500).json({
+            return res.status(
+                err.status || 500
+            ).json({
 
                 error:
-                    "Erreur lors de la mise à jour du paiement."
+                    err.status === 404
+                        ? "Paiement introuvable."
+                        : "Erreur lors de la mise à jour du paiement."
 
             });
 
