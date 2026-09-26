@@ -3,6 +3,9 @@ import "./AgencyDocuments.css";
 
 import Layout from "../Layout";
 
+import { useAuth } from "../../context/AuthContext";
+import { hasPermission } from "../../config/permissions";
+
 
 const API_URL =
     import.meta.env.VITE_API_URL ||
@@ -10,6 +13,19 @@ const API_URL =
 
 
 export default function AgencyDocuments() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+    const canCreate =
+        hasPermission(
+            role,
+            "agency_documents",
+            "create"
+        );
+
 
     const [logo, setLogo] = useState(null);
     const [contract, setContract] = useState(null);
@@ -26,6 +42,20 @@ export default function AgencyDocuments() {
 
         setSuccess("");
         setError("");
+
+
+        // =====================================================
+        // PROTECTION RBAC
+        // =====================================================
+
+        if (!canCreate) {
+
+            setError(
+                "Vous n'avez pas les droits nécessaires pour modifier les documents de l'agence."
+            );
+
+            return;
+        }
 
 
         if (!logo && !contract && !receipt) {
@@ -45,6 +75,16 @@ export default function AgencyDocuments() {
 
             const token =
                 localStorage.getItem("marega_token");
+
+
+            if (!token) {
+
+                setError(
+                    "Session expirée. Veuillez vous reconnecter."
+                );
+
+                return;
+            }
 
 
             const formData =
@@ -101,10 +141,30 @@ export default function AgencyDocuments() {
                 await response.json();
 
 
+            // =================================================
+            // SESSION EXPIRÉE
+            // =================================================
+
+            if (response.status === 401) {
+
+                localStorage.removeItem(
+                    "marega_token"
+                );
+
+                navigate(
+                    "/login",
+                    { replace: true }
+                );
+
+                return;
+            }
+
+
             if (!response.ok) {
 
                 throw new Error(
                     data.message ||
+                    data.error ||
                     "Erreur lors de l'envoi des documents."
                 );
 
@@ -218,6 +278,7 @@ export default function AgencyDocuments() {
                                     image/jpeg,
                                     image/webp
                                 "
+                                disabled={!canCreate || loading}
                                 onChange={(e) =>
                                     setLogo(
                                         e.target.files[0] || null
@@ -259,6 +320,7 @@ export default function AgencyDocuments() {
                             <input
                                 type="file"
                                 accept="application/pdf"
+                                disabled={!canCreate || loading}
                                 onChange={(e) =>
                                     setContract(
                                         e.target.files[0] || null
@@ -300,6 +362,7 @@ export default function AgencyDocuments() {
                             <input
                                 type="file"
                                 accept="application/pdf"
+                                disabled={!canCreate || loading}
                                 onChange={(e) =>
                                     setReceipt(
                                         e.target.files[0] || null
@@ -361,7 +424,10 @@ export default function AgencyDocuments() {
 
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={
+                                loading ||
+                                !canCreate
+                            }
                             className="document-submit"
                         >
 

@@ -13,6 +13,12 @@ import {
 
 import UsersService from "../../services/users.service";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 
 const ROLES = [
     "RESPONSABLE",
@@ -22,6 +28,35 @@ const ROLES = [
 
 
 export default function Users() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+
+    const canCreate =
+        hasPermission(
+            role,
+            "users",
+            "create"
+        );
+
+
+    const canUpdate =
+        hasPermission(
+            role,
+            "users",
+            "update"
+        );
+
+
+    const canDelete =
+        hasPermission(
+            role,
+            "users",
+            "delete"
+        );
 
     const [users, setUsers] =
         useState([]);
@@ -119,6 +154,12 @@ export default function Users() {
 
     function openCreateModal() {
 
+        if (!canCreate) {
+
+            return;
+
+        }
+
         resetForm();
 
         setShowModal(true);
@@ -127,6 +168,12 @@ export default function Users() {
 
 
     function openEditModal(user) {
+
+        if (!canUpdate) {
+
+            return;
+
+        }
 
         setEditingUser(user);
 
@@ -195,6 +242,20 @@ export default function Users() {
     async function handleSubmit(e) {
 
         e.preventDefault();
+
+            if (
+                editingUser
+                    ? !canUpdate
+                    : !canCreate
+            ) {
+
+                alert(
+                    "Vous n'avez pas les droits nécessaires."
+                );
+
+                return;
+
+            }
 
         try {
 
@@ -321,6 +382,17 @@ export default function Users() {
 
     async function toggleActive(user) {
 
+        if (!canUpdate) {
+
+            alert(
+                "Vous n'avez pas les droits nécessaires."
+            );
+
+            return;
+
+        }
+
+
         const action =
             user.active
                 ? "désactiver"
@@ -368,6 +440,16 @@ export default function Users() {
     // =========================================================
 
     async function handleDelete(user) {
+
+            if (!canDelete) {
+
+                alert(
+                    "Vous n'avez pas les droits nécessaires."
+                );
+
+                return;
+
+            }
 
         const confirmed =
             window.confirm(
@@ -440,7 +522,6 @@ export default function Users() {
         <Layout>
 
             <PageHeader
-
                 title="Gestion des utilisateurs"
 
                 subtitle="
@@ -448,12 +529,17 @@ export default function Users() {
                     de l'application MAREGA.
                 "
 
-                buttonLabel="+ Nouvel utilisateur"
-
-                onButtonClick={
-                    openCreateModal
+                buttonLabel={
+                    canCreate
+                        ? "+ Nouvel utilisateur"
+                        : null
                 }
 
+                onButtonClick={
+                    canCreate
+                        ? openCreateModal
+                        : undefined
+                }
             />
             <br></br>
 
@@ -743,34 +829,40 @@ export default function Users() {
                                                     flex-wrap
                                                 ">
 
-                                                    <Button
-                                                        type="button"
-                                                        variant="secondary"
-                                                        onClick={() =>
-                                                            openEditModal(user)
-                                                        }
-                                                    >
-                                                        Modifier
-                                                    </Button>
+                                                    {canUpdate && (
+
+                                                        <Button
+                                                            type="button"
+                                                            variant="secondary"
+                                                            onClick={() =>
+                                                                openEditModal(user)
+                                                            }
+                                                        >
+                                                            Modifier
+                                                        </Button>
+
+                                                    )}
 
 
-                                                    <Button
-                                                        type="button"
-                                                        variant="secondary"
-                                                        onClick={() =>
-                                                            toggleActive(user)
-                                                        }
-                                                    >
+                                                    {canUpdate && (
 
-                                                        {user.active
-                                                            ? "Désactiver"
-                                                            : "Activer"
-                                                        }
+                                                        <Button
+                                                            type="button"
+                                                            variant="secondary"
+                                                            onClick={() =>
+                                                                toggleActive(user)
+                                                            }
+                                                        >
+                                                            {user.active
+                                                                ? "Désactiver"
+                                                                : "Activer"
+                                                            }
+                                                        </Button>
 
-                                                    </Button>
+                                                    )}
 
 
-                                                    {user.role !== "ADMIN" && (
+                                                    {canDelete && user.role !== "ADMIN" && (
 
                                                         <Button
                                                             type="button"
@@ -783,6 +875,8 @@ export default function Users() {
                                                         </Button>
 
                                                     )}
+
+                                                    
 
                                                 </div>
 
@@ -1051,6 +1145,11 @@ export default function Users() {
                         <Button
                             type="submit"
                             variant="primary"
+                            disabled={
+                                editingUser
+                                    ? !canUpdate
+                                    : !canCreate
+                            }
                         >
 
                             {editingUser

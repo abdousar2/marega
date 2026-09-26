@@ -12,16 +12,51 @@ import {
     SearchBar,
     Modal,
     Button,
-    Badge,
     Empty
 } from "../../components/ui";
 
 import { ExpensesContext } from "../../context/ExpensesContext";
 import { BuildingsContext } from "../../context/BuildingsContext";
 import { ApartmentsContext } from "../../context/ApartmentsContext";
+
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 import "./Expenses.css";
 
 export default function Expenses() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+
+    const canCreate =
+        hasPermission(
+            role,
+            "expenses",
+            "create"
+        );
+
+
+    const canUpdate =
+        hasPermission(
+            role,
+            "expenses",
+            "update"
+        );
+
+
+    const canDelete =
+        hasPermission(
+            role,
+            "expenses",
+            "delete"
+        );
 
     const {
         expenses,
@@ -336,14 +371,17 @@ export default function Expenses() {
             e.preventDefault();
 
 
-            if (!expenseDate) {
+            if (
+                editingExpense
+                    ? !canUpdate
+                    : !canCreate
+            ) {
 
                 alert(
-                    "Veuillez renseigner la date."
+                    "Vous n'avez pas les droits nécessaires."
                 );
 
                 return;
-
             }
 
 
@@ -468,6 +506,16 @@ export default function Expenses() {
     const handleDelete =
         async (expense) => {
 
+            if (!canDelete) {
+
+                alert(
+                    "Vous n'avez pas les droits nécessaires."
+                );
+
+                return;
+            }
+
+
             const confirmed =
                 window.confirm(
 
@@ -569,10 +617,16 @@ export default function Expenses() {
 
                 subtitle="Suivez les sorties d'argent de l'agence."
 
-                buttonLabel="+ Nouvelle dépense"
+                buttonLabel={
+                    canCreate
+                        ? "+ Nouvelle dépense"
+                        : null
+                }
 
                 onButtonClick={
-                    openCreateModal
+                    canCreate
+                        ? openCreateModal
+                        : undefined
                 }
 
             />
@@ -926,34 +980,46 @@ export default function Expenses() {
 
                                     <div className="expense-actions">
 
-                                        <Button
+                                        {canUpdate && (
 
-                                            variant="secondary"
+                                            <Button
 
-                                            onClick={() =>
-                                                openEditModal(expense)
-                                            }
+                                                variant="secondary"
 
-                                        >
+                                                onClick={() =>
+                                                    openEditModal(
+                                                        expense
+                                                    )
+                                                }
 
-                                            ✏️ Modifier
+                                            >
 
-                                        </Button>
+                                                ✏️ Modifier
+
+                                            </Button>
+
+                                        )}
 
 
-                                        <Button
+                                        {canDelete && (
 
-                                            variant="danger"
+                                            <Button
 
-                                            onClick={() =>
-                                                handleDelete(expense)
-                                            }
+                                                variant="danger"
 
-                                        >
+                                                onClick={() =>
+                                                    handleDelete(
+                                                        expense
+                                                    )
+                                                }
 
-                                            🗑️ Supprimer
+                                            >
 
-                                        </Button>
+                                                🗑️ Supprimer
+
+                                            </Button>
+
+                                        )}
 
                                     </div>
 
@@ -1566,8 +1632,13 @@ export default function Expenses() {
 
                             variant="primary"
 
-                        >
+                            disabled={
+                                editingExpense
+                                    ? !canUpdate
+                                    : !canCreate
+                            }
 
+                        >
                             {editingExpense
                                 ? "Enregistrer"
                                 : "Créer"}

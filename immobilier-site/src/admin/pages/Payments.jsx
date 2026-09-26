@@ -27,9 +27,29 @@ import { PaymentsContext } from "../../context/PaymentsContext";
 import { RentsContext } from "../../context/RentsContext";
 
 import PaymentsService from "../../services/payments.service";
+
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 import "./Payments.css";
 
 export default function Payments() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+
+    const canCreate =
+        hasPermission(
+            role,
+            "payments",
+            "create"
+        );
 
     const { tenants } =
         useContext(TenantsContext);
@@ -114,6 +134,17 @@ export default function Payments() {
 
         e.preventDefault();
 
+
+        if (!canCreate) {
+
+            alert(
+                "Vous n'avez pas les droits nécessaires."
+            );
+
+            return;
+        }
+
+
         const lease = selectedRent
             ? { id: selectedRent.lease_id }
             : contracts.find(
@@ -191,7 +222,17 @@ export default function Payments() {
 
         if (!rentId) return;
 
-        setShowModal(true);
+
+        if (!canCreate) {
+
+            navigate(
+                "/admin/rents"
+            );
+
+            return;
+        }
+
+
 
         async function loadRent() {
 
@@ -225,7 +266,11 @@ export default function Payments() {
 
         loadRent();
 
-    }, [rentId]);
+    }, [
+        rentId,
+        canCreate,
+        navigate
+    ]);
 
     const totalPaid = payments
         .filter(p => p.status === "Payé")
@@ -271,12 +316,18 @@ export default function Payments() {
 
         <PageHeader
             title="Gestion des paiements"
+
             subtitle="Enregistrez les loyers et consultez l'historique."
-            buttonLabel={rentId ? null : "+ Nouveau paiement"}
+
+            buttonLabel={
+                !rentId && canCreate
+                    ? "+ Nouveau paiement"
+                    : null
+            }
+
             onButtonClick={
-                rentId
-                    ? undefined
-                    : () => {
+                !rentId && canCreate
+                    ? () => {
 
                         setSelectedRent(null);
 
@@ -288,11 +339,12 @@ export default function Payments() {
 
                         setAmount("");
 
-                        setMethod("Espèces");                        
+                        setMethod("Espèces");
 
                         setShowModal(true);
 
                     }
+                    : undefined
             }
         />
         
@@ -325,7 +377,13 @@ export default function Payments() {
         />
         
         <Modal
-            open={showModal}
+            open={
+                showModal ||
+                (
+                    !!rentId &&
+                    canCreate
+                )
+            }
             title={
                 rentId
                     ? "Encaissement du loyer"
@@ -480,9 +538,16 @@ export default function Payments() {
 
                         <Button
                             type="submit"
+
                             variant="primary"
+
+                            disabled={!canCreate}
                         >
-                            {rentId ? "💳 Encaisser le loyer" : "Enregistrer"}
+                            {
+                                rentId
+                                    ? "💳 Encaisser le loyer"
+                                    : "Enregistrer"
+                            }
                         </Button>
 
                     </div>

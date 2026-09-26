@@ -20,9 +20,28 @@ import {
 
 import { RentsContext } from "../../context/RentsContext";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
+
 import "./Rents.css";
 
 export default function Rents() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+    const canCreatePayment =
+        hasPermission(
+            role,
+            "payments",
+            "create"
+        );
 
     const { rents, loading } = useContext(RentsContext);
 
@@ -33,29 +52,28 @@ export default function Rents() {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const [showSuccess, setShowSuccess] = useState(false);
+    const showSuccess =
+        new URLSearchParams(location.search).get("success") === "1";
 
     useEffect(() => {
 
-        const params = new URLSearchParams(location.search);
+        const params =
+            new URLSearchParams(location.search);
 
-        if (params.get("success") === "1") {
-
-            setShowSuccess(true);
-
-            const timer = setTimeout(() => {
-
-                setShowSuccess(false);
-
-                navigate("/admin/rents", {
-                    replace: true
-                });
-
-            }, 3000);
-
-            return () => clearTimeout(timer);
-
+        if (params.get("success") !== "1") {
+            return;
         }
+
+        const timer = setTimeout(() => {
+
+            navigate("/admin/rents", {
+                replace: true
+            });
+
+        }, 3000);
+
+        return () =>
+            clearTimeout(timer);
 
     }, [location.search, navigate]);
    
@@ -566,45 +584,41 @@ export default function Rents() {
                                 {getRentStatus(rent) === "Payé" ? (
 
                                     rent.receipt_path && (
-
                                         <Button
-
                                             variant="primary"
-
                                             className="w-full"
-
                                             onClick={() =>
                                                 window.open(
                                                     `${API_BASE}${rent.receipt_path}`,
                                                     "_blank"
                                                 )
                                             }
-
                                         >
-
                                             📄 Télécharger la quittance
-
                                         </Button>
-
                                     )
 
                                 ) : (
 
-                                    <Link
-                                        to={`/admin/payments?rent=${rent.id}`}
-                                        className="rent-action-link"
-                                    >
+                                    canCreatePayment ? (
 
-                                        <Button
-                                            variant="primary"
-                                            className="w-full"
+                                        <Link
+                                            to={`/admin/payments?rent=${rent.id}`}
+                                            className="rent-action-link"
                                         >
 
-                                            💳 Encaisser
+                                            <Button
+                                                variant="primary"
+                                                className="w-full"
+                                            >
 
-                                        </Button>
+                                                💳 Encaisser
 
-                                    </Link>
+                                            </Button>
+
+                                        </Link>
+
+                                    ) : null
 
                                 )}
 

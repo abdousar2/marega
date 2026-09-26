@@ -6,16 +6,34 @@ import {
     PageHeader,
     Card,
     Badge,
-    Button,
     Empty
 } from "../../components/ui";
 
 import FinanceService from "../../services/finance.service";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
+
 import "./Finance.css";
 
 
 export default function Finance() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+    const canViewFinance =
+        hasPermission(
+            role,
+            "finance",
+            "view"
+        );
 
     // =========================================================
     // ÉTAT
@@ -131,7 +149,64 @@ export default function Finance() {
 
     useEffect(() => {
 
-        loadReport();
+        let cancelled = false;
+
+        async function loadInitialReport() {
+
+            try {
+
+                const data =
+                    await FinanceService.getReport({
+                        period: "daily",
+                        date:
+                            new Date()
+                                .toISOString()
+                                .split("T")[0]
+                    });
+
+                if (cancelled) {
+                    return;
+                }
+
+                setReport(data);
+
+            }
+
+            catch (err) {
+
+                if (cancelled) {
+                    return;
+                }
+
+                console.error(
+                    "Erreur chargement situation financière :",
+                    err
+                );
+
+                setError(
+                    err.message ||
+                    "Impossible de charger la situation financière."
+                );
+
+                setReport(null);
+
+            }
+
+            finally {
+
+                if (!cancelled) {
+                    setLoading(false);
+                }
+
+            }
+
+        }
+
+        loadInitialReport();
+
+        return () => {
+            cancelled = true;
+        };
 
     }, []);
 
@@ -279,6 +354,48 @@ export default function Finance() {
     // =========================================================
     // CHARGEMENT
     // =========================================================
+
+        if (!canViewFinance) {
+            return (
+                <Layout>
+                    <div className="
+                        min-h-[60vh]
+                        flex
+                        flex-col
+                        items-center
+                        justify-center
+                        text-center
+                        px-6
+                    ">
+
+                        <div className="
+                            text-5xl
+                            mb-4
+                        ">
+                            🔒
+                        </div>
+
+                        <h2 className="
+                            text-2xl
+                            font-bold
+                            text-slate-800
+                            mb-2
+                        ">
+                            Accès non autorisé
+                        </h2>
+
+                        <p className="
+                            text-slate-500
+                            max-w-md
+                        ">
+                            Vous n'avez pas les droits nécessaires
+                            pour consulter la situation financière.
+                        </p>
+
+                    </div>
+                </Layout>
+            );
+        }
 
     if (
         loading &&

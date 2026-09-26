@@ -77,14 +77,19 @@ class LeasesController {
                 );
 
 
+            // -------------------------------------------------
+            // CONTRAT ABSENT OU APPARTENANT À UNE AUTRE AGENCE
+            // -------------------------------------------------
+
             if (!lease) {
 
-                throw Object.assign(
-                    new Error("Contrat introuvable."),
-                    {
-                        code: "LEASE_NOT_FOUND"
-                    }
-                );
+                return res.status(404).json({
+
+                    error:
+                        "Contrat introuvable."
+
+                });
+
             }
 
 
@@ -94,9 +99,13 @@ class LeasesController {
 
         catch (err) {
 
-            console.error(err);
+            console.error(
+                "Erreur chargement contrat :",
+                err
+            );
 
-            res.status(500).json({
+
+            return res.status(500).json({
 
                 error:
                     "Erreur lors du chargement du contrat."

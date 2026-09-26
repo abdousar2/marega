@@ -4,6 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import "./AgencySettings.css";
 import Layout from "../Layout";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 
 const API_URL =
     import.meta.env.VITE_API_URL ||
@@ -26,6 +32,18 @@ const EMPTY_FORM = {
 export default function AgencySettings() {
 
     const navigate = useNavigate();
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+    const canUpdate =
+        hasPermission(
+            role,
+            "agency_settings",
+            "update"
+        );
 
     const [form, setForm] =
         useState(EMPTY_FORM);
@@ -212,9 +230,20 @@ export default function AgencySettings() {
 
         e.preventDefault();
 
+
+        if (!canUpdate) {
+
+            setError(
+                "Vous n'avez pas les droits nécessaires pour modifier les paramètres de l'agence."
+            );
+
+            return;
+
+        }
+
+
         setSuccess("");
         setError("");
-
 
         try {
 
@@ -732,7 +761,10 @@ export default function AgencySettings() {
                         <button
                             type="submit"
                             className="agency-settings-save"
-                            disabled={saving}
+                            disabled={
+                                saving ||
+                                !canUpdate
+                            }
                         >
 
                             {saving

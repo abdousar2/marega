@@ -17,10 +17,45 @@ import { ApartmentsContext } from "../../context/ApartmentsContext";
 
 import BuildingsService from "../../services/buildings.service";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 import "./Buildings.css";
 
 
 export default function Buildings() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+
+    const canCreate =
+        hasPermission(
+            role,
+            "buildings",
+            "create"
+        );
+
+
+    const canUpdate =
+        hasPermission(
+            role,
+            "buildings",
+            "update"
+        );
+
+
+    const canDelete =
+        hasPermission(
+            role,
+            "buildings",
+            "delete"
+        );
 
     const {
         buildings,
@@ -119,26 +154,31 @@ export default function Buildings() {
 
         e.preventDefault();
 
+        if (
+            editingId
+                ? !canUpdate
+                : !canCreate
+        ) {
+
+            alert(
+                "Vous n'avez pas les droits nécessaires."
+            );
+
+            return;
+        }
+
         try {
 
             const payload = {
 
                 name,
-
                 address,
-
                 floors,
-
                 status,
-
                 deliveryDate,
-
                 description: "",
-
                 city: "",
-
                 country: "",
-
                 apartments_count: 0
 
             };
@@ -271,20 +311,27 @@ export default function Buildings() {
                 ====================================================== */}
 
                 <PageHeader
-
                     title="Gestion des immeubles"
 
                     subtitle="Ajoutez, modifiez et gérez votre patrimoine immobilier."
 
-                    buttonLabel="+ Nouvel immeuble"
+                    buttonLabel={
+                        canCreate
+                            ? "+ Nouvel immeuble"
+                            : null
+                    }
 
-                    onButtonClick={() => {
+                    onButtonClick={
+                        canCreate
+                            ? () => {
 
-                        resetForm();
+                                resetForm();
 
-                        setShowModal(true);
+                                setShowModal(true);
 
-                    }}
+                            }
+                            : undefined
+                    }
 
                 />
 
@@ -541,38 +588,38 @@ export default function Buildings() {
 
                                                 <div className="building-actions">
 
-                                                    <Button
+                                                    {canUpdate && (
 
-                                                        color="blue"
+                                                        <Button
+                                                            color="blue"
 
-                                                        onClick={() =>
-                                                            editBuilding(
-                                                                building
-                                                            )
-                                                        }
+                                                            onClick={() =>
+                                                                editBuilding(
+                                                                    building
+                                                                )
+                                                            }
+                                                        >
+                                                            ✏️ Modifier
+                                                        </Button>
 
-                                                    >
-
-                                                        ✏️ Modifier
-
-                                                    </Button>
+                                                    )}
 
 
-                                                    <Button
+                                                    {canDelete && (
 
-                                                        color="red"
+                                                        <Button
+                                                            color="red"
 
-                                                        onClick={() =>
-                                                            deleteBuilding(
-                                                                building.id
-                                                            )
-                                                        }
+                                                            onClick={() =>
+                                                                deleteBuilding(
+                                                                    building.id
+                                                                )
+                                                            }
+                                                        >
+                                                            🗑️ Supprimer
+                                                        </Button>
 
-                                                    >
-
-                                                        🗑️ Supprimer
-
-                                                    </Button>
+                                                    )}
 
                                                 </div>
 
@@ -795,20 +842,22 @@ export default function Buildings() {
                             </Button>
 
 
-                            <Button
-
+                           <Button
                                 color="blue"
 
                                 type="submit"
 
+                                disabled={
+                                    editingId
+                                        ? !canUpdate
+                                        : !canCreate
+                                }
                             >
-
                                 {
                                     editingId
                                         ? "Enregistrer"
                                         : "Créer"
                                 }
-
                             </Button>
 
                         </div>

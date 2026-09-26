@@ -15,8 +15,23 @@ import {
 
 import AuditService from "../../services/audit.service";
 
+import { useAuth } from "../../context/AuthContext";
+import { hasPermission } from "../../config/permissions";
+
 
 export default function Audit() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+    const canView =
+        hasPermission(
+            role,
+            "audit",
+            "view"
+        );
 
     const [logs, setLogs] = useState([]);
 
@@ -75,9 +90,13 @@ export default function Audit() {
 
     useEffect(() => {
 
+        if (!canView) {
+            return;
+        }
+
         loadAudit();
 
-    }, []);
+    }, [canView]);
 
 
     // =========================================================
@@ -723,6 +742,30 @@ export default function Audit() {
     // =========================================================
     // CHARGEMENT
     // =========================================================
+
+    if (!canView) {
+
+        return (
+
+            <Layout>
+
+                <div className="
+                    py-20
+                    text-center
+                    text-slate-500
+                ">
+
+                    Vous n'avez pas les droits nécessaires
+                    pour consulter le journal d'audit.
+
+                </div>
+
+            </Layout>
+
+        );
+
+    }
+
 
     if (loading) {
 

@@ -15,10 +15,45 @@ import { BuildingsContext } from "../../context/BuildingsContext";
 
 import TenantsService from "../../services/tenants.service";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 import "./Tenants.css";
 
 
 export default function Tenants() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+
+    const canCreate =
+        hasPermission(
+            role,
+            "tenants",
+            "create"
+        );
+
+
+    const canUpdate =
+        hasPermission(
+            role,
+            "tenants",
+            "update"
+        );
+
+
+    const canDelete =
+        hasPermission(
+            role,
+            "tenants",
+            "delete"
+        );
 
     /* =========================================================
        FORMAT DATE
@@ -245,6 +280,20 @@ export default function Tenants() {
         e.preventDefault();
 
 
+        if (
+            editingId
+                ? !canUpdate
+                : !canCreate
+        ) {
+
+            alert(
+                "Vous n'avez pas les droits nécessaires."
+            );
+
+            return;
+        }
+
+
         if (!apartmentId) {
 
             alert(
@@ -252,7 +301,6 @@ export default function Tenants() {
             );
 
             return;
-
         }
 
 
@@ -395,6 +443,15 @@ export default function Tenants() {
 
     const deleteTenant = async (id) => {
 
+        if (!canDelete) {
+
+            alert(
+                "Vous n'avez pas les droits nécessaires."
+            );
+
+            return;
+        }
+
         if (
             !window.confirm(
                 "Supprimer ce locataire ?"
@@ -433,6 +490,16 @@ export default function Tenants() {
 
     const markTenantAsFormer =
         async (tenant) => {
+
+            if (!canUpdate) {
+
+                alert(
+                    "Vous n'avez pas les droits nécessaires."
+                );
+
+                return;
+            }
+
 
             try {
 
@@ -532,10 +599,16 @@ export default function Tenants() {
 
                     subtitle="Ajoutez, modifiez et gérez vos locataires."
 
-                    buttonLabel="+ Nouveau locataire"
+                    buttonLabel={
+                        canCreate
+                            ? "+ Nouveau locataire"
+                            : null
+                    }
 
                     onButtonClick={
-                        openCreateModal
+                        canCreate
+                            ? openCreateModal
+                            : undefined
                     }
 
                 />
@@ -879,19 +952,21 @@ export default function Tenants() {
 
 
                             <Button
-
                                 color="blue"
 
                                 type="submit"
 
+                                disabled={
+                                    editingId
+                                        ? !canUpdate
+                                        : !canCreate
+                                }
                             >
-
                                 {
                                     editingId
                                         ? "Enregistrer"
                                         : "Créer"
                                 }
-
                             </Button>
 
                         </div>
@@ -1190,38 +1265,42 @@ export default function Tenants() {
 
                                         <div className="tenant-actions">
 
-                                            <Button
+                                            {canUpdate && (
 
-                                                color="blue"
+                                                <Button
+                                                    color="blue"
 
-                                                onClick={() =>
-                                                    editTenant(
-                                                        tenant
-                                                    )
-                                                }
+                                                    onClick={() =>
+                                                        editTenant(
+                                                            tenant
+                                                        )
+                                                    }
+                                                >
 
-                                            >
+                                                    ✏️ Modifier
 
-                                                ✏️ Modifier
+                                                </Button>
 
-                                            </Button>
+                                            )}
 
 
-                                            <Button
+                                            {canDelete && (
 
-                                                color="red"
+                                                <Button
+                                                    color="red"
 
-                                                onClick={() =>
-                                                    deleteTenant(
-                                                        tenant.id
-                                                    )
-                                                }
+                                                    onClick={() =>
+                                                        deleteTenant(
+                                                            tenant.id
+                                                        )
+                                                    }
+                                                >
 
-                                            >
+                                                    🗑️ Supprimer
 
-                                                🗑️ Supprimer
+                                                </Button>
 
-                                            </Button>
+                                            )}
 
                                         </div>
 
@@ -1229,7 +1308,8 @@ export default function Tenants() {
                                         {/* CLÔTURE */}
 
                                         {
-                                            tenant.status === "Actif" && (
+                                            tenant.status === "Actif" &&
+                                            canUpdate && (
 
                                                 <button
 

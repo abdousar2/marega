@@ -23,10 +23,45 @@ import { TenantsContext } from "../../context/TenantsContext";
 
 import ApartmentsService from "../../services/apartments.service";
 
+import { useAuth } from "../../context/AuthContext";
+
+import {
+    hasPermission
+} from "../../config/permissions";
+
 import "./Apartments.css";
 
 
 export default function Apartments() {
+
+    const { user } = useAuth();
+
+    const role =
+        user?.role;
+
+
+    const canCreate =
+        hasPermission(
+            role,
+            "apartments",
+            "create"
+        );
+
+
+    const canUpdate =
+        hasPermission(
+            role,
+            "apartments",
+            "update"
+        );
+
+
+    const canDelete =
+        hasPermission(
+            role,
+            "apartments",
+            "delete"
+        );
 
     const { buildings } =
         useContext(BuildingsContext);
@@ -151,6 +186,20 @@ export default function Apartments() {
         e.preventDefault();
 
 
+        if (
+            editingId
+                ? !canUpdate
+                : !canCreate
+        ) {
+
+            alert(
+                "Vous n'avez pas les droits nécessaires."
+            );
+
+            return;
+        }
+
+
         if (!buildingId) {
 
             alert(
@@ -158,9 +207,7 @@ export default function Apartments() {
             );
 
             return;
-
         }
-
 
         try {
 
@@ -426,17 +473,21 @@ export default function Apartments() {
                 ====================================================== */}
 
                 <PageHeader
-
                     title="Gestion des appartements"
 
                     subtitle="Consultez, ajoutez et gérez tous les appartements."
 
-                    buttonLabel="+ Nouvel appartement"
-
-                    onButtonClick={
-                        openCreateModal
+                    buttonLabel={
+                        canCreate
+                            ? "+ Nouvel appartement"
+                            : null
                     }
 
+                    onButtonClick={
+                        canCreate
+                            ? openCreateModal
+                            : undefined
+                    }
                 />
 
 
@@ -712,38 +763,38 @@ export default function Apartments() {
 
                                                 <div className="apartment-actions">
 
-                                                    <Button
+                                                    {canUpdate && (
 
-                                                        color="blue"
+                                                        <Button
+                                                            color="blue"
 
-                                                        onClick={() =>
-                                                            editApartment(
-                                                                apartment
-                                                            )
-                                                        }
+                                                            onClick={() =>
+                                                                editApartment(
+                                                                    apartment
+                                                                )
+                                                            }
+                                                        >
+                                                            ✏️
+                                                        </Button>
 
-                                                    >
-
-                                                        ✏️
-
-                                                    </Button>
+                                                    )}
 
 
-                                                    <Button
+                                                    {canDelete && (
 
-                                                        color="red"
+                                                        <Button
+                                                            color="red"
 
-                                                        onClick={() =>
-                                                            deleteApartment(
-                                                                apartment.id
-                                                            )
-                                                        }
+                                                            onClick={() =>
+                                                                deleteApartment(
+                                                                    apartment.id
+                                                                )
+                                                            }
+                                                        >
+                                                            🗑️
+                                                        </Button>
 
-                                                    >
-
-                                                        🗑️
-
-                                                    </Button>
+                                                    )}
 
                                                 </div>
 
@@ -1023,19 +1074,21 @@ export default function Apartments() {
 
 
                             <Button
-
                                 color="blue"
 
                                 type="submit"
 
+                                disabled={
+                                    editingId
+                                        ? !canUpdate
+                                        : !canCreate
+                                }
                             >
-
                                 {
                                     editingId
                                         ? "Enregistrer"
                                         : "Créer"
                                 }
-
                             </Button>
 
                         </div>
