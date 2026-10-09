@@ -582,7 +582,7 @@ router.delete("/:id", async (req, res) => {
         // Enregistrer l'action dans la même transaction.
         // Le journal identifie l'administrateur qui effectue la suppression
         // et conserve les informations du compte supprimé dans details.
-        await AuditService.log(
+       await AuditService.log(
             req,
             {
                 user_id: req.user.id,
@@ -597,9 +597,9 @@ router.delete("/:id", async (req, res) => {
                     role: target.role,
                     was_active: target.active
                 },
+                client,
                 throwOnError: true
-            },
-            client
+            }
         );
 
         const deletion = await client.query(
