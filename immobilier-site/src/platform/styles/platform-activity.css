@@ -1,0 +1,221 @@
+/* =========================================================
+   MODULE ACTIVITÉ — ADMINISTRATION PLATEFORME
+========================================================= */
+
+.platform-activity-summary {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding: 24px;
+    margin-bottom: 24px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.platform-activity-summary-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    flex-shrink: 0;
+    color: #2563eb;
+    background: #eff6ff;
+    border-radius: 14px;
+    font-size: 30px;
+    font-weight: 700;
+}
+
+.platform-activity-summary p {
+    margin: 0 0 6px;
+    color: #64748b;
+    font-size: 13px;
+}
+
+.platform-activity-summary strong {
+    color: #0f172a;
+    font-size: 28px;
+    font-weight: 800;
+}
+
+.platform-activity-panel {
+    padding: 24px;
+    margin-bottom: 28px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.platform-activity-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.platform-activity-panel-heading h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.platform-activity-panel-heading p {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.platform-activity-readonly {
+    display: inline-flex;
+    align-items: center;
+    padding: 7px 11px;
+    color: #475569;
+    background: #f1f5f9;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.platform-activity-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.platform-activity-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+}
+
+.platform-activity-table thead {
+    background: #f8fafc;
+}
+
+.platform-activity-table th {
+    padding: 15px 18px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+}
+
+.platform-activity-table td {
+    padding: 17px 18px;
+    color: #475569;
+    border-top: 1px solid #f1f5f9;
+    white-space: nowrap;
+}
+
+.platform-activity-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.platform-activity-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.platform-activity-table td strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.platform-activity-event {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 10px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.platform-activity-event-dot {
+    width: 7px;
+    height: 7px;
+    flex-shrink: 0;
+    background: #3b82f6;
+    border-radius: 50%;
+}
+
+.platform-activity-message {
+    padding: 32px 16px;
+    color: #64748b;
+    font-size: 14px;
+    text-align: center;
+}
+
+.platform-activity-error {
+    padding: 18px;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.platform-activity-error button {
+    display: block;
+    margin-top: 12px;
+    padding: 10px 15px;
+    color: #ffffff;
+    background: #2563eb;
+    border: 0;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.platform-activity-error button:hover {
+    background: #1d4ed8;
+}
+
+.platform-activity-footer {
+    margin: 18px 0 0;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 768px) {
+    .platform-activity-summary,
+    .platform-activity-panel {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .platform-activity-panel-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .platform-activity-panel-heading h3 {
+        font-size: 17px;
+    }
+
+    .platform-activity-table th,
+    .platform-activity-table td {
+        padding: 13px 14px;
+    }
+
+    .platform-agencies-content {
+        padding: 20px 16px;
+    }
+}

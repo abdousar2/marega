@@ -1,0 +1,54 @@
+const express = require("express");
+
+const pool = require("../config/database");
+
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
+
+const router = express.Router();
+
+// Réserver toutes les routes de ce module
+// aux administrateurs de la plateforme.
+router.use(
+    authenticateToken,
+    authorizeRoles("PLATFORM_ADMIN")
+);
+
+// GET /api/platform/users
+// Liste des administrateurs de la plateforme.
+router.get("/", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                id,
+                first_name,
+                last_name,
+                email,
+                active,
+                created_at,
+                updated_at
+            FROM marega.users
+            WHERE role = 'PLATFORM_ADMIN'
+            ORDER BY created_at DESC
+        `);
+
+        return res.json({
+            success: true,
+            users: result.rows
+        });
+    } catch (error) {
+        console.error(
+            "PLATFORM USERS GET ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            error:
+                "Erreur lors du chargement des administrateurs."
+        });
+    }
+});
+
+module.exports = router;

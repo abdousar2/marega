@@ -1,0 +1,259 @@
+
+import { useEffect, useState } from "react";
+
+import PlatformSidebar
+    from "../components/PlatformSidebar";
+
+import PlatformHeader
+    from "../components/PlatformHeader";
+
+import "../styles/platform-agencies.css";
+
+import "../styles/platform-users.css";
+
+const API_URL =
+    import.meta.env.VITE_API_URL ||
+    "http://localhost:5000/api";
+
+function formatDate(value) {
+    if (!value) return "—";
+
+    const date = new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+        return "—";
+    }
+
+    return new Intl.DateTimeFormat("fr-FR", {
+        dateStyle: "medium",
+    }).format(date);
+}
+
+export default function PlatformUsers() {
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        let mounted = true;
+
+        async function loadUsers() {
+            try {
+                setLoading(true);
+                setError("");
+
+                const token = localStorage.getItem(
+                    "techtradisport_platform_token"
+                );
+
+                if (!token) {
+                    throw new Error(
+                        "Session administrateur absente. Veuillez vous reconnecter."
+                    );
+                }
+
+                const response = await fetch(
+                    `${API_URL}/platform/users`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.error ||
+                        "Impossible de charger les administrateurs."
+                    );
+                }
+
+                if (mounted) {
+                    setUsers(
+                        Array.isArray(data.users)
+                            ? data.users
+                            : []
+                    );
+                }
+            } catch (err) {
+                if (mounted) {
+                    setError(
+                        err.message ||
+                        "Une erreur est survenue."
+                    );
+                }
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        }
+
+        loadUsers();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    const activeCount = users.filter(
+        (user) => user.active === true
+    ).length;
+
+    const inactiveCount = users.length - activeCount;
+
+    return (
+        <div className="platform-agencies">
+            <PlatformSidebar />
+
+            <div className="platform-agencies-main">
+                <PlatformHeader />
+
+                <main className="platform-agencies-content">
+                    <section className="platform-agencies-heading">
+                        <div>
+                            <p className="platform-agencies-eyebrow">
+                                Administration plateforme
+                            </p>
+
+                            <h2>Utilisateurs</h2>
+
+                            <p className="platform-agencies-subtitle">
+                                Gérez les comptes administrateurs de
+                                la plateforme TECHTRADISPORT.
+                            </p>
+                        </div>
+                    </section>
+
+                    <section className="platform-agencies-stats">
+                        <div className="platform-agencies-stat-card">
+                            <div>
+                                <p>Total des administrateurs</p>
+                                <h3>{users.length}</h3>
+                            </div>
+                        </div>
+
+                        <div className="platform-agencies-stat-card">
+                            <div>
+                                <p>Comptes actifs</p>
+                                <h3>{activeCount}</h3>
+                            </div>
+                        </div>
+
+                        <div className="platform-agencies-stat-card">
+                            <div>
+                                <p>Comptes inactifs</p>
+                                <h3>{inactiveCount}</h3>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section className="platform-users-panel">
+                        <div className="platform-users-panel-heading">
+                            <div>
+                                <h3>Administrateurs de la plateforme</h3>
+                                <p>
+                                    Comptes disposant du rôle
+                                    PLATFORM_ADMIN.
+                                </p>
+                            </div>
+                        </div>
+
+                        {loading && (
+                            <p role="status">
+                                Chargement des administrateurs…
+                            </p>
+                        )}
+
+                        {!loading && error && (
+                            <div role="alert">
+                                <p>{error}</p>
+
+                                <button
+                                    type="button"
+                                    onClick={() =>
+                                        window.location.reload()
+                                    }
+                                >
+                                    Réessayer
+                                </button>
+                            </div>
+                        )}
+
+                        {!loading && !error && users.length === 0 && (
+                            <p>
+                                Aucun administrateur de plateforme
+                                n'a été trouvé.
+                            </p>
+                        )}
+
+                        {!loading && !error && users.length > 0 && (
+                            <div className="platform-users-table-wrapper">
+                                <table className="platform-users-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Administrateur</th>
+                                            <th>Adresse e-mail</th>
+                                            <th>Rôle</th>
+                                            <th>Statut</th>
+                                            <th>Date de création</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        {users.map((user) => (
+                                            <tr key={user.id}>
+                                                <td>
+                                                    <strong>
+                                                        {[
+                                                            user.first_name,
+                                                            user.last_name,
+                                                        ]
+                                                            .filter(Boolean)
+                                                            .join(" ") ||
+                                                            "Nom non renseigné"}
+                                                    </strong>
+                                                </td>
+
+                                                <td>{user.email}</td>
+
+                                                <td>
+                                                    <span className="platform-users-role">
+                                                        PLATFORM_ADMIN
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    <span
+                                                        className={
+                                                            user.active
+                                                                ? "platform-users-status is-active"
+                                                                : "platform-users-status is-inactive"
+                                                        }
+                                                    >
+                                                        {user.active
+                                                            ? "Actif"
+                                                            : "Inactif"}
+                                                    </span>
+                                                </td>
+
+                                                <td>
+                                                    {formatDate(
+                                                        user.created_at
+                                                    )}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </section>
+                </main>
+            </div>
+        </div>
+    );
+}

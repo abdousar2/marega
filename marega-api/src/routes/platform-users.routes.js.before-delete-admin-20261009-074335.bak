@@ -1,0 +1,496 @@
+const express = require("express");
+
+const pool = require("../config/database");
+
+const {
+    authenticateToken,
+    authorizeRoles
+} = require("../middleware/auth.middleware");
+
+const bcrypt = require("bcryptjs");
+
+const AuditService = require("../services/audit.service");
+
+const router = express.Router();
+
+// Réserver toutes les routes de ce module
+// aux administrateurs de la plateforme.
+router.use(
+    authenticateToken,
+    authorizeRoles("PLATFORM_ADMIN")
+);
+
+// GET /api/platform/users
+// Liste des administrateurs de la plateforme.
+router.get("/", async (req, res) => {
+    try {
+        const result = await pool.query(`
+            SELECT
+                id,
+                first_name,
+                last_name,
+                email,
+                active,
+                created_at,
+                updated_at
+            FROM marega.users
+            WHERE role = 'PLATFORM_ADMIN'
+            ORDER BY created_at DESC
+        `);
+
+        return res.json({
+            success: true,
+            users: result.rows
+        });
+    } catch (error) {
+        console.error(
+            "PLATFORM USERS GET ERROR:",
+            error
+        );
+
+        return res.status(500).json({
+            error:
+                "Erreur lors du chargement des administrateurs."
+        });
+    }
+});
+
+// POST /api/platform/users
+// Créer un nouvel administrateur de plateforme.
+router.post("/", async (req, res) => {
+    try {
+        const {
+            first_name,
+            last_name,
+            email,
+            password
+        } = req.body;
+
+        // Validation des champs obligatoires.
+        if (
+            typeof first_name !== "string" ||
+            typeof last_name !== "string" ||
+            typeof email !== "string" ||
+            typeof password !== "string" ||
+            !first_name.trim() ||
+            !last_name.trim() ||
+            !email.trim() ||
+            !password
+        ) {
+            return res.status(400).json({
+                error: "Tous les champs sont obligatoires."
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)
+        ) {
+            return res.status(400).json({
+                error: "Adresse e-mail invalide."
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                error: "Le mot de passe doit contenir au moins 8 caractères."
+            });
+        }
+
+        if (
+            first_name.trim().length > 100 ||
+            last_name.trim().length > 100
+        ) {
+            return res.status(400).json({
+                error: "Le prénom et le nom ne doivent pas dépasser 100 caractères."
+            });
+        }
+
+        // L'adresse e-mail est unique dans l'ensemble de marega.users.
+        const existing = await pool.query(
+            `
+            SELECT id
+            FROM marega.users
+            WHERE LOWER(email) = LOWER($1)
+            LIMIT 1
+            `,
+            [normalizedEmail]
+        );
+
+        if (existing.rows.length > 0) {
+            return res.status(409).json({
+                error: "Un compte utilise déjà cette adresse e-mail."
+            });
+        }
+
+        // Ne jamais enregistrer le mot de passe en clair.
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        const result = await pool.query(
+            `
+            INSERT INTO marega.users (
+                first_name,
+                last_name,
+                email,
+                password_hash,
+                role,
+                active
+            )
+            VALUES ($1, $2, $3, $4, 'PLATFORM_ADMIN', TRUE)
+            RETURNING
+                id,
+                first_name,
+                last_name,
+                email,
+                role,
+                active,
+                created_at,
+                updated_at
+            `,
+            [
+                first_name.trim(),
+                last_name.trim(),
+                normalizedEmail,
+                passwordHash
+            ]
+        );
+
+        const user = result.rows[0];
+
+        // Journaliser l'opération sans enregistrer de mot de passe.
+        await AuditService.log(req, {
+            action: "PLATFORM_USER_CREATED",
+            module: "platform_users",
+            entity_id: user.id,
+            details: {
+                email: user.email,
+                role: user.role
+            }
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: "Administrateur créé avec succès.",
+            user
+        });
+
+    } catch (error) {
+        // La contrainte UNIQUE en base protège aussi
+        // contre deux créations simultanées du même e-mail.
+        if (error.code === "23505") {
+            return res.status(409).json({
+                error: "Un compte utilise déjà cette adresse e-mail."
+            });
+        }
+
+        console.error("PLATFORM USER CREATE ERROR:", error);
+
+        return res.status(500).json({
+            error: "Erreur lors de la création de l'administrateur."
+        });
+    }
+});
+
+
+/* =========================================================
+   PUT /api/platform/users/:id
+   Modifier le profil d'un administrateur de plateforme
+========================================================= */
+
+router.put("/:id", async (req, res) => {
+    try {
+        const userId = Number(req.params.id);
+
+        if (!Number.isSafeInteger(userId) || userId <= 0) {
+            return res.status(400).json({
+                error: "Identifiant administrateur invalide."
+            });
+        }
+
+        const {
+            first_name,
+            last_name,
+            email
+        } = req.body;
+
+        if (
+            typeof first_name !== "string" ||
+            typeof last_name !== "string" ||
+            typeof email !== "string" ||
+            !first_name.trim() ||
+            !last_name.trim() ||
+            !email.trim()
+        ) {
+            return res.status(400).json({
+                error: "Le prénom, le nom et l'adresse e-mail sont obligatoires."
+            });
+        }
+
+        if (
+            first_name.trim().length > 100 ||
+            last_name.trim().length > 100
+        ) {
+            return res.status(400).json({
+                error: "Le prénom et le nom ne doivent pas dépasser 100 caractères."
+            });
+        }
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (
+            normalizedEmail.length > 255 ||
+            !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)
+        ) {
+            return res.status(400).json({
+                error: "Adresse e-mail invalide."
+            });
+        }
+
+        // Vérifier qu'aucun autre compte n'utilise cet e-mail.
+        const duplicate = await pool.query(
+            `
+            SELECT id
+            FROM marega.users
+            WHERE LOWER(email) = LOWER($1)
+              AND id <> $2
+            LIMIT 1
+            `,
+            [normalizedEmail, userId]
+        );
+
+        if (duplicate.rows.length > 0) {
+            return res.status(409).json({
+                error: "Cette adresse e-mail est déjà utilisée."
+            });
+        }
+
+        // Modifier uniquement un compte PLATFORM_ADMIN.
+        const result = await pool.query(
+            `
+            UPDATE marega.users
+            SET
+                first_name = $1,
+                last_name = $2,
+                email = $3,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $4
+              AND role = 'PLATFORM_ADMIN'
+            RETURNING
+                id,
+                first_name,
+                last_name,
+                email,
+                role,
+                active,
+                created_at,
+                updated_at
+            `,
+            [
+                first_name.trim(),
+                last_name.trim(),
+                normalizedEmail,
+                userId
+            ]
+        );
+
+        if (result.rows.length === 0) {
+            return res.status(404).json({
+                error: "Administrateur de plateforme introuvable."
+            });
+        }
+
+        const user = result.rows[0];
+
+        await AuditService.log(req, {
+            action: "PLATFORM_USER_UPDATED",
+            module: "platform_users",
+            entity_id: user.id,
+            details: {
+                email: user.email,
+                role: user.role
+            }
+        });
+
+        return res.json({
+            success: true,
+            message: "Administrateur modifié avec succès.",
+            user
+        });
+
+    } catch (error) {
+        if (error.code === "23505") {
+            return res.status(409).json({
+                error: "Cette adresse e-mail est déjà utilisée."
+            });
+        }
+
+        console.error("PLATFORM USER UPDATE ERROR:", error);
+
+        return res.status(500).json({
+            error: "Erreur lors de la modification de l'administrateur."
+        });
+    }
+});
+
+
+/* =========================================================
+   PATCH /api/platform/users/:id/status
+   Activer ou désactiver un administrateur
+========================================================= */
+
+router.patch("/:id/status", async (req, res) => {
+    const userId = Number(req.params.id);
+    const { active } = req.body;
+
+    if (!Number.isSafeInteger(userId) || userId <= 0) {
+        return res.status(400).json({
+            error: "Identifiant administrateur invalide."
+        });
+    }
+
+    if (typeof active !== "boolean") {
+        return res.status(400).json({
+            error: "Le statut active doit être true ou false."
+        });
+    }
+
+    if (
+        !active &&
+        String(req.user.id) === String(userId)
+    ) {
+        return res.status(409).json({
+            error: "Vous ne pouvez pas désactiver votre propre compte."
+        });
+    }
+
+    const client = await pool.connect();
+    let transactionStarted = false;
+
+    try {
+        await client.query("BEGIN");
+        transactionStarted = true;
+
+        // Verrouiller les comptes administrateurs dans un ordre
+        // constant pour contrôler le dernier administrateur actif.
+        const adminsResult = await client.query(`
+            SELECT id, active
+            FROM marega.users
+            WHERE role = 'PLATFORM_ADMIN'
+            ORDER BY id
+            FOR UPDATE
+        `);
+
+        const target = adminsResult.rows.find(
+            (user) => String(user.id) === String(userId)
+        );
+
+        if (!target) {
+            const error = new Error(
+                "Administrateur de plateforme introuvable."
+            );
+            error.status = 404;
+            throw error;
+        }
+
+        const activeCount = adminsResult.rows.filter(
+            (user) => user.active === true
+        ).length;
+
+        if (
+            target.active === true &&
+            active === false &&
+            activeCount <= 1
+        ) {
+            const error = new Error(
+                "Impossible de désactiver le dernier administrateur actif."
+            );
+            error.status = 409;
+            throw error;
+        }
+
+        const result = await client.query(
+            `
+            UPDATE marega.users
+            SET
+                active = $1,
+                updated_at = CURRENT_TIMESTAMP
+            WHERE id = $2
+              AND role = 'PLATFORM_ADMIN'
+            RETURNING
+                id,
+                first_name,
+                last_name,
+                email,
+                role,
+                active,
+                created_at,
+                updated_at
+            `,
+            [active, userId]
+        );
+
+        if (result.rows.length === 0) {
+            const error = new Error(
+                "Administrateur de plateforme introuvable."
+            );
+            error.status = 404;
+            throw error;
+        }
+
+        await client.query("COMMIT");
+        transactionStarted = false;
+
+        const user = result.rows[0];
+
+        await AuditService.log(req, {
+            action: active
+                ? "PLATFORM_USER_ACTIVATED"
+                : "PLATFORM_USER_DEACTIVATED",
+            module: "platform_users",
+            entity_id: user.id,
+            details: {
+                email: user.email,
+                active: user.active
+            }
+        });
+
+        return res.json({
+            success: true,
+            message: active
+                ? "Administrateur activé avec succès."
+                : "Administrateur désactivé avec succès.",
+            user
+        });
+
+    } catch (error) {
+        if (transactionStarted) {
+            try {
+                await client.query("ROLLBACK");
+            } catch (rollbackError) {
+                console.error(
+                    "PLATFORM USER STATUS ROLLBACK ERROR:",
+                    rollbackError
+                );
+            }
+        }
+
+        if (error.status) {
+            return res.status(error.status).json({
+                error: error.message
+            });
+        }
+
+        console.error("PLATFORM USER STATUS ERROR:", error);
+
+        return res.status(500).json({
+            error: "Erreur lors du changement de statut."
+        });
+
+    } finally {
+        client.release();
+    }
+});
+
+
+module.exports = router;

@@ -20,6 +20,8 @@ const platformAuthRoutes = require("./routes/platformAuth.routes");
 const platformAgenciesRoutes = require("./routes/platform-agencies");
 const platformRequestsRoutes = require("./routes/platform-requests");
 const platformAgencyUsersRoutes = require("./routes/platform-agency-users");
+const platformUsersRoutes = require("./routes/platform-users.routes");
+const platformActivityRoutes = require("./routes/platform-activity.routes");
 const documentTemplateRoutes = require("./routes/document-templates.routes");
 
 
@@ -92,6 +94,8 @@ app.use("/api/agencies", agenciesRoutes);
 app.use("/api/platform/agencies", platformAgenciesRoutes);
 app.use("/api/platform/requests", platformRequestsRoutes);
 app.use("/api/platform/agencies", platformAgencyUsersRoutes);
+app.use("/api/platform/users", platformUsersRoutes);
+app.use("/api/platform/activity", platformActivityRoutes);
 app.use("/api/platform/document-templates", documentTemplateRoutes);
 
 app.get("/", (req, res) => {

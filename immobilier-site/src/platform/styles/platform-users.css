@@ -1,0 +1,458 @@
+
+/* =========================================================
+   MODULE UTILISATEURS — ADMINISTRATION PLATEFORME
+========================================================= */
+
+.platform-users-panel {
+    padding: 24px;
+    margin-bottom: 28px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.platform-users-panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.platform-users-panel-heading h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+}
+
+.platform-users-panel-heading p {
+    margin: 7px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.platform-users-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+}
+
+.platform-users-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: 13px;
+}
+
+.platform-users-table thead {
+    background: #f8fafc;
+}
+
+.platform-users-table th {
+    padding: 15px 18px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+}
+
+.platform-users-table td {
+    padding: 17px 18px;
+    color: #475569;
+    border-top: 1px solid #f1f5f9;
+    white-space: nowrap;
+}
+
+.platform-users-table tbody tr {
+    transition: background 0.15s ease;
+}
+
+.platform-users-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.platform-users-table td strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+.platform-users-role {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 9px;
+    color: #1d4ed8;
+    background: #eff6ff;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.platform-users-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 9px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.platform-users-status::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    flex: 0 0 6px;
+    border-radius: 50%;
+}
+
+.platform-users-status.is-active {
+    color: #047857;
+    background: #ecfdf5;
+}
+
+.platform-users-status.is-active::before {
+    background: #10b981;
+}
+
+.platform-users-status.is-inactive {
+    color: #b91c1c;
+    background: #fef2f2;
+}
+
+.platform-users-status.is-inactive::before {
+    background: #ef4444;
+}
+
+/* États : chargement, erreur et liste vide */
+
+.platform-users-panel [role="status"],
+.platform-users-panel > p {
+    padding: 24px 12px;
+    color: #64748b;
+    font-size: 14px;
+    text-align: center;
+}
+
+.platform-users-panel [role="alert"] {
+    padding: 18px;
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+    font-size: 13px;
+}
+
+.platform-users-panel [role="alert"] button {
+    margin-top: 8px;
+    padding: 9px 14px;
+    color: #ffffff;
+    background: #2563eb;
+    border: 0;
+    border-radius: 9px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.platform-users-panel [role="alert"] button:hover {
+    background: #1d4ed8;
+}
+
+/* Adaptation aux écrans mobiles */
+
+@media (max-width: 768px) {
+    .platform-users-panel {
+        padding: 16px;
+        border-radius: 14px;
+    }
+
+    .platform-users-panel-heading h3 {
+        font-size: 17px;
+    }
+
+    .platform-users-table th,
+    .platform-users-table td {
+        padding: 13px 14px;
+    }
+
+    .platform-agencies-content {
+        padding: 20px 16px;
+    }
+}
+
+
+/* =========================================================
+   CRÉATION D'UN ADMINISTRATEUR DE PLATEFORME
+========================================================= */
+
+.platform-users-create-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 11px;
+    background: #2563eb;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.16);
+    transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.platform-users-create-button:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
+
+.platform-users-create-button:focus-visible,
+.platform-users-submit-button:focus-visible,
+.platform-users-cancel-button:focus-visible {
+    outline: 3px solid #93c5fd;
+    outline-offset: 3px;
+}
+
+.platform-users-create-panel {
+    margin-bottom: 24px;
+    padding: 26px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.platform-users-create-heading {
+    margin-bottom: 24px;
+}
+
+.platform-users-create-heading h3 {
+    margin: 0;
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 800;
+}
+
+.platform-users-create-heading p {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.platform-users-create-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.platform-users-form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.platform-users-form-field label {
+    color: #334155;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.platform-users-form-field input {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 46px;
+    padding: 0 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #f8fafc;
+    color: #0f172a;
+    font: inherit;
+    font-size: 14px;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.platform-users-form-field input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    background: #ffffff;
+}
+
+.platform-users-form-field small {
+    color: #64748b;
+    font-size: 12px;
+}
+
+.platform-users-form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 12px;
+    padding-top: 20px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.platform-users-submit-button,
+.platform-users-cancel-button {
+    min-height: 43px;
+    padding: 0 18px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.platform-users-submit-button {
+    border: 1px solid #2563eb;
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.platform-users-submit-button:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+.platform-users-cancel-button {
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #475569;
+}
+
+.platform-users-cancel-button:hover:not(:disabled) {
+    background: #f1f5f9;
+}
+
+.platform-users-submit-button:disabled,
+.platform-users-cancel-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.platform-users-error,
+.platform-users-success {
+    margin-bottom: 18px;
+    padding: 14px 16px;
+    border-radius: 10px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.platform-users-error {
+    color: #b91c1c;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.platform-users-success {
+    color: #047857;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+}
+
+@media (max-width: 768px) {
+    .platform-users-create-panel {
+        padding: 18px;
+    }
+
+    .platform-users-create-form {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 18px;
+    }
+
+    .platform-users-form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .platform-users-submit-button,
+    .platform-users-cancel-button {
+        width: 100%;
+    }
+
+    .platform-users-create-button {
+        width: 100%;
+    }
+}
+
+.platform-users-toggle-button {
+    min-height: 43px;
+    margin-left: 8px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    background: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.platform-users-toggle-button.is-deactivate {
+    border-color: #fecaca;
+    color: #b91c1c;
+}
+
+.platform-users-toggle-button.is-deactivate:hover:not(:disabled) {
+    background: #fef2f2;
+}
+
+.platform-users-toggle-button.is-activate {
+    border-color: #a7f3d0;
+    color: #047857;
+}
+
+.platform-users-toggle-button.is-activate:hover:not(:disabled) {
+    background: #ecfdf5;
+}
+
+.platform-users-toggle-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* =========================================================
+   SUPPRESSION D'UN ADMINISTRATEUR
+========================================================= */
+
+.platform-users-delete-button {
+    min-height: 43px;
+    margin-left: 8px;
+    padding: 0 13px;
+    border: 1px solid #fecaca;
+    border-radius: 10px;
+    background: #ffffff;
+    color: #b91c1c;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.platform-users-delete-button:hover:not(:disabled) {
+    background: #fef2f2;
+    border-color: #f87171;
+}
+
+.platform-users-delete-button:focus-visible {
+    outline: 3px solid #fca5a5;
+    outline-offset: 3px;
+}
+
+.platform-users-delete-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

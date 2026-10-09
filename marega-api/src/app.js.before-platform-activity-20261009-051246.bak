@@ -1,0 +1,107 @@
+const express = require("express");
+const cors = require("cors");
+const path = require("path");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const buildingsRoutes = require("./routes/buildings.routes");
+const apartmentsRoutes = require("./routes/apartments.routes");
+const tenantsRoutes = require("./routes/tenants.routes");
+const leasesRoutes = require("./routes/leases.routes");
+const paymentsRoutes = require("./routes/payments.routes");
+const rentsRoutes = require("./routes/rents.routes");
+const expensesRoutes = require("./routes/expenses.routes");
+const auditRoutes = require("./routes/audit.routes");
+const authRoutes = require("./routes/auth.routes");
+const usersRoutes = require("./routes/users.routes");
+const financeRoutes = require("./routes/finance.routes");
+const contactRoutes = require("./routes/contact.routes");
+const agenciesRoutes = require("./routes/agencies.routes");
+const platformAuthRoutes = require("./routes/platformAuth.routes");
+const platformAgenciesRoutes = require("./routes/platform-agencies");
+const platformRequestsRoutes = require("./routes/platform-requests");
+const platformAgencyUsersRoutes = require("./routes/platform-agency-users");
+const platformUsersRoutes = require("./routes/platform-users.routes");
+const documentTemplateRoutes = require("./routes/document-templates.routes");
+
+
+const app = express();
+
+console.log(
+    "Express sert :",
+    path.join(__dirname, "../contracts")
+);
+app.use(cors());
+app.use(helmet());
+app.use(morgan("dev"));
+
+app.use(express.json());
+const contractsPath =
+    path.resolve(
+        process.cwd(),
+        "contracts"
+    );
+
+console.log(
+    "Serving contracts from:",
+    contractsPath
+);
+
+app.use(
+    "/contracts",
+    express.static(contractsPath)
+);
+
+
+const receiptsPath =
+    path.resolve(
+        process.cwd(),
+        "receipts"
+    );
+
+console.log(
+    "Serving receipts from:",
+    receiptsPath
+);
+
+app.use(
+    "/receipts",
+    express.static(receiptsPath)
+);
+
+
+// =========================================================
+// DOCUMENTS DES AGENCES
+// =========================================================
+
+
+
+app.use("/api/auth", authRoutes);
+app.use("/api/platform/auth", platformAuthRoutes);
+app.use("/api/users", usersRoutes);
+
+app.use("/api/buildings", buildingsRoutes);
+app.use("/api/apartments", apartmentsRoutes);
+app.use("/api/tenants", tenantsRoutes);
+app.use("/api/leases", leasesRoutes);
+app.use("/api/payments", paymentsRoutes);
+app.use("/api/rents", rentsRoutes);
+app.use("/api/expenses", expensesRoutes);
+app.use("/api/finance", financeRoutes);
+app.use("/api/audit", auditRoutes);
+app.use("/api/contact", contactRoutes);
+app.use("/api/agencies", agenciesRoutes);
+app.use("/api/platform/agencies", platformAgenciesRoutes);
+app.use("/api/platform/requests", platformRequestsRoutes);
+app.use("/api/platform/agencies", platformAgencyUsersRoutes);
+app.use("/api/platform/users", platformUsersRoutes);
+app.use("/api/platform/document-templates", documentTemplateRoutes);
+
+app.get("/", (req, res) => {
+    res.json({
+        application: "MAREGA API",
+        version: "1.0.0",
+        status: "running"
+    });
+});
+
+module.exports = app;

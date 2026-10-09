@@ -99,10 +99,25 @@ export default function PlatformAgencyDetails() {
                 setError("");
 
 
-                const response =
-                    await fetch(
-                        `${API_URL}/platform/agencies/${id}`
+                const token = localStorage.getItem(
+                    "techtradisport_platform_token"
+                );
+
+                if (!token) {
+                    throw new Error(
+                        "Session administrateur expirée. Veuillez vous reconnecter."
                     );
+                }
+
+                const response = await fetch(
+                    `${API_URL}/platform/agencies/${id}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`
+                        }
+                    }
+                );
 
 
                 const data =
@@ -205,7 +220,8 @@ export default function PlatformAgencyDetails() {
                         method: "PUT",
 
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("techtradisport_platform_token")}`
                         },
 
                         body: JSON.stringify(
@@ -278,7 +294,8 @@ export default function PlatformAgencyDetails() {
                     method: "POST",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("techtradisport_platform_token")}`
                     },
 
                     body: JSON.stringify(userForm)
@@ -375,7 +392,8 @@ export default function PlatformAgencyDetails() {
                     method: "PUT",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("techtradisport_platform_token")}`
                     },
 
                     body: JSON.stringify(editUserForm)
@@ -444,7 +462,8 @@ export default function PlatformAgencyDetails() {
                     method: "PATCH",
 
                     headers: {
-                        "Content-Type": "application/json"
+                        "Content-Type": "application/json",
+                        Authorization: `Bearer ${localStorage.getItem("techtradisport_platform_token")}`
                     },
 
                     body: JSON.stringify({
@@ -518,7 +537,8 @@ export default function PlatformAgencyDetails() {
                         method: "PATCH",
 
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("techtradisport_platform_token")}`
                         },
 
                         body: JSON.stringify({
@@ -613,7 +633,8 @@ export default function PlatformAgencyDetails() {
                         method: "PATCH",
 
                         headers: {
-                            "Content-Type": "application/json"
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${localStorage.getItem("techtradisport_platform_token")}`
                         },
 
                         body: JSON.stringify({

@@ -72,6 +72,12 @@ import { AuthProvider }
 import PlatformAgencies
     from "./platform/pages/PlatformAgencies";
 
+import PlatformUsers
+    from "./platform/pages/PlatformUsers";
+
+import PlatformActivity
+    from "./platform/pages/PlatformActivity";
+
 import PlatformAgencyDetails
     from "./platform/pages/PlatformAgencyDetails";
 
@@ -163,6 +169,24 @@ function App() {
                     element={
                         <PlatformProtectedRoute>
                             <PlatformAgencies />
+                        </PlatformProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/platform/users"
+                    element={
+                        <PlatformProtectedRoute>
+                            <PlatformUsers />
+                        </PlatformProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/platform/activity"
+                    element={
+                        <PlatformProtectedRoute>
+                            <PlatformActivity />
                         </PlatformProtectedRoute>
                     }
                 />
