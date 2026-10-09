@@ -31,6 +31,7 @@ router.get("/", async (req, res) => {
                 ? requestedOffset
                 : 0;
 
+        
         const result = await pool.query(
             `
             SELECT
@@ -47,17 +48,17 @@ router.get("/", async (req, res) => {
             FROM marega.audit_logs a
             LEFT JOIN marega.users u
                 ON u.id = a.user_id
-            WHERE a.module = $1
+            WHERE a.module IN ('platform_auth', 'platform_users')
             ORDER BY a.created_at DESC, a.id DESC
-            LIMIT $2
-            OFFSET $3
+            LIMIT $1
+            OFFSET $2
             `,
             [
-                "platform_auth",
                 limit,
                 offset
             ]
         );
+
 
         return res.json({
             success: true,
